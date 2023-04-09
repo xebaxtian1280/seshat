@@ -46,8 +46,11 @@ a {
     
 }
 
+
+
 .form-container {
     display: grid;
+    align-content: center;
     grid-template-rows: auto 1fr auto;
     width: 300px;
     background-color: var(--black);
@@ -79,11 +82,23 @@ a {
     margin: 5px;
 }
 
+.logoLogin{
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+
 /***************************** Radicacion ********************************/
 
-.logo {
-    max-width: 80px;
-    margin: 10px;
+
+.container-logo {
+    height: 90px;
+    margin-top: 7px;
+    margin-left: 40px;
+    margin-right: 20px;
+}
+
+.logoPaginas{
+    height: 100%;
 }
 
 .radication-container{
@@ -153,8 +168,41 @@ a {
 
 .form-cliente label{
     color: black;
+    text-align: start;
 }
 
 .container-operation h2{
     margin-bottom: 15px;
+}
+
+/***************************** Mapa Radicación ********************************/
+
+.seleccionLocalizacion{
+    display: flex;
+    flex-direction: column;
+    padding: 5px 5px;
+    background-color: var(--grey);
+    border-radius: 5px;
+    align-items: center;
+}
+
+.itemLoc{
+    color: var(--white);
+    
+}
+
+#mapLocRadication{
+    height: 87%;
+    width: 100vh;
+}
+
+.btnSaveCoordinates{
+    text-align: center;
+}
+
+.form-control{
+    margin-bottom: 10px;
+    width: 207px;
+    height: 22px;
+    border: none;
 }
