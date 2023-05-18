@@ -191,7 +191,7 @@ a {
     
 }
 
-#mapLocRadication{
+.mapa-localizacion-radicacion{
     height: 87%;
     width: 100vh;
 }
@@ -205,4 +205,12 @@ a {
     width: 207px;
     height: 22px;
     border: none;
+}
+
+/** Mapa consulta localizacion respecto a otros radicados **/
+
+.mapaVisitas{
+    height: 400px;
+    width: 80vh;
+    margin-right: 20px;
 }
