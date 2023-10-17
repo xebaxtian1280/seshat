@@ -76,16 +76,25 @@
     
     const email = LogInForm['email-login'].value
     const password = LogInForm['password-login'].value
-
-    console.log(email);
+   
 
     try {      
   
       const credentials = signInWithEmailAndPassword(auth, email, password)
-      console.log(credentials);
+
+      console.log(auth.user);
+      open.window("/Radicacion.html")
+      if(auth.user != null){
+        open.window("/Radicacion.html")
+      }
     
     } catch (error) {
-      console.log(error);
+      window.alert("Password o correo Errado")
+      console.log(error.code);
+      if(error.code === "auth/wrong-password" ){
+        window.alert("Password o correo Errado")
+
+      }
     }
 
   })
