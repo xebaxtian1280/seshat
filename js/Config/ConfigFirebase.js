@@ -1,7 +1,8 @@
   // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
-  import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
+  import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, connectAuthEmulator} from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
+  import { getFirestore, collection, getDoc, getDocs,addDoc} from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js"
   //import { getFirestore, collection, getDoc, getDocs} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-getFirestore.js";
 //import { user } from "firebase-functions/v1/auth";
   // TODO: Add SDKs for Firebase products that you want to use
@@ -29,9 +30,57 @@
   const analytics = getAnalytics(app);
   const provider = new GoogleAuthProvider();
 
-  const auth = getAuth(app)
+  // funciones de coneccion y modificacion de la base de datos
+
+  const db = getFirestore(app)
+
+  export const saveTask = (email, password) =>{
+    console.log(email, password);
+    addDoc(collection(db, 'Pruebas'), {email, password})
+  }
+
+  export const getTask = () => {
+   const taskdocs = getDocs(collection(db,'Pruebas'))
+
+   return taskdocs
+
+   //db.collection('Pruebas').getDocs();
+  }
+
+
+  // ------------------------------ Autenticacion ---------------------------------------------
 
   
+
+  export const loginEmailPassword = async (email, password) => {
+    const auth = getAuth(app)
+
+    try {
+
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      window.location = "/Radicacion.html"
+      
+    } catch (error) {
+      console.log(error);
+      if (Notification.permission === 'granted') {
+        new Notification("Usuario o contraseña incorrecta")
+      }
+    }
+  }  
+
+// -------------------------------Creacion y modificacion de avaluos -------------------------
+
+  export const saveAppraisal = async () => {
+
+    addDoc(collection(db, 'Pruebas'), {
+      email, 
+      password})
+  }
+
+
+/*
+  const googleAuthProvider = new GoogleAuthProvider();
+
   onAuthStateChanged(auth, user => {
     if(user =! null){
       console.log('Logged in!');
@@ -39,7 +88,7 @@
     } else {
       console.log('No User');
     }
-  })
+  })*/
 
 //****** Acceso con Google */
 
@@ -64,7 +113,7 @@
     const credential = GoogleAuthProvider.credentialFromError(error);
     // ...
   });*/
-
+/*
   onAuthStateChanged(auth, async (user)=> {
     console.log();
   })
@@ -97,4 +146,4 @@
       }
     }
 
-  })
+  })*/
