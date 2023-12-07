@@ -10,8 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Montserrat+Alternates:wght@400;700&display=swap" rel="stylesheet">
 
     <script src="./ol7/ol.js"></script>
+    <script src="js/radicacion.js"></script>
     <link rel="stylesheet" href="./ol7/ol.css">
-
     <link rel="stylesheet" href="css/stylos.css">
     <title>Radicacion</title>
 </head>
@@ -59,55 +59,121 @@
 
                     <h2> Informacion del Cliente</h2>
                     
-                    <form action="/" class="form-cliente">
+                    <form action="/" class="form-cliente" id="form-cliente-radicacion">
     
                         <div>
     
                             <label for="Text" class="label">Nombre Cliente</label>
-                            <input type="text" class="input">
+                            <input type="text" class="input" id="form-cliente-name">
                         </div>
-    
-                        <div>
-                            <label for="Text" class="label">Identificacion</label>
-                            <input type="number" class="input">
+
+                        <div>    
+                            <label for="Text" class="label">Apellido Cliente</label>
+                            <input type="text" class="input" id="form-cliente-lastname">
                         </div>
-    
+
                         <div>
                             <label for="Text" class="label">Celular Cliente</label>
                             <input type="tel" class="input" name="phone">
                         </div>
     
                         <div>
+                            <label for="Text" class="label">Identificacion</label>
+                            <select class="form-control-ID" id="city" required>
+                                <option value="C.C.">C.C.</option>
+                                <option value="NIT">NIT</option>
+                                <option value="C.C. Extrangeria">C.C. Extr.</option>
+                                <option value="Pasaporte">Pasaporte</option>
+                            </select>
+                            <input type="number" class="input" id="form-cliente-clienteID">
+                        </div>  
     
-                            <label for="Text" class="label">Persona que atiende la visita</label>
-                            <input type="text" class="input">
+                        <div>    
+                            <label for="Text" class="label">Contacto atiende la visita</label>
+                            <input type="text" class="input" id="form-cliente-contactoNombre">
                         </div>
     
                         <div>
-                            <label for="Text" class="label">Telefono Persona que atiende visita</label>
-                            <input type="tel" class="input" name="phone">
+                            <label for="Text" class="label">Telefono Contacto</label>
+                            <input type="tel" class="input" name="phone" id="form-cliente-contactoCell">
                         </div>                    
     
                     </form>
     
                     <h2> Informacion del Activo</h2>
                     
-                    <form action="/" class="form-cliente">
+                    <form action="/" class="form-cliente" id="form-activo-radicacion">
+
+                        <div>
+                            <label for="Text" class="label">Zona</label>
+
+                            <select class="form-control" id="form-activo-radicacion-zona" required>
+                                <option value="Zona">Seleccione Localizacion...</option>
+                                <option value="Urbano">Urbano</option>
+                                <option value="Rural">Rural</option>
+                            </select>
+
+                        </div>
     
                         <div>
     
                             <label for="Text" class="label">Tipo de activo</label>
-                            <input type="list" class="input">
+                            <select class="form-control" id="form-activo-radicacion-tipoActivo" required>
+                                <option value="Zona">Seleccione una opcion...</option>
+                                <option value="Apartamento">Apartamento</option>
+                                <option value="Casa">Casa</option>
+                                <option value="Oficina">Oficina</option>
+                                <option value="Bodega">Bodega</option>
+                                <option value="Local">Local</option>
+                                <option value="Lote Urbano">Lote Urbano</option>
+                                <option value="Finca">Finca</option>
+                                
+                            </select>
                         </div>
     
                         <div>
                             <label for="Text" class="label">Departamento</label>
-                            <input type="number" class="input">
+                            <select class="form-control" id="form-activo-radicacion-tipoActivo" required>
+                                <option value="Zona">Seleccione una opcion...</option>
+                                <option value="Amazonas"></option>
+                                <option value="Antioquia"></option>
+                                <option value="Arauca"></option>
+                                <option value="Atlántico"></option>
+                                <option value="Bolívar"></option>
+                                <option value="Boyacá"></option>
+                                <option value="Caldas"></option>
+                                <option value="Caqueta"></option>
+                                <option value="Casanare"></option>
+                                <option value="Cauca"></option>
+                                <option value="Cesar"></option>
+                                <option value="Choco"></option>
+                                <option value="Córdoba"></option>
+                                <option value="Cundinamarca"></option>
+                                <option value="Distrito Capital"></option>
+                                <option value="Guainia"></option>
+                                <option value="Huila"></option>
+                                <option value="Guaviare"></option>
+                                <option value="La Guajira"></option>
+                                <option value="Magdalena"></option>
+                                <option value="Meta"></option>
+                                <option value="Nariño"></option>
+                                <option value="Norte de Santander"></option>
+                                <option value="Putumayo"></option>
+                                <option value="Quindio"></option>
+                                <option value="Risaralda"></option>
+                                <option value="San Andres y Prividencia"></option>
+                                <option value="Santander"></option>
+                                <option value="Sucre"></option>
+                                <option value="Tolima"></option>
+                                <option value="Valle"></option>
+                                <option value="Vaupés"></option>
+                                <option value="Vichada"></option>
+                            </select>
                         </div>
     
                         <div>
                             <label for="Text" class="label">Municipio</label>                            
-                            <select class="form-control" id="city" required>
+                            <select class="form-control" id="Municipio" required>
                                 <option value="">Selecciona una opción...</option>
                                 <option value="Abejorral">Abejorral</option>
                                 <option value="Abrego">Abrego</option>
@@ -1233,12 +1299,6 @@
                         </div>
     
                         <div>
-    
-                            <label for="Text" class="label">Zona</label>
-                            <input type="text" class="input">
-                        </div>
-    
-                        <div>
                             <label for="Text" class="label">Dirección</label>
                             <input type="tel" class="input" name="phone">
                         </div>      
@@ -1246,14 +1306,25 @@
                             <label for="Text" class="label">Matricula</label>
                             <input type="tel" class="input" name="phone">
                         </div> 
+
                         <div>
-                            <label for="Text" class="label">Codico Catastral</label>
+                            <label for="Text" class="label">Chip (Bogota)</label>
                             <input type="tel" class="input" name="phone">
+                        </div>   
+                        <div>
+                            <label for="Text" class="label">Codico Catastral (x)</label>
+                            <input type="number" class="input" name="phone">
                         </div>    
                         
                         <div>
                             <label for="Text" class="label">Coordenadas</label>
-                            <input type="text" class="input" name="Coordenadas" id="coordenadasInmueble">
+                            <input type="text" class="coordinates" name="Longitud" id="longitud" placeholder="Lon: -74.0000">
+                            <input type="text" class="coordinates" name="Latitud" id="latitud" placeholder="Lat: 4.0000">
+                        </div> 
+
+                        <div>
+                            <label for="Text" class="label">Inspector</label>
+                            <input type="text" class="input" name="inpector">
                         </div> 
 
                         <button id="btnRadicarSolicitud">Radicar Solicitud </button>

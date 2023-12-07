@@ -1,6 +1,7 @@
 const btnGuardar = document.querySelector(".btnSaveCoordinates");
 const btnCancelar = document.querySelector(".btnCancelCoordinates");
-const coordenadasInmuebleSolicitud = document.getElementById("coordenadasInmueble")
+const longitudInmuebleSolicitud = document.getElementById("longitud")
+const latitudInmuebleSolicitud = document.getElementById("latitud")
 
 let coordenadasInmueble
 
@@ -37,7 +38,8 @@ function init() {
 
   btnGuardar.onclick = function(){
     console.log(coordenadasInmueble.coordinate[0].toString());
-    coordenadasInmuebleSolicitud.value = coordenadasInmueble.coordinate[0].toString()+","+coordenadasInmueble.coordinate[1].toString()
+    longitudInmuebleSolicitud.value = coordenadasInmueble.coordinate[0].toString()
+    latitudInmuebleSolicitud.value = coordenadasInmueble.coordinate[1].toString()
 
    
     inmuebleCoordenada.setPosition(undefined)

@@ -14,6 +14,8 @@
   const btnLoginGoogle = document.getElementById("login-google-button")
   const LogInForm = document.getElementById("login-form")
 
+  const dbAppraisal = "Avaluos"
+
   const firebaseConfig = {
     apiKey: "AIzaSyDRwj6hrGphOvt4hiJIfNaBAO-FoDz366U",
     authDomain: "visitatecnica-a1b3f.firebaseapp.com",
@@ -70,11 +72,50 @@
 
 // -------------------------------Creacion y modificacion de avaluos -------------------------
 
-  export const saveAppraisal = async () => {
+  export const saveAppraisal = async (nombreSolicitante,
+    apellidoSolicitante,
+    numeroSolicitante,
+    tipoDocumentoSolicitante,
+    idSolicitante,
+    nombreContacto,
+    numeroContacto,
+    ubicacionInmueble,
+    tipoInmueble,
+    departamento,
+    municipio,
+    direccion,
+    matricula,
+    chip,
+    uidUsuario,
+    localizacion, // Geopoint
+    idVisitador,
+    fecha,
+    nombreVisitador,
+    numeroVisitador,
+    fechaRadicacion) => {
 
     addDoc(collection(db, 'Pruebas'), {
-      email, 
-      password})
+    nombreSolicitante,
+    apellidoSolicitante,
+    numeroSolicitante,
+    tipoDocumentoSolicitante,
+    idSolicitante,
+    nombreContacto,
+    numeroContacto,
+    ubicacionInmueble,
+    tipoInmueble,
+    departamento,
+    municipio,
+    direccion,
+    matricula,
+    chip,
+    uidUsuario,
+    localizacion, // Geopoint
+    idVisitador,
+    fecha,
+    nombreVisitador,
+    numeroVisitador,
+    fechaRadicacion})
   }
 
 
