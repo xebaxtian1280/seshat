@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Montserrat+Alternates:wght@400;700&display=swap" rel="stylesheet">
 
     <script src="./ol7/ol.js"></script>
-    <script src="js/radicacion.js"></script>
+    <script type="module" src="js/radicacion.js"></script>
     <link rel="stylesheet" href="./ol7/ol.css">
     <link rel="stylesheet" href="css/stylos.css">
     <title>Radicacion</title>
@@ -35,6 +35,19 @@
             <div class="navbar-top-item">
                 <ul>
                     <a href="/Radicacion-Visita.html" class="item-top-menu">Visita</a>
+                    <p id="name-constumer">Pepito perez</p>
+                </ul>
+            </div>
+
+            <div class="navbar-top-item">
+                <ul>
+                    <a href="/Radicacion-Visita.html" class="item-top-menu">Clientes</a>
+                    <p id="name-constumer">Pepito perez</p>
+                </ul>
+            </div>
+            <div class="navbar-top-item">
+                <ul>
+                    <a href="/Radicacion-Visita.html" class="item-top-menu">Inspectores</a>
                     <p id="name-constumer">Pepito perez</p>
                 </ul>
             </div>
@@ -63,52 +76,52 @@
     
                         <div>
     
-                            <label for="Text" class="label">Nombre Cliente</label>
+                            <label class="label">Nombre Cliente</label>
                             <input type="text" class="input" id="form-cliente-name">
                         </div>
 
                         <div>    
-                            <label for="Text" class="label">Apellido Cliente</label>
+                            <label  class="label">Apellido Cliente</label>
                             <input type="text" class="input" id="form-cliente-lastname">
                         </div>
 
                         <div>
-                            <label for="Text" class="label">Celular Cliente</label>
-                            <input type="tel" class="input" name="phone">
+                            <label class="label">Celular Cliente</label>
+                            <input type="tel" class="input" name="form-cliente-phone">
                         </div>
     
                         <div>
-                            <label for="Text" class="label">Identificacion</label>
+                            <label class="label">Identificacion</label>
                             <select class="form-control-ID" id="city" required>
                                 <option value="C.C.">C.C.</option>
                                 <option value="NIT">NIT</option>
                                 <option value="C.C. Extrangeria">C.C. Extr.</option>
                                 <option value="Pasaporte">Pasaporte</option>
                             </select>
-                            <input type="number" class="input" id="form-cliente-clienteID">
+                            <input type="number" class="input" id="form-cliente-cliente-ID">
                         </div>  
     
                         <div>    
-                            <label for="Text" class="label">Contacto atiende la visita</label>
-                            <input type="text" class="input" id="form-cliente-contactoNombre">
+                            <label class="label">Contacto atiende la visita</label>
+                            <input type="text" class="input" id="form-cliente-contact-name">
                         </div>
     
                         <div>
-                            <label for="Text" class="label">Telefono Contacto</label>
-                            <input type="tel" class="input" name="phone" id="form-cliente-contactoCell">
+                            <label class="label">Telefono Contacto</label>
+                            <input type="tel" class="input" name="phone" id="form-cliente-contacto-cell">
                         </div>                    
     
                     </form>
     
                     <h2> Informacion del Activo</h2>
                     
-                    <form action="/" class="form-cliente" id="form-activo-radicacion">
+                    <form action="" class="form-cliente" id="form-activo-radicacion">
 
                         <div>
-                            <label for="Text" class="label">Zona</label>
+                            <label class="label">Zona</label>
 
                             <select class="form-control" id="form-activo-radicacion-zona" required>
-                                <option value="Zona">Seleccione Localizacion...</option>
+                                <option value="">Seleccione Localizacion...</option>
                                 <option value="Urbano">Urbano</option>
                                 <option value="Rural">Rural</option>
                             </select>
@@ -117,9 +130,9 @@
     
                         <div>
     
-                            <label for="Text" class="label">Tipo de activo</label>
-                            <select class="form-control" id="form-activo-radicacion-tipoActivo" required>
-                                <option value="Zona">Seleccione una opcion...</option>
+                            <label class="label">Tipo de activo</label>
+                            <select class="form-control" id="form-activo-radicacion-tipo-activo" required>
+                                <option value="">Seleccione una opcion...</option>
                                 <option value="Apartamento">Apartamento</option>
                                 <option value="Casa">Casa</option>
                                 <option value="Oficina">Oficina</option>
@@ -132,48 +145,48 @@
                         </div>
     
                         <div>
-                            <label for="Text" class="label">Departamento</label>
-                            <select class="form-control" id="form-activo-radicacion-tipoActivo" required>
+                            <label class="label">Departamento</label>
+                            <select class="form-control" id="form-activo-radicacion-departamento" required>
                                 <option value="Zona">Seleccione una opcion...</option>
-                                <option value="Amazonas"></option>
-                                <option value="Antioquia"></option>
-                                <option value="Arauca"></option>
-                                <option value="Atlántico"></option>
-                                <option value="Bolívar"></option>
-                                <option value="Boyacá"></option>
-                                <option value="Caldas"></option>
-                                <option value="Caqueta"></option>
-                                <option value="Casanare"></option>
-                                <option value="Cauca"></option>
-                                <option value="Cesar"></option>
-                                <option value="Choco"></option>
-                                <option value="Córdoba"></option>
-                                <option value="Cundinamarca"></option>
-                                <option value="Distrito Capital"></option>
-                                <option value="Guainia"></option>
-                                <option value="Huila"></option>
-                                <option value="Guaviare"></option>
-                                <option value="La Guajira"></option>
-                                <option value="Magdalena"></option>
-                                <option value="Meta"></option>
-                                <option value="Nariño"></option>
-                                <option value="Norte de Santander"></option>
-                                <option value="Putumayo"></option>
-                                <option value="Quindio"></option>
-                                <option value="Risaralda"></option>
-                                <option value="San Andres y Prividencia"></option>
-                                <option value="Santander"></option>
-                                <option value="Sucre"></option>
-                                <option value="Tolima"></option>
-                                <option value="Valle"></option>
-                                <option value="Vaupés"></option>
-                                <option value="Vichada"></option>
+                                <option value="Amazonas">Amazonas</option>
+                                <option value="Antioquia">Antioquia</option>
+                                <option value="Arauca">Arauca</option>
+                                <option value="Atlántico">Atlántico</option>
+                                <option value="Bolívar">Bolívar</option>
+                                <option value="Boyacá">Boyacá</option>
+                                <option value="Caldas">Caldas</option>
+                                <option value="Caqueta">Caqueta</option>
+                                <option value="Casanare">Casanare</option>
+                                <option value="Cauca">Cauca</option>
+                                <option value="Cesar">Cesar</option>
+                                <option value="Choco">Choco</option>
+                                <option value="Córdoba">Córdoba</option>
+                                <option value="Cundinamarca">Cundinamarca</option>
+                                <option value="Distrito Capital">Distrito Capital</option>
+                                <option value="Guainia">Guainia</option>
+                                <option value="Huila">Huila</option>
+                                <option value="Guaviare">Guaviare</option>
+                                <option value="La Guajira">La Guajira</option>
+                                <option value="Magdalena">Magdalena</option>
+                                <option value="Meta">Meta</option>
+                                <option value="Nariño">Nariño</option>
+                                <option value="Norte de Santander">Norte de Santander</option>
+                                <option value="Putumayo">Putumayo</option>
+                                <option value="Quindio">Quindio</option>
+                                <option value="Risaralda">Risaralda</option>
+                                <option value="San Andres y Prividencia">San Andres y Prividencia</option>
+                                <option value="Santander">Santander</option>
+                                <option value="Sucre">Sucre</option>
+                                <option value="Tolima">Tolima</option>
+                                <option value="Valle">Valle</option>
+                                <option value="Vaupés">Vaupés</option>
+                                <option value="Vichada">Vichada</option>
                             </select>
                         </div>
     
                         <div>
-                            <label for="Text" class="label">Municipio</label>                            
-                            <select class="form-control" id="Municipio" required>
+                            <label class="label">Municipio</label>                            
+                            <select class="form-control" id="form-activo-radicacion-municipio" required>
                                 <option value="">Selecciona una opción...</option>
                                 <option value="Abejorral">Abejorral</option>
                                 <option value="Abrego">Abrego</option>
@@ -1299,35 +1312,32 @@
                         </div>
     
                         <div>
-                            <label for="Text" class="label">Dirección</label>
-                            <input type="tel" class="input" name="phone">
-                        </div>      
+                            <label class="label">Dirección</label>
+                            <input type="text" class="input" id="form-activo-radicacion-direccion"> 
+                            
+                        </div>     
                         <div>
-                            <label for="Text" class="label">Matricula</label>
-                            <input type="tel" class="input" name="phone">
+                            <label class="label">Matricula</label>
+                            <input type="text" class="input" id="form-activo-radicacion-matricula">
                         </div> 
 
                         <div>
-                            <label for="Text" class="label">Chip (Bogota)</label>
-                            <input type="tel" class="input" name="phone">
-                        </div>   
-                        <div>
-                            <label for="Text" class="label">Codico Catastral (x)</label>
-                            <input type="number" class="input" name="phone">
-                        </div>    
+                            <label class="label">Chip /Cod. Catastral</label>
+                            <input type="tel" class="input" id="form-activo-radicacion-chip">
+                        </div>     
                         
                         <div>
-                            <label for="Text" class="label">Coordenadas</label>
-                            <input type="text" class="coordinates" name="Longitud" id="longitud" placeholder="Lon: -74.0000">
-                            <input type="text" class="coordinates" name="Latitud" id="latitud" placeholder="Lat: 4.0000">
+                            <label class="label">Coordenadas</label>
+                            <input type="text" class="coordinates" id="form-activo-radicacion-longitud" placeholder="Lon: -74.0000">
+                            <input type="text" class="coordinates" id="form-activo-radicacion-latitud" placeholder="Lat: 4.0000">
                         </div> 
 
                         <div>
-                            <label for="Text" class="label">Inspector</label>
-                            <input type="text" class="input" name="inpector">
+                            <label class="label">Inspector</label>
+                            <input type="text" class="input" id="form-activo-radicacion-inspector">
                         </div> 
 
-                        <button id="btnRadicarSolicitud">Radicar Solicitud </button>
+                        <input type="submit" id="btnRadicarSolicitud" value="Solicitud" class="primary-button">
     
                     </form>
                 </div>

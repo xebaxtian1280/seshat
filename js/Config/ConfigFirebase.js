@@ -95,26 +95,26 @@
     fechaRadicacion) => {
 
     addDoc(collection(db, 'Pruebas'), {
-    nombreSolicitante,
-    apellidoSolicitante,
-    numeroSolicitante,
-    tipoDocumentoSolicitante,
-    idSolicitante,
-    nombreContacto,
-    numeroContacto,
-    ubicacionInmueble,
-    tipoInmueble,
-    departamento,
-    municipio,
-    direccion,
-    matricula,
-    chip,
-    uidUsuario,
+    nombreSolicitante, //-
+    apellidoSolicitante, //-
+    numeroSolicitante, //-
+    tipoDocumentoSolicitante, //-
+    idSolicitante, //-
+    nombreContacto, //-
+    numeroContacto, //-
+    ubicacionInmueble, //-
+    tipoInmueble, //-
+    departamento, //-
+    municipio, //-
+    direccion, //-
+    matricula, //-
+    chip, //-
+    uidUsuario, //- Consulta Auth
     localizacion, // Geopoint
-    idVisitador,
-    fecha,
-    nombreVisitador,
-    numeroVisitador,
+    idVisitador, //- Consulta auth
+    fecha, // Automatico hora fecha del sistema
+    nombreVisitador, //-
+    numeroVisitador, // Consulta Firestore
     fechaRadicacion})
   }
 
