@@ -74,8 +74,13 @@
                     
                     <form action="/" class="form-cliente" id="form-cliente-radicacion">
     
-                        <div>
-    
+                        <div>    
+                            <label for="form-cliente-search" class="label">Buscar Cliente</label>
+                            <select class="form-control" id="form-cliente-search">
+                                <option value="">Bucar</option>
+                            </select>
+                        </div>
+                        <div>    
                             <label class="label">Nombre Cliente</label>
                             <input type="text" class="input" id="form-cliente-name">
                         </div>
@@ -92,7 +97,7 @@
     
                         <div>
                             <label class="label">Identificacion</label>
-                            <select class="form-control-ID" id="city" required>
+                            <select class="form-control-ID" id="form-cliente-ID" required>
                                 <option value="C.C.">C.C.</option>
                                 <option value="NIT">NIT</option>
                                 <option value="C.C. Extrangeria">C.C. Extr.</option>
@@ -109,8 +114,12 @@
                         <div>
                             <label class="label">Telefono Contacto</label>
                             <input type="tel" class="input" name="phone" id="form-cliente-contacto-cell">
-                        </div>                    
-    
+                        </div>      
+                        <div>
+
+                            <input type="submit" id="btnGuardarCliente" value="Crear Cliente" class="primary-button">              
+                            <input type="reset" value="Borrar Datos">
+                        </div>
                     </form>
     
                     <h2> Informacion del Activo</h2>
@@ -1334,7 +1343,13 @@
 
                         <div>
                             <label class="label">Inspector</label>
-                            <input type="text" class="input" id="form-activo-radicacion-inspector">
+                            <select class="form-control" id="form-activo-inspectors">
+                                <option value="">Bucar</option>
+                            </select>
+                        </div> 
+                        <div>
+                            <label class="label">Fecha Visita</label>
+                            <input type="datetime-local" class="input" id="form-activo-radicacion-Fecha-Visita">
                         </div> 
 
                         <input type="submit" id="btnRadicarSolicitud" value="Solicitud" class="primary-button">

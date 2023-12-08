@@ -1,7 +1,7 @@
 const btnGuardar = document.querySelector(".btnSaveCoordinates");
 const btnCancelar = document.querySelector(".btnCancelCoordinates");
-const longitudInmuebleSolicitud = document.getElementById("longitud")
-const latitudInmuebleSolicitud = document.getElementById("latitud")
+const longitudInmuebleSolicitud = document.getElementById("form-activo-radicacion-longitud")
+const latitudInmuebleSolicitud = document.getElementById("form-activo-radicacion-latitud")
 
 let coordenadasInmueble
 

@@ -1,9 +1,12 @@
   // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+  import { initializeApp} from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js"; 
+  //import { firebase} from "https://www.gstatic.com/firebasejs/10.6.0/firebase.js";
+
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
   import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, connectAuthEmulator} from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
-  import { getFirestore, collection, getDoc, getDocs,addDoc} from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js"
-  //import { getFirestore, collection, getDoc, getDocs} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-getFirestore.js";
+  import { getFirestore, collection, getDoc, getDocs,addDoc, query, orderBy, GeoPoint} from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js"
+
+ //import { getFirestore, collection, getDoc, getDocs} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-getFirestore.js";
 //import { user } from "firebase-functions/v1/auth";
   // TODO: Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
@@ -15,6 +18,8 @@
   const LogInForm = document.getElementById("login-form")
 
   const dbAppraisal = "Avaluos"
+  const dbClients = "Cliente"
+  const dbInspectors = "Visitadores"
 
   const firebaseConfig = {
     apiKey: "AIzaSyDRwj6hrGphOvt4hiJIfNaBAO-FoDz366U",
@@ -41,14 +46,7 @@
     addDoc(collection(db, 'Pruebas'), {email, password})
   }
 
-  export const getTask = () => {
-   const taskdocs = getDocs(collection(db,'Pruebas'))
-
-   return taskdocs
-
-   //db.collection('Pruebas').getDocs();
-  }
-
+  
 
   // ------------------------------ Autenticacion ---------------------------------------------
 
@@ -72,13 +70,31 @@
 
 // -------------------------------Creacion y modificacion de avaluos -------------------------
 
+  export const saveClient = async (
+
+    nombreSolicitante,
+    apellidoSolicitante,
+    numeroSolicitante,
+    tipoDocumentoSolicitante,
+    idSolicitante, 
+
+  ) => {
+    addDoc(collection(db, dbClients),{
+      nombreSolicitante,
+    apellidoSolicitante,
+    numeroSolicitante,
+    tipoDocumentoSolicitante,
+    idSolicitante, 
+    })
+  }
+
   export const saveAppraisal = async (nombreSolicitante,
     apellidoSolicitante,
     numeroSolicitante,
     tipoDocumentoSolicitante,
-    idSolicitante,
+    idSolicitante, 
     nombreContacto,
-    numeroContacto,
+    numeroContacto, 
     ubicacionInmueble,
     tipoInmueble,
     departamento,
@@ -87,14 +103,18 @@
     matricula,
     chip,
     uidUsuario,
-    localizacion, // Geopoint
+    longitud,
+    latitud, // Geopoint
     idVisitador,
     fecha,
     nombreVisitador,
     numeroVisitador,
     fechaRadicacion) => {
 
-    addDoc(collection(db, 'Pruebas'), {
+    let localizacion = new GeoPoint(latitud, longitud)
+    const Estado = "Pendiente"
+
+    addDoc(collection(db, dbAppraisal), {
     nombreSolicitante, //-
     apellidoSolicitante, //-
     numeroSolicitante, //-
@@ -115,9 +135,38 @@
     fecha, // Automatico hora fecha del sistema
     nombreVisitador, //-
     numeroVisitador, // Consulta Firestore
-    fechaRadicacion})
+    fechaRadicacion,
+    Estado})
   }
 
+  //----------------------- Consulta de datos ------------------------
+
+  export const getAppraisals = () => {
+
+    const appraisaldocs = getDocs(collection(db,dbAppraisal))
+ 
+    return appraisaldocs
+ 
+    //db.collection('Pruebas').getDocs();
+   }
+
+   export const getClients = () =>{
+
+    const consulta = query(collection(db, dbClients), orderBy("nombreSolicitante"))
+    //const clientsDocs = getDocs(collection(db, dbClients))
+    const clientsDocs = getDocs(consulta)
+    
+    return clientsDocs
+
+   }
+   export const getInspectors = () =>{
+
+    const consulta = query(collection(db, dbInspectors))
+    const Docs = getDocs(consulta)
+    
+    return Docs
+
+   }
 
 /*
   const googleAuthProvider = new GoogleAuthProvider();
@@ -130,7 +179,6 @@
       console.log('No User');
     }
   })*/
-
 //****** Acceso con Google */
 
 /*btnLoginGoogle.onclick = signInWithPopup(auth, provider)

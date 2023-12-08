@@ -1,14 +1,16 @@
-import {getTask, loginEmailPassword} from '../js/Config/ConfigFirebase.js'
+import {loginEmailPassword} from '../js/Config/ConfigFirebase.js'
 
 
-window.addEventListener('DOMContentLoaded', async () =>{
+/*window.addEventListener('DOMContentLoaded', async () =>{
     const querySnapshot = await getTask();
     
     querySnapshot.forEach(element => {
         console.log(element.data());
     });
 
-})
+})*/
+
+
 
 const taskForm = document.getElementById("login-form")
 
