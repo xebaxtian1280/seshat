@@ -105,13 +105,13 @@
     uidUsuario,
     longitud,
     latitud, // Geopoint
-    idVisitador,
-    fecha,
-    nombreVisitador,
+    IdVisitador,
+    Fecha,
+    NombreVisitador,
     numeroVisitador,
-    fechaRadicacion) => {
+    FechaRadicacion) => {
 
-    let localizacion = new GeoPoint(latitud, longitud)
+    let Localizacion = new GeoPoint(latitud, longitud)
     const Estado = "Pendiente"
 
     addDoc(collection(db, dbAppraisal), {
@@ -130,12 +130,12 @@
     matricula, //-
     chip, //-
     uidUsuario, //- Consulta Auth
-    localizacion, // Geopoint
-    idVisitador, //- Consulta auth
-    fecha, // Automatico hora fecha del sistema
-    nombreVisitador, //-
+    Localizacion, // Geopoint
+    IdVisitador, //- Consulta auth
+    Fecha, // Automatico hora fecha del sistema
+    NombreVisitador, //-
     numeroVisitador, // Consulta Firestore
-    fechaRadicacion,
+    FechaRadicacion,
     Estado})
   }
 
