@@ -1,0 +1,27 @@
+{
+  "name": "web",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^10.6.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xebaxtian1280/seshat.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xebaxtian1280/seshat/issues"
+  },
+  "homepage": "https://github.com/xebaxtian1280/seshat#readme",
+  "description": ""
+}
