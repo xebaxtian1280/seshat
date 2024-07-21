@@ -9,8 +9,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Montserrat+Alternates:wght@400;700&display=swap" rel="stylesheet">
 
-    <script src="./ol7/ol.js"></script>
-    <link rel="stylesheet" href="./ol7/ol.css">
+    <!-- <script src="./ol7/ol.js"></script> // carga libreria Openlayers
+    <link rel="stylesheet" href="./ol7/ol.css"> //Carga estilos Openlayers -->
+
+    <!--Se Cargan las  librerias de Openlayers-->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@main/dist/en/v7.0.0/legacy/ol.css"
+    />
+    <link rel="stylesheet" href="./ol/dist/layerswitcher.css"/>
+    <link rel="stylesheet" href="./ol/dist/ol-layerswitcher.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@main/dist/en/v7.0.0/legacy/ol.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/difflib@0.2.4/dist/difflib-browser.min.js"></script>
+    <script src="/ol/dist/ol-layerswitcher.js"></script>
+
 
     <link rel="stylesheet" href="css/stylos.css">
     <title>Radicacion</title>
@@ -58,7 +71,7 @@
     
                     <h2>Localizacion Vs otras solicitudes</h2>
                     
-                    <div id="map-container-radication" class="mapaVisitas"></div>
+                    <div id="mapa-localizacion-radicacion" class="mapaVisitas"></div>
                     
                     <script src="./js/mapaRadicacion.js" type="module"></script>
     

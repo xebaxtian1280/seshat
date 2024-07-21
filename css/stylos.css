@@ -199,7 +199,7 @@ a {
 
 .mapa-localizacion-radicacion{
     height: 87%;
-    width: 100vh;
+    width: 80vh;
 }
 
 .btnSaveCoordinates{
@@ -222,7 +222,7 @@ a {
 /** Mapa consulta localizacion respecto a otros radicados **/
 
 .mapaVisitas{
-    height: 400px;
+    height: 87%;
     width: 80vh;
     margin-right: 20px;
 }
