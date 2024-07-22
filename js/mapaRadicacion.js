@@ -9,11 +9,38 @@
 //   url: "http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}"
 // })})
 
+var lyrAvaluo = new ol.layer.Tile({
+  title:'Avaluo',
+  visible: true,
+  source: new ol.source.TileWMS({
+    url:'http://localhost:8080/geoserver/ne/wms?',
+    params:{
+      VERSION:'1.1.1',
+      FORMAT:'image/png',
+      TRANSPARENT:true,
+      LAYERS:'ne:Ofertas'
+    }
+  })
+})
+
+/*
+http://localhost:8080/geoserver/ne/wms?SERVICE=WMS&
+VERSION=1.1.1&
+FORMAT=image%2Fpng
+TRANSPARENT=true
+QUERY_LAYERS=ne%3AOfertas&
+LAYERS=ne%3AOfertas
+SRS=EPSG%3A4326&
+*/
+
 var map = new ol.Map({
   target: 'mapa-localizacion-radicacion',
   layers: [
-    //lyrGoogleSatelite,          
-        
+    //lyrGoogleSatelite,  
+    
+    new ol.layer.Group({
+      title:'Mapa Base',
+      layers:[
         new ol.layer.Tile({
           title: "Hybrid",
           type: 'base',
@@ -29,7 +56,15 @@ var map = new ol.Map({
           visible: true,
           source: new ol.source.OSM()
         })
-        
+      ]
+    }),
+
+    new ol.layer.Group({
+      title:'Tematico',
+      layers:[
+        lyrAvaluo
+      ]
+    })  
       
   ],
   view: new ol.View({
