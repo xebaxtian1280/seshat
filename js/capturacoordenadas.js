@@ -5,6 +5,8 @@ const latitudInmuebleSolicitud = document.getElementById("form-activo-radicacion
 
 let coordenadasInmueble
 
+var layers = new GeoLayers();
+
 window.onload = init();
 
 
