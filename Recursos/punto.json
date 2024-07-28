@@ -1,0 +1,23 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "punto.1",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.04381161, 4.75534768]
+      },
+      "geometry_name": "geom",
+      "properties": { "id_android_store": "Prueva" }
+    }
+  ],
+  "totalFeatures": 1,
+  "numberMatched": 1,
+  "numberReturned": 1,
+  "timeStamp": "2024-07-28T15:16:22.236Z",
+  "crs": {
+    "type": "name",
+    "properties": { "name": "urn:ogc: def: crs: EPSG:: 3857" }
+  }
+}
