@@ -9,39 +9,59 @@ var layers = new GeoLayers();
 
 window.onload = init();
 
+
+
+
+
 function init() {
-  const map = new ol.Map({
+
+  // Popup overlay
+var placemark = new ol.Overlay.Placemark ({
+  // color: '#369',
+  // backgroundColor : 'yellow',
+  contentColor: '#000',
+  onshow: function(){ console.log("You opened a placemark"); },
+  autoPan: { 
+    animation : {
+      duration: 250 
+    }
+  }
+});
+  var map = new ol.Map({
     target: "mapLocRadication",
     view: new ol.View({
       center: [-74.1, 4.65],
       zoom: 11,
       projection: "EPSG:4326",
     }),
-    layers: [//layers.ObtenerLayersBase()
+     layers: [//layers.ObtenerLayersBase()
       
-       new ol.layer.Group({
-          title: 'Mapa base',
-          layers: layers.ObtenerLayersBase()
+        new ol.layer.Group({
+           title: 'Mapa base',
+           layers: layers.ObtenerLayersBase()
           
-       }),
-       new ol.layer.Group({
-        title: 'Tematicos',
-        layers: 
-          layers.CargarGeoJson()      
+        }),
+        new ol.layer.Group({
+         title: 'Tematicos',
+         layers: 
+           layers.CargarLayersTematicos()      
         
-     })
+      })
+     ],
 
-    ]
+    
+    
+    overlays:[placemark]
 
   });
 
-  var vector = new ol.layer.Vector({ 
+  /* var vector = new ol.layer.Vector({ 
     title:'Capa de Dibujo',
     source: new ol.source.Vector()})
-  map.addLayer(vector)
+  map.addLayer(vector) */
 
-  var controlModificar = new ol.interaction.Modify({source:vector.getSource()})
-  map.addInteraction(controlModificar)
+  /* var controlModificar = new ol.interaction.Modify({source:vector.getSource()})
+  map.addInteraction(controlModificar) */
     
   var layerSwitcher = new ol.control.LayerSwitcher({
     tiplabel: 'Leyenda',
@@ -64,7 +84,7 @@ function init() {
 
   mainBar.addControl(drawBar)  
 
-  var controlDraw = new ol.control.Toggle({
+  /* var controlDraw = new ol.control.Toggle({
     title:'Ubicar Avaluo',
     html: '<i class="fas fa-map-marker-alt"></i>',
     active: true,
@@ -84,42 +104,11 @@ function init() {
     //   }
     // }
 
-  })
+  }) */
 
-  drawBar.addControl(controlDraw)
+ // drawBar.addControl(controlDraw)
 
-  var controlSelect = new ol.control.Toggle({
-    title:'Seleccionar puto',
-    html: '<i class="fa-solid fa-hand-point-up"></i>',
-    interaction: new ol.interaction.Select(),
-    bar: new ol.control.Bar({
-      controls:[
-        new ol.control.TextButton({
-          title:'Eliminar',
-          html:'Eliminar',
-          handleClick: function(){
-            
-            var features = controlSelect.getInteraction().getFeatures()
-            console.log(features.getLength());
-            if(features.getLength()==0){
-              alert('Selecionar un punto')
-            }
 
-            for(var i=0, f;f=features.item(i);i++){
-
-              vector.getSource().removeFeature(f)
-
-            }
-
-            controlSelect.getInteraction().getFeatures().clear()
-
-          }
-        })
-      ]
-    })
-  })
-
-  drawBar.addControl(controlSelect)
 
   var controlBusqueda = new ol.control.SearchFeature({
     source: layers.vectorGeoJson,
@@ -160,9 +149,10 @@ function init() {
 
   btnGuardar.onclick = function(){
 
+    
     longitudInmuebleSolicitud.value = coordenadasInmueble.coordinate[0].toString()
     latitudInmuebleSolicitud.value = coordenadasInmueble.coordinate[1].toString()
-
+    placemark.show(coordenadasInmueble.coordinate)
    
     inmuebleCoordenada.setPosition(undefined)
     
@@ -177,13 +167,14 @@ function init() {
 
   map.addOverlay(inmuebleCoordenada);
 
-  // map.on("click", function (e) {
-
-  
-  //     coordenadasInmueble = e;
-  //   inmuebleCoordenada.setPosition(coordenadasInmueble.coordinate);
-  //   divUbicacionInmueble.innerHTML = coordenadasInmueble.coordinate;
+   map.on("click", function (e) {
     
+     coordenadasInmueble = e;
+     inmuebleCoordenada.setPosition(coordenadasInmueble.coordinate);
+     divUbicacionInmueble.innerHTML = coordenadasInmueble.coordinate;
+     
+     
+     
     
-  // });
+   });
 }

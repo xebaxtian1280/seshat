@@ -31,6 +31,12 @@ GeoLayers.prototype.ObtenerLayersBase = function(){
       return listaLayers
 }
 
+/*
+http://localhost:8080/geoserver/Avaluos/wms
+&layers=Avaluos%3AAvaluosISA&bbox=-75.2917251586914%2C2.892789840698242%2C-72.91071319580078%2C6.246711254119873&width=545&height=768&srs=EPSG%3A4326&styles=&format=application/openlayers
+
+*/
+
 GeoLayers.prototype.CargarLayersTematicos = function(){
   var listaTematicos = []
 
@@ -40,9 +46,9 @@ GeoLayers.prototype.CargarLayersTematicos = function(){
     source: new ol.source.TileWMS({
       url: 'http://localhost:8080/geoserver/Avaluos/wms',
           params: {'FORMAT': 'image/png',
-                   'VERSION': '1.1.1',  
+                   'VERSION': '1.1.0',  
                 "STYLES": '',
-                "LAYERS": 'Avaluos:Ofertas',
+                "LAYERS": 'Avaluos:AvaluosISA',
           }
     })
   })
