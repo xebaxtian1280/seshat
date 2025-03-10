@@ -1,0 +1,68 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}Información básica}{4}{}%
+\contentsline {subsection}{\numberline {1.1}Identificación del cliente}{4}{}%
+\contentsline {subsection}{\numberline {1.2}Objeto de la Valuación}{4}{}%
+\contentsline {subsection}{\numberline {1.3}Tipo de avalúo}{4}{}%
+\contentsline {subsection}{\numberline {1.4}Ubicación del inmueble}{4}{}%
+\contentsline {subsection}{\numberline {1.5}Fecha de visita}{4}{}%
+\contentsline {subsection}{\numberline {1.6}Fecha del informe}{4}{}%
+\contentsline {subsection}{\numberline {1.7}Documentación aportada}{5}{}%
+\contentsline {subsection}{\numberline {1.8}Vigencia del avalúo}{5}{}%
+\contentsline {section}{\numberline {2}Información jurídica}{5}{}%
+\contentsline {subsection}{\numberline {2.1}Datos generales}{5}{}%
+\contentsline {section}{\numberline {3}Características de sector}{5}{}%
+\contentsline {subsection}{\numberline {3.1}Delimitación del sector}{5}{}%
+\contentsline {subsection}{\numberline {3.2}Amoblamiento urbano}{6}{}%
+\contentsline {subsection}{\numberline {3.3}Normatividad urbanística}{6}{}%
+\contentsline {subsubsection}{\numberline {3.3.1}Usos}{6}{}%
+\contentsline {subsubsection}{\numberline {3.3.2}Tratamiento}{8}{}%
+\contentsline {subsection}{\numberline {3.4}Servicios Públicos}{11}{}%
+\contentsline {subsection}{\numberline {3.5}Vías publicas de acceso}{11}{}%
+\contentsline {subsubsection}{\numberline {3.5.1}Principales}{11}{}%
+\contentsline {subsubsection}{\numberline {3.5.2}Secundarias}{11}{}%
+\contentsline {subsubsection}{\numberline {3.5.3}Transporte publico}{11}{}%
+\contentsline {subsection}{\numberline {3.6}Topografía}{11}{}%
+\contentsline {subsection}{\numberline {3.7}Estrato socioeconomico}{11}{}%
+\contentsline {section}{\numberline {4}Características Físicas}{11}{}%
+\contentsline {subsection}{\numberline {4.1}Tipo de bien inmueble}{11}{}%
+\contentsline {subsection}{\numberline {4.2}Características del terreno}{12}{}%
+\contentsline {paragraph}{Nota 1:}{12}{}%
+\contentsline {subsubsection}{\numberline {4.2.1}Linderos}{12}{}%
+\contentsline {paragraph}{Fuente}{12}{}%
+\contentsline {subsection}{\numberline {4.3}Afectaciones}{12}{}%
+\contentsline {subsubsection}{\numberline {4.3.1}Ambientales}{12}{}%
+\contentsline {subsubsection}{\numberline {4.3.2}Servidumbres, cesiones y afectaciones viales}{12}{}%
+\contentsline {subsection}{\numberline {4.4}Servicios públicos}{12}{}%
+\contentsline {subsection}{\numberline {4.5}Características de la Construcción}{13}{}%
+\contentsline {subsubsection}{\numberline {4.5.1}Datos generales}{13}{}%
+\contentsline {subsubsection}{\numberline {4.5.2}Croquis de la construcción}{13}{}%
+\contentsline {paragraph}{Nota 1:}{14}{}%
+\contentsline {subsubsection}{\numberline {4.5.3}Área construida}{14}{}%
+\contentsline {paragraph}{Nota}{14}{}%
+\contentsline {subsubsection}{\numberline {4.5.4}Dependencias}{14}{}%
+\contentsline {subsubsection}{\numberline {4.5.5}Estado de conservación}{14}{}%
+\contentsline {paragraph}{Estructura}{14}{}%
+\contentsline {paragraph}{Acabados}{14}{}%
+\contentsline {subsubsection}{\numberline {4.5.6}Especificaciones constructivas}{14}{}%
+\contentsline {section}{\numberline {5}Alcance del avalúo}{15}{}%
+\contentsline {section}{\numberline {6}Condiciones restrictivas y afectaciones}{15}{}%
+\contentsline {subsection}{\numberline {6.1}Problemas de estabilidad y suelos}{15}{}%
+\contentsline {subsection}{\numberline {6.2}Impacto ambiental y condiciones de salubridad}{15}{}%
+\contentsline {subsection}{\numberline {6.3}Seguridad}{15}{}%
+\contentsline {section}{\numberline {7}Condiciones generales}{15}{}%
+\contentsline {section}{\numberline {8}Declaración de cumplimiento}{15}{}%
+\contentsline {section}{\numberline {9}Responsabilidad del Valuador}{16}{}%
+\contentsline {section}{\numberline {10}Declaración no existencia de conflicto de interés}{17}{}%
+\contentsline {section}{\numberline {11}Aspecto económico}{18}{}%
+\contentsline {subsection}{\numberline {11.1}Metodologías valuatorias empleadas}{18}{}%
+\contentsline {subsubsection}{\numberline {11.1.1}Método de comparación o de mercado:}{18}{}%
+\contentsline {subsubsection}{\numberline {11.1.2}Método de capitalización de rentas o ingresos:}{18}{}%
+\contentsline {subsection}{\numberline {11.2}Justificación de las metodologías}{18}{}%
+\contentsline {subsubsection}{\numberline {11.2.1}Memorias de cálculos}{18}{}%
+\contentsline {subsubsection}{\numberline {11.2.2}Perspectivas de valorización}{18}{}%
+\contentsline {section}{\numberline {12}Valuación}{19}{}%
+\contentsline {paragraph}{Son: }{19}{}%
+\contentsline {subsection}{\numberline {12.1}Nombre, cualificación profesional y firma del valuador}{19}{}%
+\contentsline {section}{\numberline {13}Calculo de Valor de Renta Parcial Mensual}{19}{}%
+\contentsline {section}{\numberline {14}Calculo de Valor de Renta Total}{19}{}%
+\contentsline {section}{\numberline {15}Registro Fotográfico}{20}{}%

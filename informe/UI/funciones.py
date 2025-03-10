@@ -1,0 +1,68 @@
+import subprocess
+import os
+
+
+def generar_informe(texto, template_path="Base/Informe.tex", output_name="Resultados/informe"):
+    """
+    Genera un informe LaTeX desde una plantilla y texto dinámico.
+    
+    Args:
+        texto (str): Contenido a insertar
+        template_path (str): Ruta de la plantilla .tex
+        output_name (str): Nombre base del archivo de salida
+    """
+    
+    # Leer plantilla
+    try:
+        with open(template_path, "r", encoding="utf-8") as f:
+            plantilla = f.read()
+    except FileNotFoundError:
+        print(f"Error: No se encontró {template_path}")
+        return
+
+    # Escapar caracteres especiales de LaTeX
+    texto_procesado = texto.replace("&", "\&").replace("%", "\%").replace("$", "\$")
+    
+    # Reemplazar marcador en la plantilla
+    informe_final = plantilla.replace("%DIRECCION%", texto_procesado)
+    
+    # Guardar archivo .tex
+    with open(f"{output_name}.tex", "w", encoding="utf-8") as f:
+        f.write(informe_final)
+    
+    # Compilar a PDF
+    """ try:
+        subprocess.run(["pdflatex", f"{output_name}.tex"], check=True)
+        print(f"\nPDF generado: {output_name}.pdf")
+        
+        # Limpiar archivos auxiliares
+        for ext in [".aux", ".log", ".out"]:
+            archivo = f"{output_name}{ext}"
+            if os.path.exists(archivo):
+                os.remove(archivo)
+                
+    except FileNotFoundError:
+        print("\n¡Error! Necesitas LaTeX instalado (pdflatex)") """
+
+# Ejemplo de uso
+if __name__ == "__main__":
+    mi_texto = r"""
+\section{Resultados del Estudio}
+Aquí van los resultados clave:
+
+\begin{itemize}
+    \item Crecimiento del 15\% en ventas
+    \item ROI máximo: \$2.5M
+    \item \textbf{Tendencia principal}: Aumento en demanda juvenil
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{grafico.png}
+    \caption{Resultados por trimestre}
+\end{figure}
+"""
+
+mi_texto2 = r"""Calle 175 No. 20A -65"""
+
+generar_informe(mi_texto2)

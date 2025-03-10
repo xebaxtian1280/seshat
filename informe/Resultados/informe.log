@@ -1,0 +1,1230 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.3.15)  10 MAR 2025 06:42
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**informe.tex
+(./informe.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-01-21>
+(/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/size12.clo
+File: size12.clo 2021/10/04 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count185
+\c@section=\count186
+\c@subsection=\count187
+\c@subsubsection=\count188
+\c@paragraph=\count189
+\c@subparagraph=\count190
+\c@figure=\count191
+\c@table=\count192
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen138
+)
+(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty
+Package: inputenc 2021/02/14 v1.3d Input encoding file
+\inpenc@prehook=\toks16
+\inpenc@posthook=\toks17
+)
+(/usr/share/texlive/texmf-dist/tex/generic/babel/babel.sty
+Package: babel 2022/01/26 3.70 The Babel package
+\babel@savecnt=\count193
+\U@D=\dimen139
+\l@unhyphenated=\language87
+
+(/usr/share/texlive/texmf-dist/tex/generic/babel/txtbabel.def)
+\bbl@readstream=\read2
+\bbl@dirlevel=\count194
+
+(/usr/share/texlive/texmf-dist/tex/generic/babel-spanish/spanish.ldf
+Language: spanish.ldf 2021/05/27 v5.0q Spanish support from the babel system
+\es@quottoks=\toks18
+\es@quotdepth=\count195
+Package babel Info: Making " an active character on input line 570.
+Package babel Info: Making . an active character on input line 675.
+Package babel Info: Making < an active character on input line 722.
+Package babel Info: Making > an active character on input line 722.
+))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2021/10/15 v2.17l AMS math features
+\@mathmargin=\skip49
+
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2021/08/26 v2.01 AMS text
+
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks19
+\ex@=\dimen140
+))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen141
+)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2021/08/26 v2.02 operator names
+)
+\inf@bad=\count196
+LaTeX Info: Redefining \frac on input line 234.
+\uproot@=\count197
+\leftroot@=\count198
+LaTeX Info: Redefining \overline on input line 399.
+\classnum@=\count199
+\DOTSCASE@=\count266
+LaTeX Info: Redefining \ldots on input line 496.
+LaTeX Info: Redefining \dots on input line 499.
+LaTeX Info: Redefining \cdots on input line 620.
+\Mathstrutbox@=\box50
+\strutbox@=\box51
+\big@size=\dimen142
+LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
+\macc@depth=\count267
+\c@MaxMatrixCols=\count268
+\dotsspace@=\muskip16
+\c@parentequation=\count269
+\dspbrk@lvl=\count270
+\tag@help=\toks20
+\row@=\count271
+\column@=\count272
+\maxfields@=\count273
+\andhelp@=\toks21
+\eqnshift@=\dimen143
+\alignsep@=\dimen144
+\tagshift@=\dimen145
+\tagwidth@=\dimen146
+\totwidth@=\dimen147
+\lineht@=\dimen148
+\@envbody=\toks22
+\multlinegap=\skip50
+\multlinetaggap=\skip51
+\mathdisplay@stack=\toks23
+LaTeX Info: Redefining \[ on input line 2938.
+LaTeX Info: Redefining \] on input line 2939.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks24
+)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2021/03/04 v1.4d Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
+)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 107.
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2020/10/05 v1.2a Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen149
+\Gin@req@width=\dimen150
+)
+(/usr/share/texlive/texmf-dist/tex/latex/transparent/transparent.sty
+Package: transparent 2019/11/29 v1.4 Transparency via pdfTeX's color stack (HO)
+
+
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty
+Package: iftex 2020/03/06 v1.0d TeX engine tests
+)
+(/usr/share/texlive/texmf-dist/tex/latex/auxhook/auxhook.sty
+Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
+))
+(/usr/share/texlive/texmf-dist/tex/latex/eso-pic/eso-pic.sty
+Package: eso-pic 2020/10/14 v3.0a eso-pic (RN)
+\ESO@tempdima=\dimen151
+\ESO@tempdimb=\dimen152
+
+(/usr/share/texlive/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2021/10/31 v2.13 LaTeX color extensions (UK)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 227.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1352.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1356.
+Package xcolor Info: Model `RGB' extended on input line 1368.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1370.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1371.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1372.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1373.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1374.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1375.
+))
+(/usr/share/texlive/texmf-dist/tex/latex/lipsum/lipsum.sty
+(/usr/share/texlive/texmf-dist/tex/latex/l3packages/l3keys2e/l3keys2e.sty
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/expl3.sty
+Package: expl3 2022-01-21 L3 programming layer (loader) 
+
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2022-01-12 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count274
+\l__pdf_internal_box=\box52
+))
+Package: l3keys2e 2022-01-12 LaTeX2e option processing using LaTeX3 keys
+)
+Package: lipsum 2021-09-20 v2.7 150 paragraphs of Lorem Ipsum dummy text
+\g__lipsum_par_int=\count275
+\l__lipsum_a_int=\count276
+\l__lipsum_b_int=\count277
+
+(/usr/share/texlive/texmf-dist/tex/latex/lipsum/lipsum.ltd.tex))
+(/usr/share/texlive/texmf-dist/tex/latex/geometry/geometry.sty
+Package: geometry 2020/01/02 v5.9 Page Geometry
+
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/ifvtex.sty
+Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+)
+\Gm@cnth=\count278
+\Gm@cntv=\count279
+\c@Gm@tempcnt=\count280
+\Gm@bindingoffset=\dimen153
+\Gm@wd@mp=\dimen154
+\Gm@odd@mp=\dimen155
+\Gm@even@mp=\dimen156
+\Gm@layoutwidth=\dimen157
+\Gm@layoutheight=\dimen158
+\Gm@layouthoffset=\dimen159
+\Gm@layoutvoffset=\dimen160
+\Gm@dimlist=\toks25
+)
+*geometry* verbose mode - [ newgeometry ] result:
+* driver: 
+* paper: a4paper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: twoside 
+* h-part:(L,W,R)=(85.35826pt, 426.79135pt, 85.35826pt)
+* v-part:(T,H,B)=(85.35826pt, 645.87756pt, 113.81102pt)
+* \paperwidth=597.50787pt
+* \paperheight=845.04684pt
+* \textwidth=426.79135pt
+* \textheight=645.87756pt
+* \oddsidemargin=13.08827pt
+* \evensidemargin=13.08827pt
+* \topmargin=-23.91173pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=12.0pt
+* \footskip=30.0pt
+* \marginparwidth=85.0pt
+* \marginparsep=10.0pt
+* \columnsep=10.0pt
+* \skip\footins=10.8pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidetrue
+* \@mparswitchtrue
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+
+(/usr/share/texlive/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
+Package: fancyhdr 2021/01/28 v4.0.1 Extensive control of page headers and foote
+rs
+\f@nch@headwidth=\skip52
+\f@nch@O@elh=\skip53
+\f@nch@O@erh=\skip54
+\f@nch@O@olh=\skip55
+\f@nch@O@orh=\skip56
+\f@nch@O@elf=\skip57
+\f@nch@O@erf=\skip58
+\f@nch@O@olf=\skip59
+\f@nch@O@orf=\skip60
+)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/multicol.sty
+Package: multicol 2021/10/28 v1.9b multicolumn formatting (FMi)
+\c@tracingmulticols=\count281
+\mult@box=\box53
+\multicol@leftmargin=\dimen161
+\c@unbalance=\count282
+\c@collectmore=\count283
+\doublecol@number=\count284
+\multicoltolerance=\count285
+\multicolpretolerance=\count286
+\full@width=\dimen162
+\page@free=\dimen163
+\premulticols=\dimen164
+\postmulticols=\dimen165
+\multicolsep=\skip61
+\multicolbaselineskip=\skip62
+\partial@page=\box54
+\last@line=\box55
+\maxbalancingoverflow=\dimen166
+\mult@rightbox=\box56
+\mult@grightbox=\box57
+\mult@firstbox=\box58
+\mult@gfirstbox=\box59
+\@tempa=\box60
+\@tempa=\box61
+\@tempa=\box62
+\@tempa=\box63
+\@tempa=\box64
+\@tempa=\box65
+\@tempa=\box66
+\@tempa=\box67
+\@tempa=\box68
+\@tempa=\box69
+\@tempa=\box70
+\@tempa=\box71
+\@tempa=\box72
+\@tempa=\box73
+\@tempa=\box74
+\@tempa=\box75
+\@tempa=\box76
+\@tempa=\box77
+\@tempa=\box78
+\@tempa=\box79
+\@tempa=\box80
+\@tempa=\box81
+\@tempa=\box82
+\@tempa=\box83
+\@tempa=\box84
+\@tempa=\box85
+\@tempa=\box86
+\@tempa=\box87
+\@tempa=\box88
+\@tempa=\box89
+\@tempa=\box90
+\@tempa=\box91
+\@tempa=\box92
+\@tempa=\box93
+\@tempa=\box94
+\@tempa=\box95
+\c@minrows=\count287
+\c@columnbadness=\count288
+\c@finalcolumnbadness=\count289
+\last@try=\dimen167
+\multicolovershoot=\dimen168
+\multicolundershoot=\dimen169
+\mult@nat@firstbox=\box96
+\colbreak@box=\box97
+\mc@col@check@num=\count290
+) (./informe.aux
+LaTeX Info: Redefining \. on input line 11.
+LaTeX Info: Redefining \% on input line 11.
+
+
+LaTeX Warning: Label `fig:tratamiento' multiply defined.
+
+
+LaTeX Warning: Label `fig:tratamiento' multiply defined.
+
+)
+\openout1 = `informe.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Info: Redefining \. on input line 54.
+LaTeX Info: Redefining \% on input line 54.
+ (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count291
+\scratchdimen=\dimen170
+\scratchbox=\box98
+\nofMPsegments=\count292
+\nofMParguments=\count293
+\everyMPshowfont=\toks26
+\MPscratchCnt=\count294
+\MPscratchDim=\dimen171
+\MPnumerator=\count295
+\makeMPintoPDFobject=\count296
+\everyMPtoPDFconversion=\toks27
+) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+85.
+
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: a4paper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: twoside 
+* h-part:(L,W,R)=(85.35826pt, 426.79135pt, 85.35826pt)
+* v-part:(T,H,B)=(85.35826pt, 645.87756pt, 113.81102pt)
+* \paperwidth=597.50787pt
+* \paperheight=845.04684pt
+* \textwidth=426.79135pt
+* \textheight=645.87756pt
+* \oddsidemargin=13.08827pt
+* \evensidemargin=13.08827pt
+* \topmargin=-23.91173pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=12.0pt
+* \footskip=30.0pt
+* \marginparwidth=85.0pt
+* \marginparsep=10.0pt
+* \columnsep=10.0pt
+* \skip\footins=10.8pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidetrue
+* \@mparswitchtrue
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+<Imagenes/Geovalores.png, id=1, 578.16pt x 155.49pt>
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 124.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
+
+
+ <./Imagenes/Geovalores.png>] (./informe.toc
+LaTeX Info: Redefining \. on input line 1.
+LaTeX Info: Redefining \% on input line 1.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 3.
+ (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 3.
+
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 48.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 48.
+LaTeX Info: Redefining \% on input line 48.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[2
+
+])
+\tf@toc=\write3
+\openout3 = `informe.toc'.
+
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 128.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 128.
+LaTeX Info: Redefining \% on input line 128.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[3]
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 183.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 183.
+LaTeX Info: Redefining \% on input line 183.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[4
+
+]
+Underfull \hbox (badness 1097) in paragraph at lines 210--210
+[]\OT1/cmr/bx/n/12 Numero Ma-tri-cu-la In-mo-bi-
+ []
+
+<Imagenes/ubicacion1.png, id=26, 956.57375pt x 482.80376pt>
+File: Imagenes/ubicacion1.png Graphic file (type png)
+<use Imagenes/ubicacion1.png>
+Package pdftex.def Info: Imagenes/ubicacion1.png  used on input line 227.
+(pdftex.def)             Requested size: 341.43437pt x 172.32845pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 238.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 238.
+LaTeX Info: Redefining \% on input line 238.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[5]
+Underfull \hbox (badness 10000) in paragraph at lines 252--253
+
+ []
+
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 259.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 259.
+LaTeX Info: Redefining \% on input line 259.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[6 <./Imagenes/ubicacion1.png>]
+<Norma/AreaAc.png, id=36, 846.16125pt x 638.385pt>
+File: Norma/AreaAc.png Graphic file (type png)
+<use Norma/AreaAc.png>
+Package pdftex.def Info: Norma/AreaAc.png  used on input line 264.
+(pdftex.def)             Requested size: 341.43437pt x 257.58989pt.
+<Norma/AreaAcL.jpeg, id=37, 678.535pt x 364.36125pt>
+File: Norma/AreaAcL.jpeg Graphic file (type jpg)
+<use Norma/AreaAcL.jpeg>
+Package pdftex.def Info: Norma/AreaAcL.jpeg  used on input line 265.
+(pdftex.def)             Requested size: 341.43437pt x 183.34215pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 300--301
+
+ []
+
+
+Underfull \vbox (badness 1292) has occurred while \output is active []
+
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 301.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 301.
+LaTeX Info: Redefining \% on input line 301.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[7 <./Norma/AreaAc.png> <./Norma/AreaAcL.jpeg>]
+Underfull \hbox (badness 10000) in paragraph at lines 302--303
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 317--318
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 319--327
+
+ []
+
+<Norma/Tratamiento.png, id=43, 733.74126pt x 546.04pt>
+File: Norma/Tratamiento.png Graphic file (type png)
+<use Norma/Tratamiento.png>
+Package pdftex.def Info: Norma/Tratamiento.png  used on input line 342.
+(pdftex.def)             Requested size: 426.79135pt x 317.61992pt.
+<Norma/TratamientoL.jpeg, id=44, 828.09375pt x 382.42876pt>
+File: Norma/TratamientoL.jpeg Graphic file (type jpg)
+<use Norma/TratamientoL.jpeg>
+Package pdftex.def Info: Norma/TratamientoL.jpeg  used on input line 343.
+(pdftex.def)             Requested size: 426.79135pt x 197.1018pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<Norma/Edificabilidad.jpeg, id=45, 1057.9525pt x 765.86125pt>
+File: Norma/Edificabilidad.jpeg Graphic file (type jpg)
+<use Norma/Edificabilidad.jpeg>
+Package pdftex.def Info: Norma/Edificabilidad.jpeg  used on input line 351.
+(pdftex.def)             Requested size: 298.75264pt x 216.26271pt.
+<Norma/Edificabilidad1.jpeg, id=46, 677.53125pt x 199.74625pt>
+File: Norma/Edificabilidad1.jpeg Graphic file (type jpg)
+<use Norma/Edificabilidad1.jpeg>
+Package pdftex.def Info: Norma/Edificabilidad1.jpeg  used on input line 352.
+(pdftex.def)             Requested size: 298.75264pt x 88.07758pt.
+<Norma/Edificabilidad3.png, id=47, 139.52126pt x 311.1625pt>
+File: Norma/Edificabilidad3.png Graphic file (type png)
+<use Norma/Edificabilidad3.png>
+Package pdftex.def Info: Norma/Edificabilidad3.png  used on input line 352.
+(pdftex.def)             Requested size: 42.68173pt x 95.18692pt.
+<Norma/Edificabilidad2.png, id=48, 989.6975pt x 311.1625pt>
+File: Norma/Edificabilidad2.png Graphic file (type png)
+<use Norma/Edificabilidad2.png>
+Package pdftex.def Info: Norma/Edificabilidad2.png  used on input line 353.
+(pdftex.def)             Requested size: 298.75264pt x 93.92871pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<Norma/sectornormativo.png, id=49, 940.51375pt x 655.44875pt>
+File: Norma/sectornormativo.png Graphic file (type png)
+<use Norma/sectornormativo.png>
+Package pdftex.def Info: Norma/sectornormativo.png  used on input line 363.
+(pdftex.def)             Requested size: 213.39568pt x 148.70976pt.
+<Norma/sectornormativo1.png, id=50, 238.8925pt x 190.7125pt>
+File: Norma/sectornormativo1.png Graphic file (type png)
+<use Norma/sectornormativo1.png>
+Package pdftex.def Info: Norma/sectornormativo1.png  used on input line 364.
+(pdftex.def)             Requested size: 128.0387pt x 102.21495pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<Norma/Edificabilidad4.png, id=51, 410.53375pt x 311.1625pt>
+File: Norma/Edificabilidad4.png Graphic file (type png)
+<use Norma/Edificabilidad4.png>
+Package pdftex.def Info: Norma/Edificabilidad4.png  used on input line 371.
+(pdftex.def)             Requested size: 128.0387pt x 97.04337pt.
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 372.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 372.
+LaTeX Info: Redefining \% on input line 372.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[8]
+Overfull \vbox (9.72084pt too high) has occurred while \output is active []
+
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 372.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 372.
+LaTeX Info: Redefining \% on input line 372.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[9 <./Norma/Tratamiento.png> <./Norma/TratamientoL.jpeg> <./Norma/Edificabilida
+d4.png>]
+
+LaTeX Warning: Text page 10 contains only floats.
+
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 372.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 372.
+LaTeX Info: Redefining \% on input line 372.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[10 <./Norma/Edificabilidad.jpeg> <./Norma/Edificabilidad1.jpeg> <./Norma/Edifi
+cabilidad3.png> <./Norma/Edificabilidad2.png> <./Norma/sectornormativo.png> <./
+Norma/sectornormativo1.png>]
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 444.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 444.
+LaTeX Info: Redefining \% on input line 444.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[11]
+Underfull \hbox (badness 10000) in paragraph at lines 454--455
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 455--456
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 456--457
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 457--458
+
+ []
+
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 497.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 497.
+LaTeX Info: Redefining \% on input line 497.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[12]
+Underfull \hbox (badness 10000) in paragraph at lines 499--502
+
+ []
+
+<Imagenes/PLANO.png, id=74, 614.295pt x 794.97pt>
+File: Imagenes/PLANO.png Graphic file (type png)
+<use Imagenes/PLANO.png>
+Package pdftex.def Info: Imagenes/PLANO.png  used on input line 503.
+(pdftex.def)             Requested size: 341.43437pt x 441.85648pt.
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 508.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 508.
+LaTeX Info: Redefining \% on input line 508.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[13 <./Imagenes/PLANO.png>]
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 629.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 629.
+LaTeX Info: Redefining \% on input line 629.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[14]
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 678.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[15]
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 696.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 696.
+LaTeX Info: Redefining \% on input line 696.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[16]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 724.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[17]
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 757.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 757.
+LaTeX Info: Redefining \% on input line 757.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[18]
+<Imagenes/Valoracion1.png, id=94, 1271.75125pt x 291.0875pt>
+File: Imagenes/Valoracion1.png Graphic file (type png)
+<use Imagenes/Valoracion1.png>
+Package pdftex.def Info: Imagenes/Valoracion1.png  used on input line 762.
+(pdftex.def)             Requested size: 426.79135pt x 97.68924pt.
+<Imagenes/Firma.png, id=95, 880.28876pt x 324.21124pt>
+File: Imagenes/Firma.png Graphic file (type png)
+<use Imagenes/Firma.png>
+Package pdftex.def Info: Imagenes/Firma.png  used on input line 770.
+(pdftex.def)             Requested size: 176.05463pt x 64.8411pt.
+<Imagenes/RentaParcial1.png, id=96, 773.89125pt x 239.89626pt>
+File: Imagenes/RentaParcial1.png Graphic file (type png)
+<use Imagenes/RentaParcial1.png>
+Package pdftex.def Info: Imagenes/RentaParcial1.png  used on input line 779.
+(pdftex.def)             Requested size: 426.79135pt x 132.30206pt.
+<Imagenes/RentaTotal1.png, id=97, 773.89125pt x 141.52875pt>
+File: Imagenes/RentaTotal1.png Graphic file (type png)
+<use Imagenes/RentaTotal1.png>
+Package pdftex.def Info: Imagenes/RentaTotal1.png  used on input line 785.
+(pdftex.def)             Requested size: 426.79135pt x 78.05267pt.
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 788.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[19 <./Imagenes/Valoracion1.png> <./Imagenes/Firma.png> <./Imagenes/RentaParcia
+l1.png> <./Imagenes/RentaTotal1.png>]
+<Imagenes/1.jpg, id=106, 1156.32pt x 2055.68pt>
+File: Imagenes/1.jpg Graphic file (type jpg)
+<use Imagenes/1.jpg>
+Package pdftex.def Info: Imagenes/1.jpg  used on input line 794.
+(pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
+<Imagenes/2.jpg, id=107, 1156.32pt x 2055.68pt>
+File: Imagenes/2.jpg Graphic file (type jpg)
+<use Imagenes/2.jpg>
+Package pdftex.def Info: Imagenes/2.jpg  used on input line 794.
+(pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
+<Imagenes/3.jpg, id=108, 1156.32pt x 2055.68pt>
+File: Imagenes/3.jpg Graphic file (type jpg)
+<use Imagenes/3.jpg>
+Package pdftex.def Info: Imagenes/3.jpg  used on input line 796.
+(pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
+<Imagenes/4.jpg, id=109, 1156.32pt x 2055.68pt>
+File: Imagenes/4.jpg Graphic file (type jpg)
+<use Imagenes/4.jpg>
+Package pdftex.def Info: Imagenes/4.jpg  used on input line 796.
+(pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
+<Imagenes/5.jpg, id=110, 2055.68pt x 1156.32pt>
+File: Imagenes/5.jpg Graphic file (type jpg)
+<use Imagenes/5.jpg>
+Package pdftex.def Info: Imagenes/5.jpg  used on input line 798.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/6.jpg, id=111, 1156.32pt x 2055.68pt>
+File: Imagenes/6.jpg Graphic file (type jpg)
+<use Imagenes/6.jpg>
+Package pdftex.def Info: Imagenes/6.jpg  used on input line 798.
+(pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
+<Imagenes/9.jpg, id=112, 1156.32pt x 2055.68pt>
+File: Imagenes/9.jpg Graphic file (type jpg)
+<use Imagenes/9.jpg>
+Package pdftex.def Info: Imagenes/9.jpg  used on input line 808.
+(pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
+<Imagenes/7.jpg, id=113, 2055.68pt x 1156.32pt>
+File: Imagenes/7.jpg Graphic file (type jpg)
+<use Imagenes/7.jpg>
+Package pdftex.def Info: Imagenes/7.jpg  used on input line 808.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/8.jpg, id=114, 1156.32pt x 2055.68pt>
+File: Imagenes/8.jpg Graphic file (type jpg)
+<use Imagenes/8.jpg>
+Package pdftex.def Info: Imagenes/8.jpg  used on input line 810.
+(pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
+<Imagenes/12.jpg, id=115, 2055.68pt x 1156.32pt>
+File: Imagenes/12.jpg Graphic file (type jpg)
+<use Imagenes/12.jpg>
+Package pdftex.def Info: Imagenes/12.jpg  used on input line 810.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/13.jpg, id=116, 2055.68pt x 1156.32pt>
+File: Imagenes/13.jpg Graphic file (type jpg)
+<use Imagenes/13.jpg>
+Package pdftex.def Info: Imagenes/13.jpg  used on input line 812.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/14.jpg, id=117, 2055.68pt x 1156.32pt>
+File: Imagenes/14.jpg Graphic file (type jpg)
+<use Imagenes/14.jpg>
+Package pdftex.def Info: Imagenes/14.jpg  used on input line 812.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/15.jpg, id=118, 2055.68pt x 1156.32pt>
+File: Imagenes/15.jpg Graphic file (type jpg)
+<use Imagenes/15.jpg>
+Package pdftex.def Info: Imagenes/15.jpg  used on input line 814.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/16.jpg, id=119, 2055.68pt x 1156.32pt>
+File: Imagenes/16.jpg Graphic file (type jpg)
+<use Imagenes/16.jpg>
+Package pdftex.def Info: Imagenes/16.jpg  used on input line 814.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+
+Overfull \hbox (13.17206pt too wide) in paragraph at lines 806--819
+[][] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 820.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 820.
+LaTeX Info: Redefining \% on input line 820.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[20 <./Imagenes/1.jpg> <./Imagenes/2.jpg> <./Imagenes/3.jpg> <./Imagenes/4.jpg>
+ <./Imagenes/5.jpg> <./Imagenes/6.jpg>]
+<Imagenes/17.jpg, id=123, 1156.32pt x 2055.68pt>
+File: Imagenes/17.jpg Graphic file (type jpg)
+<use Imagenes/17.jpg>
+Package pdftex.def Info: Imagenes/17.jpg  used on input line 822.
+(pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
+<Imagenes/18.jpg, id=124, 2055.68pt x 1156.32pt>
+File: Imagenes/18.jpg Graphic file (type jpg)
+<use Imagenes/18.jpg>
+Package pdftex.def Info: Imagenes/18.jpg  used on input line 822.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/19.jpg, id=125, 2055.68pt x 1156.32pt>
+File: Imagenes/19.jpg Graphic file (type jpg)
+<use Imagenes/19.jpg>
+Package pdftex.def Info: Imagenes/19.jpg  used on input line 824.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/20.jpg, id=126, 2055.68pt x 1156.32pt>
+File: Imagenes/20.jpg Graphic file (type jpg)
+<use Imagenes/20.jpg>
+Package pdftex.def Info: Imagenes/20.jpg  used on input line 824.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/21.jpg, id=127, 2055.68pt x 1156.32pt>
+File: Imagenes/21.jpg Graphic file (type jpg)
+<use Imagenes/21.jpg>
+Package pdftex.def Info: Imagenes/21.jpg  used on input line 826.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/22.jpg, id=128, 2055.68pt x 1156.32pt>
+File: Imagenes/22.jpg Graphic file (type jpg)
+<use Imagenes/22.jpg>
+Package pdftex.def Info: Imagenes/22.jpg  used on input line 826.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/23.jpg, id=129, 2055.68pt x 1156.32pt>
+File: Imagenes/23.jpg Graphic file (type jpg)
+<use Imagenes/23.jpg>
+Package pdftex.def Info: Imagenes/23.jpg  used on input line 828.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/24.jpg, id=130, 2055.68pt x 1156.32pt>
+File: Imagenes/24.jpg Graphic file (type jpg)
+<use Imagenes/24.jpg>
+Package pdftex.def Info: Imagenes/24.jpg  used on input line 828.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+
+Overfull \hbox (13.17206pt too wide) in paragraph at lines 820--834
+[][] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 835.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[21 <./Imagenes/9.jpg> <./Imagenes/7.jpg> <./Imagenes/8.jpg> <./Imagenes/12.jpg
+> <./Imagenes/13.jpg> <./Imagenes/14.jpg> <./Imagenes/15.jpg> <./Imagenes/16.jp
+g>]
+<Imagenes/25.jpg, id=134, 2055.68pt x 1156.32pt>
+File: Imagenes/25.jpg Graphic file (type jpg)
+<use Imagenes/25.jpg>
+Package pdftex.def Info: Imagenes/25.jpg  used on input line 837.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/26.jpg, id=135, 2055.68pt x 1156.32pt>
+File: Imagenes/26.jpg Graphic file (type jpg)
+<use Imagenes/26.jpg>
+Package pdftex.def Info: Imagenes/26.jpg  used on input line 837.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/27.jpg, id=136, 2055.68pt x 1156.32pt>
+File: Imagenes/27.jpg Graphic file (type jpg)
+<use Imagenes/27.jpg>
+Package pdftex.def Info: Imagenes/27.jpg  used on input line 839.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/28.jpg, id=137, 2055.68pt x 1156.32pt>
+File: Imagenes/28.jpg Graphic file (type jpg)
+<use Imagenes/28.jpg>
+Package pdftex.def Info: Imagenes/28.jpg  used on input line 839.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/29.jpg, id=138, 2055.68pt x 1156.32pt>
+File: Imagenes/29.jpg Graphic file (type jpg)
+<use Imagenes/29.jpg>
+Package pdftex.def Info: Imagenes/29.jpg  used on input line 841.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/30.jpg, id=139, 2055.68pt x 1156.32pt>
+File: Imagenes/30.jpg Graphic file (type jpg)
+<use Imagenes/30.jpg>
+Package pdftex.def Info: Imagenes/30.jpg  used on input line 841.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/31.jpg, id=140, 2055.68pt x 1156.32pt>
+File: Imagenes/31.jpg Graphic file (type jpg)
+<use Imagenes/31.jpg>
+Package pdftex.def Info: Imagenes/31.jpg  used on input line 843.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/32.jpg, id=141, 4111.36pt x 2312.64pt>
+File: Imagenes/32.jpg Graphic file (type jpg)
+<use Imagenes/32.jpg>
+Package pdftex.def Info: Imagenes/32.jpg  used on input line 843.
+(pdftex.def)             Requested size: 199.16928pt x 112.0041pt.
+<Imagenes/33.jpg, id=142, 2055.68pt x 1156.32pt>
+File: Imagenes/33.jpg Graphic file (type jpg)
+<use Imagenes/33.jpg>
+Package pdftex.def Info: Imagenes/33.jpg  used on input line 845.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/34.jpg, id=143, 2055.68pt x 1156.32pt>
+File: Imagenes/34.jpg Graphic file (type jpg)
+<use Imagenes/34.jpg>
+Package pdftex.def Info: Imagenes/34.jpg  used on input line 845.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+
+Overfull \hbox (13.17206pt too wide) in paragraph at lines 835--848
+[][] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 849.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 849.
+LaTeX Info: Redefining \% on input line 849.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[22 <./Imagenes/17.jpg> <./Imagenes/18.jpg> <./Imagenes/19.jpg> <./Imagenes/20.
+jpg> <./Imagenes/21.jpg> <./Imagenes/22.jpg> <./Imagenes/23.jpg> <./Imagenes/24
+.jpg>]
+Overfull \vbox (6.13133pt too high) has occurred while \output is active []
+
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 849.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[23 <./Imagenes/25.jpg> <./Imagenes/26.jpg> <./Imagenes/27.jpg> <./Imagenes/28.
+jpg> <./Imagenes/29.jpg> <./Imagenes/30.jpg> <./Imagenes/31.jpg> <./Imagenes/32
+.jpg> <./Imagenes/33.jpg> <./Imagenes/34.jpg>]
+<Imagenes/35.jpg, id=150, 2055.68pt x 1156.32pt>
+File: Imagenes/35.jpg Graphic file (type jpg)
+<use Imagenes/35.jpg>
+Package pdftex.def Info: Imagenes/35.jpg  used on input line 852.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/36.jpg, id=151, 2055.68pt x 1156.32pt>
+File: Imagenes/36.jpg Graphic file (type jpg)
+<use Imagenes/36.jpg>
+Package pdftex.def Info: Imagenes/36.jpg  used on input line 852.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/37.jpg, id=152, 2055.68pt x 1156.32pt>
+File: Imagenes/37.jpg Graphic file (type jpg)
+<use Imagenes/37.jpg>
+Package pdftex.def Info: Imagenes/37.jpg  used on input line 854.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/38.jpg, id=153, 1156.32pt x 2055.68pt>
+File: Imagenes/38.jpg Graphic file (type jpg)
+<use Imagenes/38.jpg>
+Package pdftex.def Info: Imagenes/38.jpg  used on input line 854.
+(pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
+<Imagenes/39.jpg, id=154, 2055.68pt x 1156.32pt>
+File: Imagenes/39.jpg Graphic file (type jpg)
+<use Imagenes/39.jpg>
+Package pdftex.def Info: Imagenes/39.jpg  used on input line 856.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/40.jpg, id=155, 2055.68pt x 1156.32pt>
+File: Imagenes/40.jpg Graphic file (type jpg)
+<use Imagenes/40.jpg>
+Package pdftex.def Info: Imagenes/40.jpg  used on input line 856.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/44.jpg, id=156, 2055.68pt x 1156.32pt>
+File: Imagenes/44.jpg Graphic file (type jpg)
+<use Imagenes/44.jpg>
+Package pdftex.def Info: Imagenes/44.jpg  used on input line 858.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+<Imagenes/42.jpg, id=157, 2055.68pt x 1156.32pt>
+File: Imagenes/42.jpg Graphic file (type jpg)
+<use Imagenes/42.jpg>
+Package pdftex.def Info: Imagenes/42.jpg  used on input line 858.
+(pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
+
+Overfull \hbox (13.17206pt too wide) in paragraph at lines 849--864
+[][] 
+ []
+
+File: Imagenes/Geovalores.png Graphic file (type png)
+<use Imagenes/Geovalores.png>
+Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 949.
+(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 949.
+LaTeX Info: Redefining \% on input line 949.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 32.33702pt, for example:
+(fancyhdr)                \setlength{\headheight}{32.33702pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-20.33702pt}.
+
+[24 <./Imagenes/35.jpg> <./Imagenes/36.jpg> <./Imagenes/37.jpg> <./Imagenes/38.
+jpg> <./Imagenes/39.jpg> <./Imagenes/40.jpg> <./Imagenes/44.jpg> <./Imagenes/42
+.jpg>] (./informe.aux
+LaTeX Info: Redefining \. on input line 10.
+LaTeX Info: Redefining \% on input line 10.
+)
+
+LaTeX Warning: There were multiply-defined labels.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 6643 strings out of 478287
+ 108676 string characters out of 5849289
+ 506289 words of memory out of 5000000
+ 24702 multiletter control sequences out of 15000+600000
+ 479097 words of font info for 65 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 68i,17n,77p,802b,740s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/share/texli
+ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/
+cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl1
+2.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1200.pfb></usr/share/te
+xmf/fonts/type1/public/cm-super/sfrm0600.pfb></usr/share/texmf/fonts/type1/publ
+ic/cm-super/sfrm1200.pfb>
+Output written on informe.pdf (24 pages, 27502925 bytes).
+PDF statistics:
+ 209 PDF objects out of 1000 (max. 8388607)
+ 89 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 500000)
+ 291 words of extra memory for PDF output out of 10000 (max. 10000000)
+
