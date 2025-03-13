@@ -4,7 +4,7 @@ from pathlib import Path
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                              QLineEdit, QPushButton, QLabel, QMessageBox, QProgressBar,
                              QFileDialog, QMenuBar, QMenu, QTabWidget, QTextEdit, 
-                             QFormLayout, QSpinBox, QComboBox, QDateEdit)
+                             QFormLayout, QGroupBox, QSpinBox, QComboBox, QDateEdit)
 from PyQt6.QtCore import Qt, QTimer, QDate
 from funciones import generar_informe
 
@@ -32,8 +32,14 @@ class ReportApp(QMainWindow):
         generar_action = file_menu.addAction("Generar Informe")
         generar_action.triggered.connect(self.iniciar_generacion)
         
-        ubicacion_action = file_menu.addAction("Seleccionar ubicación")
+        ubicacion_action = file_menu.addAction("Guardar Como")
         ubicacion_action.triggered.connect(self.seleccionar_ubicacion)
+        
+        crear_proyecto = file_menu.addAction("Crear Proyecto")
+        crear_proyecto.triggered.connect(self.crea_proyecto)
+        
+        abrir_proyecto = file_menu.addAction("Abrir proyecto")
+        abrir_proyecto.triggered.connect(self.carga_proyecto)
         
         file_menu.addSeparator()
         exit_action = file_menu.addAction("Salir")
@@ -62,32 +68,73 @@ class ReportApp(QMainWindow):
         pestana = QWidget()
         main_layout = QHBoxLayout(pestana)
         
-        # Columna izquierda (Datos de solicitud existentes)
-        left_layout = QFormLayout()
+        # Columna izquierda - Contenedor vertical
+        left_column = QVBoxLayout()
         
-        # Campos Cliente
+        # Grupo Datos de la Solicitud
+        grupo_solicitud = QGroupBox("Datos de la Solicitud")
+        grupo_solicitud.setStyleSheet("""
+            QGroupBox {
+                font-weight: bold;
+                font-size: 14px;
+                margin-top: 10px;
+                border: 1px solid #cccccc;
+            }
+        """)
+        solicitud_layout = QFormLayout(grupo_solicitud)
+        
+        # Campos de solicitud
         self.solicitante = QLineEdit()
-        self.destinatario = QLineEdit()
-        self.numero_identificacion = QLineEdit()
-        
         self.fecha_solicitud = QDateEdit(QDate.currentDate())
-        self.fecha_visita = QDateEdit(QDate.currentDate())
-        self.fecha_informe = QDateEdit(QDate.currentDate())
         self.numero_referencia = QLineEdit()
         self.tipo_solicitud = QComboBox()
-        self.tipo_solicitud.addItems(["Originacion", "Actualizacion", "Avaluo por escritorio", "Concepto de valor"])
+        self.tipo_solicitud.addItems(["Consulta", "Reclamo", "Solicitud formal", "Otro"])
         
-        left_layout.addRow("Solicitante:", self.solicitante)
-        left_layout.addRow("Destinatario:", self.destinatario)
-        left_layout.addRow("Documento de ID:", self.numero_identificacion)
-        left_layout.addRow("Fecha de solicitud:", self.fecha_solicitud)
-        left_layout.addRow("Fecha de visita:", self.fecha_visita)
-        left_layout.addRow("Fecha de informe:", self.fecha_informe)
-        left_layout.addRow("Número de referencia:", self.numero_referencia)
-        left_layout.addRow("Tipo de solicitud:", self.tipo_solicitud)
+        solicitud_layout.addRow("Solicitante:", self.solicitante)
+        solicitud_layout.addRow("Fecha de solicitud:", self.fecha_solicitud)
+        solicitud_layout.addRow("Número de referencia:", self.numero_referencia)
+        solicitud_layout.addRow("Tipo de solicitud:", self.tipo_solicitud)
         
-        # Columna derecha (Datos del inmueble)
-        right_layout = QFormLayout()
+        # Nuevo Grupo Jurídico
+        grupo_juridico = QGroupBox("Información Jurídica del Inmueble")
+        grupo_juridico.setStyleSheet("""
+            QGroupBox {
+                font-weight: bold;
+                font-size: 14px;
+                margin-top: 15px;
+                border: 1px solid #cccccc;
+            }
+        """)
+        juridico_layout = QFormLayout(grupo_juridico)
+        
+        # Campos jurídicos
+        self.propietario_legal = QLineEdit()
+        self.numero_matricula = QLineEdit()
+        self.tipo_documento = QComboBox()
+        self.tipo_documento.addItems(["Escritura pública", "Sentencia judicial", "Resolución administrativa"])
+        self.fecha_adquisicion = QDateEdit(QDate.currentDate())
+        
+        juridico_layout.addRow("Propietario legal:", self.propietario_legal)
+        juridico_layout.addRow("Número de matrícula:", self.numero_matricula)
+        juridico_layout.addRow("Tipo de documento:", self.tipo_documento)
+        juridico_layout.addRow("Fecha de adquisición:", self.fecha_adquisicion)
+        
+        # Agregar grupos a la columna izquierda
+        left_column.addWidget(grupo_solicitud)
+        left_column.addWidget(grupo_juridico)
+        left_column.addStretch()
+        
+        # Columna derecha - Datos del inmueble
+        grupo_inmueble = QGroupBox("Datos del Inmueble")
+        grupo_inmueble.setStyleSheet("""
+            QGroupBox {
+                font-weight: bold;
+                font-size: 14px;
+                margin-top: 10px;
+                border: 1px solid #cccccc;
+            }
+        """)
+        right_layout = QFormLayout(grupo_inmueble)
         
         # Campos nuevos del inmueble
         self.direccion_inmueble = QLineEdit()
@@ -104,7 +151,8 @@ class ReportApp(QMainWindow):
         self.longitud.setPlaceholderText("Ej: -74.0817")
         
         # Documentación dinámica
-        self.documentacion_layout = QVBoxLayout()
+        grupo_documentos = QGroupBox("Documentación Aportada")
+        self.documentacion_layout = QVBoxLayout(grupo_documentos)
         self.btn_agregar_doc = QPushButton("Agregar Documento")
         self.btn_agregar_doc.clicked.connect(self.agregar_campo_documento)
         
@@ -120,11 +168,19 @@ class ReportApp(QMainWindow):
         right_layout.addRow("Latitud:", self.latitud)
         right_layout.addRow("Longitud:", self.longitud)
         right_layout.addRow(QLabel("Documentación aportada:"))
-        right_layout.addRow(self.btn_agregar_doc)
-        right_layout.addRow(self.documentacion_layout)
+        right_layout.addWidget(grupo_documentos)
+        right_layout.addWidget(self.btn_agregar_doc)
         
-        main_layout.addLayout(left_layout)
-        main_layout.addLayout(right_layout)
+        # Columna izquierda - Contenedor vertical
+        right_column = QVBoxLayout()
+        
+         # Agregar grupos a la columna izquierda
+        right_column.addWidget(grupo_inmueble)
+        right_column.addStretch()
+    
+        
+        main_layout.addLayout(left_column)
+        main_layout.addLayout(right_column)  # Asegurarse de mantener la columna derecha
         
         tab_panel.addTab(pestana, "Datos de la Solicitud")
 
@@ -189,6 +245,27 @@ class ReportApp(QMainWindow):
         tab_panel.addTab(pestana, "Características del Sector")
     
     def seleccionar_ubicacion(self):
+        directory = QFileDialog.getExistingDirectory(
+            self,
+            "Seleccionar ubicación de guardado",
+            self.default_save_path
+        )
+        if directory:
+            self.default_save_path = directory
+            QMessageBox.information(self, "Ubicación actualizada", 
+                                   f"Los informes se guardarán en:\n{self.default_save_path}")
+    def crea_proyecto(self):
+        directory = QFileDialog.getExistingDirectory(
+            self,
+            "Seleccionar ubicación de guardado",
+            self.default_save_path
+        )
+        if directory:
+            self.default_save_path = directory
+            QMessageBox.information(self, "Ubicación actualizada", 
+                                   f"Los informes se guardarán en:\n{self.default_save_path}")
+            
+    def carga_proyecto(self):
         directory = QFileDialog.getExistingDirectory(
             self,
             "Seleccionar ubicación de guardado",
