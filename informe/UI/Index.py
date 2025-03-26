@@ -7,6 +7,10 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QFormLayout, QGroupBox, QSpinBox, QComboBox, QDateEdit)
 from PyQt6.QtCore import Qt, QTimer, QDate
 from funciones import generar_informe
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtCore import QUrl, QFileInfo
+
+QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
 class ReportApp(QMainWindow):
     def __init__(self):
@@ -65,6 +69,26 @@ class ReportApp(QMainWindow):
         main_layout.addWidget(self.progress_bar)
     
     def crear_pestana_datos_solicitud(self, tab_panel):
+        
+        
+        # Estilo reutilizable
+        group_style = """
+            QGroupBox {
+                font-weight: bold;
+                font-size: 14px;
+                margin-top: 10px;
+                border: 1px solid #cccccc;
+                padding-top: 15px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 3px;
+            }
+        """
+        
+
+        
         pestana = QWidget()
         main_layout = QHBoxLayout(pestana)
         
@@ -73,59 +97,81 @@ class ReportApp(QMainWindow):
         
         # Grupo Datos de la Solicitud
         grupo_solicitud = QGroupBox("Datos de la Solicitud")
-        grupo_solicitud.setStyleSheet("""
-            QGroupBox {
-                font-weight: bold;
-                font-size: 14px;
-                margin-top: 10px;
-                border: 1px solid #cccccc;
-            }
-        """)
+        grupo_solicitud.setStyleSheet(group_style)
         solicitud_layout = QFormLayout(grupo_solicitud)
         
         # Campos de solicitud
-        self.solicitante = QLineEdit()
-        self.fecha_solicitud = QDateEdit(QDate.currentDate())
-        self.numero_referencia = QLineEdit()
-        self.tipo_solicitud = QComboBox()
-        self.tipo_solicitud.addItems(["Consulta", "Reclamo", "Solicitud formal", "Otro"])
+        self.cliente = QLineEdit()
+        self.doc_identidad = QLineEdit()
+        self.doc_identidad.setInputMask("9999999999")  # Máscara para 10 dígitos
+        self.destinatario = QLineEdit()
+        self.fecha_visita = QDateEdit(QDate.currentDate())
+        self.fecha_informe = QDateEdit(QDate.currentDate())
         
-        solicitud_layout.addRow("Solicitante:", self.solicitante)
-        solicitud_layout.addRow("Fecha de solicitud:", self.fecha_solicitud)
-        solicitud_layout.addRow("Número de referencia:", self.numero_referencia)
-        solicitud_layout.addRow("Tipo de solicitud:", self.tipo_solicitud)
+        solicitud_layout.addRow("Cliente:", self.cliente)
+        solicitud_layout.addRow("Documento de identificación:", self.doc_identidad)
+        solicitud_layout.addRow("Destinatario del Avalúo:", self.destinatario)
+        solicitud_layout.addRow("Fecha de la visita:", self.fecha_visita)
+        solicitud_layout.addRow("Fecha del informe:", self.fecha_informe)
         
-        # Nuevo Grupo Jurídico
-        grupo_juridico = QGroupBox("Información Jurídica del Inmueble")
-        grupo_juridico.setStyleSheet("""
-            QGroupBox {
-                font-weight: bold;
-                font-size: 14px;
-                margin-top: 15px;
-                border: 1px solid #cccccc;
-            }
-        """)
+        # Grupo Información Jurídica y Catastral
+        grupo_juridico = QGroupBox("Información Jurídica y Catastral")
+        grupo_juridico.setStyleSheet(group_style)
         juridico_layout = QFormLayout(grupo_juridico)
         
         # Campos jurídicos
-        self.propietario_legal = QLineEdit()
-        self.numero_matricula = QLineEdit()
-        self.tipo_documento = QComboBox()
-        self.tipo_documento.addItems(["Escritura pública", "Sentencia judicial", "Resolución administrativa"])
-        self.fecha_adquisicion = QDateEdit(QDate.currentDate())
+        self.propietario = QLineEdit()
+        self.id_propietario = QLineEdit()
+        self.doc_propiedad = QTextEdit()
+        self.doc_propiedad.setPlainText("Copia simple de la Escritura Pública No. 4126 del 26 de Noviembre de 1997, otorgada en la Notaria 2 de Bucaramanga.")
         
-        juridico_layout.addRow("Propietario legal:", self.propietario_legal)
-        juridico_layout.addRow("Número de matrícula:", self.numero_matricula)
-        juridico_layout.addRow("Tipo de documento:", self.tipo_documento)
-        juridico_layout.addRow("Fecha de adquisición:", self.fecha_adquisicion)
+        # Contenedor para matrículas dinámicas
+        self.matricula_container = QWidget()
+        self.matricula_layout = QVBoxLayout(self.matricula_container)
+        self.matricula_layout.setContentsMargins(0, 0, 0, 0)
         
-        # Agregar grupos a la columna izquierda
+        # Botón para agregar matrículas
+        btn_agregar_matricula = QPushButton("Agregar Matrícula")
+        btn_agregar_matricula.clicked.connect(self.agregar_campo_matricula)
+        btn_agregar_matricula.setStyleSheet("""
+            QPushButton {
+                background-color: #e0e0e0;
+                padding: 5px;
+                border-radius: 3px;
+            }
+            QPushButton:hover {
+                background-color: #d0d0d0;
+            }
+        """)
+        
+        self.cedula_catastral = QLineEdit()
+        self.modo_adquisicion = QComboBox()
+        self.modo_adquisicion.addItems([
+            "Compraventa", 
+            "Adjudicación en Sucesión", 
+            "Transferencia a título de fiducia mercantil", 
+            "Compra parcial"
+        ])
+        self.limitaciones = QTextEdit()
+        
+        juridico_layout.addRow("Propietario:", self.propietario)
+        juridico_layout.addRow("ID Propietario:", self.id_propietario)
+        juridico_layout.addRow("Documento de propiedad:", self.doc_propiedad)
+        
+        self.agregar_campo_matricula()    
+        juridico_layout.addRow("Matrícula Inmobiliaria:", self.matricula_container)
+        juridico_layout.addRow(btn_agregar_matricula)
+        
+        juridico_layout.addRow("Cédula Catastral:", self.cedula_catastral)
+        juridico_layout.addRow("Modo de adquisición:", self.modo_adquisicion)
+        juridico_layout.addRow("Limitaciones y gravámenes:", self.limitaciones)
+        
         left_column.addWidget(grupo_solicitud)
         left_column.addWidget(grupo_juridico)
-        left_column.addStretch()
         
         # Columna derecha - Datos del inmueble
         grupo_inmueble = QGroupBox("Datos del Inmueble")
+        
         grupo_inmueble.setStyleSheet("""
             QGroupBox {
                 font-weight: bold;
@@ -139,16 +185,19 @@ class ReportApp(QMainWindow):
         # Campos nuevos del inmueble
         self.direccion_inmueble = QLineEdit()
         self.barrio_inmueble = QLineEdit()
-        self.ciudad_inmueble = QLineEdit()
+        self.municipio_inmueble = QLineEdit()
         self.departamento_inmueble = QLineEdit()
+        
+        self.tipo_inmueble = QComboBox()
+        self.tipo_inmueble.addItems(["Apartamento", "Casa", "Oficina", "Bodega", "Local", "Lote", "Finca", "Consultorio", "Hospital", "Colegio", "Edificio"])
         
         self.tipo_avaluo = QComboBox()
         self.tipo_avaluo.addItems(["Comercial", "Jurídico", "Financiero", "Seguros"])
         
         self.latitud = QLineEdit()
-        self.latitud.setPlaceholderText("Ej: 4.6097")
+        self.latitud.setPlaceholderText("4.6097")
         self.longitud = QLineEdit()
-        self.longitud.setPlaceholderText("Ej: -74.0817")
+        self.longitud.setPlaceholderText("-74.0817")
         
         # Documentación dinámica
         grupo_documentos = QGroupBox("Documentación Aportada")
@@ -158,10 +207,10 @@ class ReportApp(QMainWindow):
         
         # Campos iniciales
         self.agregar_campo_documento()  # Primer campo por defecto
-        
+        right_layout.addRow("Tipo de inmueble:", self.tipo_inmueble)
         right_layout.addRow("Dirección del inmueble:", self.direccion_inmueble)
-        right_layout.addRow("Barrio:", self.barrio_inmueble)
-        right_layout.addRow("Ciudad:", self.ciudad_inmueble)
+        right_layout.addRow("Barrio / Vereda:", self.barrio_inmueble)
+        right_layout.addRow("Municipio:", self.municipio_inmueble)
         right_layout.addRow("Departamento:", self.departamento_inmueble)
         right_layout.addRow("Tipo de avalúo:", self.tipo_avaluo)
         right_layout.addRow(QLabel("Coordenadas:"))
@@ -180,9 +229,164 @@ class ReportApp(QMainWindow):
     
         
         main_layout.addLayout(left_column)
-        main_layout.addLayout(right_column)  # Asegurarse de mantener la columna derecha
+        main_layout.addLayout(right_column) 
         
         tab_panel.addTab(pestana, "Datos de la Solicitud")
+        
+        # Grupo para el mapa
+        grupo_mapa = QGroupBox("Ubicación Geográfica")
+        grupo_mapa.setStyleSheet(group_style)
+        mapa_layout = QVBoxLayout(grupo_mapa)
+        
+        # Widget para el mapa
+        self.web_view = QWebEngineView()
+        self.web_view.setMinimumHeight(300)
+        
+        # Botón para actualizar mapa
+        btn_actualizar = QPushButton("Actualizar Mapa")
+        btn_actualizar.clicked.connect(self.actualizar_mapa)
+        
+        mapa_layout.addWidget(self.web_view)
+        mapa_layout.addWidget(btn_actualizar)
+        
+        # Agregar el mapa debajo del grupo del inmueble
+        right_column.addWidget(grupo_mapa)
+    
+        # Cargar mapa inicial
+        self.actualizar_mapa()
+        
+    def actualizar_mapa(self):
+        # Obtener coordenadas de los campos
+        lat = self.latitud.text().strip() or "4.6097"  # Bogotá por defecto
+        lon = self.longitud.text().strip() or "-74.0817"
+        
+
+        
+        """ try:
+            lat = float(self.latitud.text())
+            lon = float(self.longitud.text())
+            if not (-90 <= lat <= 90) or not (-180 <= lon <= 180):
+                raise ValueError
+        except ValueError:
+            QMessageBox.warning(self, "Error", "Coordenadas inválidas")
+            return """
+        
+        # Generar HTML con el mapa
+        mapa_html =  f'''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Mapa del Inmueble</title>
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+            <style>
+                #map {{ 
+                    height: 300px;
+                    width: 100%;
+                }}
+            </style>
+        </head>
+        <body>
+            <div id="map"></div>
+            <script>
+                // Solución para CORS y User-Agent
+                L.Browser.any3d = false; // Desactivar aceleración hardware
+                L.TileLayer.include({{
+                    createTile: function (coords, done) {{
+                        var tile = document.createElement('img');
+                        tile.onload = L.bind(this._tileOnLoad, this, done, tile);
+                        tile.onerror = L.bind(this._tileOnError, this, done, tile);
+                        tile.src = this.getTileUrl(coords);
+                        tile.setAttribute('referrerpolicy', 'no-referrer');
+                        tile.setAttribute('crossorigin', 'anonymous');
+                        return tile;
+                    }}
+                }});
+                
+                var map = L.map('map', {{
+                    attributionControl: false,
+                    zoomControl: false
+                }}).setView([{lat}, {lon}], 16);
+                
+                // Usar servidores alternativos
+                L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
+                    subdomains: 'abc', // Usar subdominios alternativos
+                    noWrap: true,
+                    maxZoom: 19,
+                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }}).addTo(map);
+                
+                L.marker([{lat}, {lon}]).addTo(map);
+            </script>
+        </body>
+        </html>
+        '''
+        
+        self.web_view.setHtml(mapa_html)
+        # self.habilitar_permisos_webengine()
+        
+    # def habilitar_permisos_webengine(self):
+    #     # Configuraciones esenciales para QtWebEngine
+    #     settings = self.web_view.settings()
+    #     settings.setAttribute(QWebEngineSettings.WebAttribute.LocalStorageEnabled, True)
+    #     settings.setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
+    #     settings.setAttribute(QWebEngineSettings.WebAttribute.JavascriptCanOpenWindows, True)
+    #     settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls, True)
+    #     settings.setUnknownUrlSchemePolicy(QWebEngineSettings.UnknownUrlSchemePolicy.AllowAllUnknownUrlSchemes)
+        
+    def agregar_campo_matricula(self):
+        campo = QLineEdit()
+        campo.setPlaceholderText("Ingrese número de matrícula")
+        campo.setStyleSheet("""
+            QLineEdit {
+                margin-bottom: 5px;
+                border: 1px solid #ccc;
+                padding: 3px;
+            }
+        """)
+        btn_eliminar = QPushButton("×")
+        btn_eliminar.setStyleSheet("""
+            QPushButton {
+                color: #ff0000;
+                font-weight: bold;
+                border: none;
+                min-width: 20px;
+                max-width: 20px;
+            }
+            QPushButton:hover {
+                background-color: #ffe0e0;
+            }
+        """)
+        
+        # Contenedor para el campo y el botón
+        campo_container = QWidget()
+        layout_container = QHBoxLayout(campo_container)
+        layout_container.addWidget(campo)
+        layout_container.addWidget(btn_eliminar)
+        layout_container.setContentsMargins(0, 0, 0, 0)
+        
+        # Conectar el botón de eliminar
+        btn_eliminar.clicked.connect(lambda: self.eliminar_campo_matricula(campo_container))
+        
+        self.matricula_layout.addWidget(campo_container)
+
+    def eliminar_campo_matricula(self, contenedor_a_eliminar):
+        # Remover el widget contenedor del layout
+        self.matricula_layout.removeWidget(contenedor_a_eliminar)
+        
+        # Eliminar los widgets hijos
+        contenedor_a_eliminar.deleteLater()
+    
+    def obtener_matriculas(self):
+        matriculas = []
+        for i in range(self.matricula_layout.count()):
+            item = self.matricula_layout.itemAt(i)
+            if item and item.widget():
+                contenedor = item.widget()
+                line_edit = contenedor.findChild(QLineEdit)
+                if line_edit and line_edit.text().strip():
+                    matriculas.append(line_edit.text().strip())
+        return matriculas
 
     def agregar_campo_documento(self):
         campo = QLineEdit()
@@ -295,24 +499,32 @@ class ReportApp(QMainWindow):
     
     def procesar_informe(self):
         # Recolectar datos de todas las pestañas
+        
+        # Obtener todas las matrículas
+        matriculas = []
+        for i in range(self.matricula_layout.count()):
+            item = self.matricula_layout.itemAt(i)
+            if item and isinstance(item, QHBoxLayout):
+                line_edit = item.itemAt(0).widget()
+                if line_edit and line_edit.text():
+                    matriculas.append(line_edit.text())
+        
         contenido = f"""
         --- DATOS DE LA SOLICITUD ---
-        Solicitante: {self.solicitante.text()}
-        Fecha: {self.fecha_solicitud.date().toString("dd/MM/yyyy")}
-        Referencia: {self.numero_referencia.text()}
-        Tipo: {self.tipo_solicitud.currentText()}
-        
-        --- INFORMACIÓN BÁSICA ---
-        Proyecto: {self.nombre_proyecto.text()}
-        Ubicación: {self.ubicacion.text()}
-        Área: {self.area_total.value()} m²
-        Descripción: {self.descripcion.toPlainText()}
+        Cliente: {self.cliente.text()}
+        Documento ID: {self.doc_identidad.text()}
+        Destinatario: {self.destinatario.text()}
+        Fecha Visita: {self.fecha_visita.date().toString("dd/MM/yyyy")}
+        Fecha Informe: {self.fecha_informe.date().toString("dd/MM/yyyy")}
         
         --- INFORMACIÓN JURÍDICA ---
-        Estado: {self.estado_juridico.currentText()}
-        Escritura: {self.numero_escritura.text()}
-        Fecha Escritura: {self.fecha_escritura.date().toString("dd/MM/yyyy")}
-        Observaciones: {self.observaciones.toPlainText()}
+        Propietario: {self.propietario.text()}
+        ID Propietario: {self.id_propietario.text()}
+        Documento Propiedad: {self.doc_propiedad.toPlainText()}
+        Matrícula: {self.matricula_inmobiliaria.text()}
+        Cédula Catastral: {self.cedula_catastral.text()}
+        Adquisición: {self.modo_adquisicion.currentText()}
+        Limitaciones: {self.limitaciones.toPlainText()}
         
         --- CARACTERÍSTICAS DEL SECTOR ---
         Zona: {self.zona.currentText()}
