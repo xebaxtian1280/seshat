@@ -4,17 +4,29 @@ from pathlib import Path
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                              QLineEdit, QPushButton, QLabel, QMessageBox, QProgressBar,
                              QFileDialog, QMenuBar, QMenu, QTabWidget, QTextEdit, 
-                             QFormLayout, QGroupBox, QSpinBox, QComboBox, QDateEdit)
+                             QFormLayout, QGroupBox, QSpinBox, QComboBox, QDateEdit, QListWidget, QListWidgetItem)
 from PyQt6.QtCore import Qt, QTimer, QDate
 from funciones import generar_informe
 from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtCore import QUrl, QFileInfo
+from PyQt6.QtCore import QUrl, QFileInfo, Qt
+from PyQt6.QtGui import QPixmap
+
+import tkinter as tk
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
 class ReportApp(QMainWindow):
     def __init__(self):
         super().__init__()
+        
+        root = tk.Tk()
+        root.withdraw()  # Oculta la ventana principal
+        
+        ancho = root.winfo_screenwidth()
+        alto = root.winfo_screenheight()
+        
+        root.destroy()
+        
         self.setWindowTitle("Sistema de Gestión de Informes")
         self.setMinimumSize(1000, 700)
         self.default_save_path = str(Path.home() / "/Proyectos/seshat/informe/Resultados")
@@ -57,9 +69,10 @@ class ReportApp(QMainWindow):
         
         # Crear pestañas
         self.crear_pestana_datos_solicitud(tab_panel)
+        self.crear_pestana_caracteristicas_sector(tab_panel)
         self.crear_pestana_info_basica(tab_panel)
         self.crear_pestana_info_juridica(tab_panel)
-        self.crear_pestana_caracteristicas_sector(tab_panel)
+        
         
         main_layout.addWidget(tab_panel)
         
@@ -393,7 +406,184 @@ class ReportApp(QMainWindow):
         campo.setPlaceholderText("Nombre del documento")
         campo.setClearButtonEnabled(True)
         self.documentacion_layout.addWidget(campo)
+        
+# ------------------------------------------------Pestañas Caracteristicas del sector --------------------------------------------------------------
+
+    def crear_pestana_caracteristicas_sector(self, tab_panel):
+        group_style = """
+            QGroupBox {
+                font-weight: bold;
+                font-size: 14px;
+                margin-top: 10px;
+                border: 1px solid #cccccc;
+                padding-top: 15px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 3px;
+            }
+        """
+        pestana = QWidget()
+        main_layout = QVBoxLayout(pestana)
+        
+        # Grupo 1: Delimitación del sector
+        grupo_delimitacion = QGroupBox("Delimitación del Sector")
+        grupo_delimitacion.setStyleSheet(group_style)
+        form_delimitacion = QFormLayout(grupo_delimitacion)
+        
+        self.norte = QLineEdit()
+        self.sur = QLineEdit()
+        self.oriente = QLineEdit()
+        self.occidente = QLineEdit()
+        
+        form_delimitacion.addRow("Norte:", self.norte)
+        form_delimitacion.addRow("Sur:", self.sur)
+        form_delimitacion.addRow("Oriente:", self.oriente)
+        form_delimitacion.addRow("Occidente:", self.occidente)
+        
+        # Grupo 2: Amoblamiento urbano
+        grupo_amoblamiento = QGroupBox("Amoblamiento urbano")
+        grupo_amoblamiento.setStyleSheet(group_style)
+        layout_amoblamiento = QVBoxLayout(grupo_amoblamiento)
+        
+        self.amoblamiento_texto = QTextEdit()
+        layout_amoblamiento.addWidget(self.amoblamiento_texto)
+        
+        # Grupo 3: Norma urbanística
+        grupo_norma = QGroupBox("Norma urbanística")
+        grupo_norma.setStyleSheet(group_style)
+        layout_norma = QVBoxLayout(grupo_norma)
+        
+        # Instrumentos de OT
+        self.instrumentos_ot = QTextEdit()
+        self.instrumentos_ot.setPlainText(
+            "Conforme al Plan de Ordenamiento Territorial, aprobado mediante acuerdo N° 0000 de 20xx "
+            "Por el cual se adopta el Plan de Ordenamiento Territorial de segunda generación del Municipio de XXXXX."
+        )
+        layout_norma.addWidget(QLabel("Instrumentos de OT:"))
+        layout_norma.addWidget(self.instrumentos_ot)
+        
+        # Subgrupo Usos
+        subgrupo_usos = QGroupBox("Usos")
+        form_usos = QFormLayout(subgrupo_usos)
+        
+        # Descripción
+        self.descripcion_usos = QTextEdit()
+        form_usos.addRow("Descripción:", self.descripcion_usos)
+        
+        # Imágenes
+        self.imagenes_usos_layout = QVBoxLayout()
+        btn_agregar_imagen = QPushButton("Agregar imagen")
+        btn_agregar_imagen.clicked.connect(self.agregar_imagen_usos)
+        form_usos.addRow(btn_agregar_imagen)
+        form_usos.addRow(self.imagenes_usos_layout)
+        
+        # Listas dinámicas de usos
+        categorias_usos = [
+            ("Principales", self.crear_lista_usos),
+            ("Complementarios", self.crear_lista_usos),
+            ("Condicionado", self.crear_lista_usos),
+            ("Permitido", self.crear_lista_usos),
+            ("Prohibido", self.crear_lista_usos)
+        ]
+        
+        for nombre, funcion in categorias_usos:
+            form_usos.addRow(funcion(nombre))
+        
+        # Subgrupo Tratamientos
+        subgrupo_tratamientos = QGroupBox("Tratamientos")
+        form_tratamientos = QFormLayout(subgrupo_tratamientos)
+        
+        # Descripción tratamientos
+        self.descripcion_tratamientos = QTextEdit()
+        form_tratamientos.addRow("Descripción:", self.descripcion_tratamientos)
+        
+        # Imágenes tratamientos
+        self.imagenes_tratamientos_layout = QVBoxLayout()
+        btn_agregar_imagen_trat = QPushButton("Agregar imagen")
+        btn_agregar_imagen_trat.clicked.connect(self.agregar_imagen_tratamientos)
+        form_tratamientos.addRow(btn_agregar_imagen_trat)
+        form_tratamientos.addRow(self.imagenes_tratamientos_layout)
+        
+        # Ensamblar layout
+        layout_norma.addWidget(subgrupo_usos)
+        layout_norma.addWidget(subgrupo_tratamientos)
+        
+        main_layout.addWidget(grupo_delimitacion)
+        main_layout.addWidget(grupo_amoblamiento)
+        main_layout.addWidget(grupo_norma)
+        
+        tab_panel.addTab(pestana, "Características del Sector")
+
+    def crear_lista_usos(self, nombre):
+        widget = QWidget()
+        layout = QHBoxLayout(widget)
+        
+        self.combo = QComboBox()
+        self.combo.addItems([
+            "Residencial", "Comercio", "Comercio liviano", 
+            "Comercio Pesado", "Servicios", "Industrial", 
+            "Industria liviana", "Industria pesada", 
+            "Dotacional", "Protección"
+        ])
+        
+        self.lista = QListWidget()
+        btn_agregar = QPushButton("Agregar")
+        btn_agregar.clicked.connect(lambda: self.agregar_uso(self.combo, self.lista))
+        
+        layout.addWidget(self.combo)
+        layout.addWidget(btn_agregar)
+        layout.addWidget(self.lista)
+        
+        grupo = QGroupBox(nombre)
+        grupo.setLayout(QVBoxLayout())
+        grupo.layout().addWidget(widget)
+        
+        return grupo
+
+    def agregar_uso(self, combo, lista):
+        item = QListWidgetItem(combo.currentText())
+        lista.addItem(item)
+        
+    def agregar_imagen_usos(self):
+        file_name, _ = QFileDialog.getOpenFileName(
+            self, "Seleccionar imagen", "", "Imágenes (*.png *.jpg *.jpeg)"
+        )
+        if file_name:
+            self.mostrar_imagen(file_name, self.imagenes_usos_layout)
+
+    def agregar_imagen_tratamientos(self):
+        file_name, _ = QFileDialog.getOpenFileName(
+            self, "Seleccionar imagen", "", "Imágenes (*.png *.jpg *.jpeg)"
+        )
+        if file_name:
+            self.mostrar_imagen(file_name, self.imagenes_tratamientos_layout)
+
+    def mostrar_imagen(self, file_path, layout):
+        contenedor = QWidget()
+        hbox = QHBoxLayout(contenedor)
+        
+        label = QLabel()
+        pixmap = QPixmap(file_path)
+        label.setPixmap(pixmap.scaled(100, 100, Qt.AspectRatioMode.KeepAspectRatio))
+        
+        btn_eliminar = QPushButton("X")
+        btn_eliminar.setStyleSheet("color: red;")
+        btn_eliminar.clicked.connect(lambda: self.eliminar_imagen(contenedor))
+        
+        hbox.addWidget(label)
+        hbox.addWidget(btn_eliminar)
+        
+        layout.addWidget(contenedor)
+
+    def eliminar_imagen(self, widget):
+        widget.deleteLater()
+
+    # Estilo común para los grupos
     
+        
+# ------------------------------------------------Pestañas Juridica --------------------------------------------------------------   
     def crear_pestana_info_basica(self, tab_panel):
         pestana = QWidget()
         layout = QFormLayout()
@@ -430,23 +620,7 @@ class ReportApp(QMainWindow):
         pestana.setLayout(layout)
         tab_panel.addTab(pestana, "Información Jurídica")
     
-    def crear_pestana_caracteristicas_sector(self, tab_panel):
-        pestana = QWidget()
-        layout = QFormLayout()
-        
-        self.zona = QComboBox()
-        self.zona.addItems(["Residencial", "Comercial", "Industrial", "Mixto"])
-        self.equipamientos = QTextEdit()
-        self.infrastructure = QTextEdit()
-        self.riesgos = QTextEdit()
-        
-        layout.addRow("Zona:", self.zona)
-        layout.addRow("Equipamientos urbanos:", self.equipamientos)
-        layout.addRow("Infraestructura:", self.infrastructure)
-        layout.addRow("Riesgos identificados:", self.riesgos)
-        
-        pestana.setLayout(layout)
-        tab_panel.addTab(pestana, "Características del Sector")
+
     
     def seleccionar_ubicacion(self):
         directory = QFileDialog.getExistingDirectory(
