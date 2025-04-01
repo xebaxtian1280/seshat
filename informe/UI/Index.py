@@ -99,9 +99,7 @@ class ReportApp(QMainWindow):
                 padding: 0 3px;
             }
         """
-        
-
-        
+                
         pestana = QWidget()
         main_layout = QHBoxLayout(pestana)
         
@@ -109,7 +107,7 @@ class ReportApp(QMainWindow):
         left_column = QVBoxLayout()
         
         # Grupo Datos de la Solicitud
-        grupo_solicitud = QGroupBox("Datos de la Solicitud")
+        grupo_solicitud = QGroupBox("Datos del Cliente")
         grupo_solicitud.setStyleSheet(group_style)
         solicitud_layout = QFormLayout(grupo_solicitud)
         
@@ -181,6 +179,7 @@ class ReportApp(QMainWindow):
         
         left_column.addWidget(grupo_solicitud)
         left_column.addWidget(grupo_juridico)
+        left_column.addStretch() 
         
         # Columna derecha - Datos del inmueble
         grupo_inmueble = QGroupBox("Datos del Inmueble")
@@ -426,6 +425,11 @@ class ReportApp(QMainWindow):
         """
         pestana = QWidget()
         main_layout = QVBoxLayout(pestana)
+        main_layout.setContentsMargins(10, 10, 10, 10)
+        main_layout.setSpacing(15)
+        # Columna izquierda
+        left_column = QVBoxLayout() 
+        left_column.setSpacing(10)
         
         # Grupo 1: Delimitación del sector
         grupo_delimitacion = QGroupBox("Delimitación del Sector")
@@ -442,6 +446,8 @@ class ReportApp(QMainWindow):
         form_delimitacion.addRow("Oriente:", self.oriente)
         form_delimitacion.addRow("Occidente:", self.occidente)
         
+        left_column.addWidget(grupo_delimitacion)
+        
         # Grupo 2: Amoblamiento urbano
         grupo_amoblamiento = QGroupBox("Amoblamiento urbano")
         grupo_amoblamiento.setStyleSheet(group_style)
@@ -450,10 +456,18 @@ class ReportApp(QMainWindow):
         self.amoblamiento_texto = QTextEdit()
         layout_amoblamiento.addWidget(self.amoblamiento_texto)
         
+        
+        # left_column.addWidget(grupo_amoblamiento)
+        # left_column.addStretch() 
+        
+        # Columna derecha
+        right_column = QVBoxLayout()
+        right_column.setSpacing(10)        
+                
         # Grupo 3: Norma urbanística
         grupo_norma = QGroupBox("Norma urbanística")
         grupo_norma.setStyleSheet(group_style)
-        layout_norma = QVBoxLayout(grupo_norma)
+        layout_norma = QHBoxLayout(grupo_norma)
         
         # Instrumentos de OT
         self.instrumentos_ot = QTextEdit()
@@ -461,8 +475,8 @@ class ReportApp(QMainWindow):
             "Conforme al Plan de Ordenamiento Territorial, aprobado mediante acuerdo N° 0000 de 20xx "
             "Por el cual se adopta el Plan de Ordenamiento Territorial de segunda generación del Municipio de XXXXX."
         )
-        layout_norma.addWidget(QLabel("Instrumentos de OT:"))
-        layout_norma.addWidget(self.instrumentos_ot)
+        # layout_norma.addWidget(QLabel("Instrumentos de OT:"))
+        # layout_norma.addWidget(self.instrumentos_ot)
         
         # Subgrupo Usos
         subgrupo_usos = QGroupBox("Usos")
@@ -506,12 +520,35 @@ class ReportApp(QMainWindow):
         form_tratamientos.addRow(btn_agregar_imagen_trat)
         form_tratamientos.addRow(self.imagenes_tratamientos_layout)
         
-        # Ensamblar layout
-        layout_norma.addWidget(subgrupo_usos)
-        layout_norma.addWidget(subgrupo_tratamientos)
+        left_column_norma = QVBoxLayout() 
+        right_column_norma = QVBoxLayout() 
         
-        main_layout.addWidget(grupo_delimitacion)
-        main_layout.addWidget(grupo_amoblamiento)
+        
+        left_column_norma.addWidget(subgrupo_usos)
+        right_column_norma.addWidget(QLabel("Instrumentos de OT:"))
+        right_column_norma.addWidget(self.instrumentos_ot)
+        right_column_norma.addWidget(subgrupo_tratamientos)
+        
+        layout_norma.addLayout(right_column_norma)
+        layout_norma.addLayout(left_column_norma)
+        
+        # layout_norma.addWidget(subgrupo_usos)
+        # layout_norma.addWidget(subgrupo_tratamientos)
+        
+        #Agrega Grupo norma a la columna de la derecha
+        
+        right_column.addWidget(grupo_amoblamiento)
+        right_column.addStretch()  
+        
+        # Ensamblar layout
+        
+        top_box = QHBoxLayout() 
+        top_box.setSpacing(10)
+        top_box.addLayout(right_column)
+        top_box.addLayout(left_column)
+        
+        main_layout.addLayout(top_box)   # 40% del ancho
+        
         main_layout.addWidget(grupo_norma)
         
         tab_panel.addTab(pestana, "Características del Sector")
