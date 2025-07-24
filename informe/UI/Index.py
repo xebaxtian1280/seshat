@@ -4,7 +4,8 @@ from pathlib import Path
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                              QLineEdit, QPushButton, QLabel, QMessageBox, QProgressBar,
                              QFileDialog, QMenuBar, QMenu, QTabWidget, QTextEdit, 
-                             QFormLayout, QGroupBox, QSpinBox, QComboBox, QDateEdit, QListWidget, QListWidgetItem)
+                             QFormLayout, QGroupBox, QSpinBox, QComboBox, QDateEdit, QListWidget, QListWidgetItem,QScrollArea,
+                             QSizePolicy, QCheckBox)
 from PyQt6.QtCore import Qt, QTimer, QDate
 from funciones import generar_informe
 from PyQt6.QtWebEngineWidgets import QWebEngineView
@@ -406,6 +407,8 @@ class ReportApp(QMainWindow):
         campo.setClearButtonEnabled(True)
         self.documentacion_layout.addWidget(campo)
         
+        
+        
 # ------------------------------------------------Pestañas Caracteristicas del sector --------------------------------------------------------------
 
     def crear_pestana_caracteristicas_sector(self, tab_panel):
@@ -416,6 +419,7 @@ class ReportApp(QMainWindow):
                 margin-top: 10px;
                 border: 1px solid #cccccc;
                 padding-top: 15px;
+                
             }
             QGroupBox::title {
                 subcontrol-origin: margin;
@@ -424,10 +428,22 @@ class ReportApp(QMainWindow):
             }
         """
         pestana = QWidget()
-        main_layout = QVBoxLayout(pestana)
+        
+        # Crear scroll area para toda la pestaña
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        
+        # Widget contenedor para el contenido
+        
+        contenido = QWidget()
+        scroll_area.setWidget(contenido) 
+        main_layout = QVBoxLayout(contenido)
         main_layout.setContentsMargins(10, 10, 10, 10)
         main_layout.setSpacing(15)
+        
         # Columna izquierda
+        
         left_column = QVBoxLayout() 
         left_column.setSpacing(10)
         
@@ -447,14 +463,79 @@ class ReportApp(QMainWindow):
         form_delimitacion.addRow("Occidente:", self.occidente)
         
         left_column.addWidget(grupo_delimitacion)
+        left_column.addStretch()
+        
+        # Grupo: Vias Publicas
+        altura_textos = 70
+        grupo_vias = QGroupBox("Vias Publicas")
+        grupo_vias.setStyleSheet(group_style)
+        contenido_vias = QWidget() 
+        form_vias = QFormLayout(grupo_vias)        
+           
+        self.vias_principales_texto = QTextEdit()
+        self.vias_principales_texto.setPlaceholderText(
+            "Las vı́as principal más importantes de la zona corresponden a la carrera 15 y calle 3. Se desplaza un alto flujo vehicular y se desarrolla la mayor actividad comercial de la zona, en general se encuentra en buen estado de conservación."
+        )
+        self.vias_principales_texto.setFixedHeight(altura_textos)
+        form_vias.addRow("Principales", self.vias_principales_texto)
+        
+        self.vias_secundarias_texto = QTextEdit()
+        self.vias_secundarias_texto.setPlaceholderText(
+            "Cuenta con vı́as para acceder al sector, como la Calle 9 y Carrera 19. Se encuentran en buen estado de conservación."
+        )
+        self.vias_secundarias_texto.setFixedHeight(altura_textos)
+        form_vias.addRow("Secundarias", self.vias_secundarias_texto)
+        
+        self.transporte_texto = QTextEdit()
+        self.transporte_texto.setPlaceholderText(
+            "El servicio de transporte público es suministrado principalmente por buses, busetas, colectivos y taxis, que comunican a los diferentes puntos del municipio."
+        )
+        self.transporte_texto.setFixedHeight(altura_textos)
+        form_vias.addRow("Trasnporte", self.transporte_texto)
+        
+        left_column.addWidget(grupo_vias)
+       
         
         # Grupo 2: Amoblamiento urbano
         grupo_amoblamiento = QGroupBox("Amoblamiento urbano")
         grupo_amoblamiento.setStyleSheet(group_style)
-        layout_amoblamiento = QVBoxLayout(grupo_amoblamiento)
+        layout_amoblamiento = QVBoxLayout(grupo_amoblamiento)     
         
+           
         self.amoblamiento_texto = QTextEdit()
         layout_amoblamiento.addWidget(self.amoblamiento_texto)
+        
+        # Nuevo Grupo: Servicios Públicos
+        grupo_servicios = QGroupBox("Servicios Públicos")
+        grupo_servicios.setStyleSheet(group_style)
+        servicios_layout = QVBoxLayout(grupo_servicios)    
+        
+        # Crear widget para dos columnas
+        column_widget = QWidget()
+        column_layout = QHBoxLayout(column_widget)
+        col1 = QVBoxLayout()
+        col2 = QVBoxLayout()
+
+        # Dividir servicios en dos columnas
+        servicios = [
+            "Acueducto", "Gas Natural", "Telefonía Fija",
+            "Recolección de Basuras", "Alcantarillado", 
+            "Energía Eléctrica", "Contador de Agua", 
+            "Contador de Energia", "Contador de Gas"
+        ]
+        mitad = len(servicios) // 2
+
+        for i, servicio in enumerate(servicios):
+            cb = QCheckBox(servicio)
+            #self.checkbox_servicios[servicio] = cb
+            if i < mitad:
+                col1.addWidget(cb)
+            else:
+                col2.addWidget(cb)
+
+        column_layout.addLayout(col1)
+        column_layout.addLayout(col2)
+        servicios_layout.addWidget(column_widget)
         
         
         # left_column.addWidget(grupo_amoblamiento)
@@ -475,12 +556,37 @@ class ReportApp(QMainWindow):
             "Conforme al Plan de Ordenamiento Territorial, aprobado mediante acuerdo N° 0000 de 20xx "
             "Por el cual se adopta el Plan de Ordenamiento Territorial de segunda generación del Municipio de XXXXX."
         )
-        # layout_norma.addWidget(QLabel("Instrumentos de OT:"))
-        # layout_norma.addWidget(self.instrumentos_ot)
+        self.instrumentos_ot.setFixedHeight(100)
         
         # Subgrupo Usos
-        subgrupo_usos = QGroupBox("Usos")
-        form_usos = QFormLayout(subgrupo_usos)
+
+
+        subgroup_style = """
+            QGroupBox {
+                font-weight: bold;
+                font-size: 13px;
+                border: 1px solid #e0e0e0;
+                margin-top: 5px;
+                padding-top: 12px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 5px;
+                padding: 0 2px;
+            }
+        """
+        
+        subgrupo_usos = QGroupBox("Usos")   
+        subgrupo_usos.setStyleSheet(subgroup_style)
+        
+            # Crear scroll area
+        scroll_usos = QScrollArea()
+        scroll_usos.setWidgetResizable(True)
+        scroll_usos.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        
+        # Widget contenedor para el formulario
+        contenido_usos = QWidget()  
+        form_usos = QFormLayout(contenido_usos)
         
         # Descripción
         self.descripcion_usos = QTextEdit()
@@ -504,6 +610,12 @@ class ReportApp(QMainWindow):
         
         for nombre, funcion in categorias_usos:
             form_usos.addRow(funcion(nombre))
+            
+        scroll_usos.setWidget(contenido_usos)
+    
+        # Layout para el grupo de usos
+        layout_usos = QVBoxLayout(subgrupo_usos)
+        layout_usos.addWidget(scroll_usos)
         
         # Subgrupo Tratamientos
         subgrupo_tratamientos = QGroupBox("Tratamientos")
@@ -511,6 +623,8 @@ class ReportApp(QMainWindow):
         
         # Descripción tratamientos
         self.descripcion_tratamientos = QTextEdit()
+        self.descripcion_tratamientos.setPlainText("De acuerdo con la consulta del POT, el predio se encuentra ubicado en una zona de tratamiento de xxxxxxxxx.")
+        self.descripcion_tratamientos.setFixedHeight(100)        
         form_tratamientos.addRow("Descripción:", self.descripcion_tratamientos)
         
         # Imágenes tratamientos
@@ -538,7 +652,10 @@ class ReportApp(QMainWindow):
         #Agrega Grupo norma a la columna de la derecha
         
         right_column.addWidget(grupo_amoblamiento)
+        right_column.addWidget(grupo_servicios)
+        
         right_column.addStretch()  
+        
         
         # Ensamblar layout
         
@@ -547,9 +664,24 @@ class ReportApp(QMainWindow):
         top_box.addLayout(right_column)
         top_box.addLayout(left_column)
         
-        main_layout.addLayout(top_box)   # 40% del ancho
         
+        # CONFIGURACIÓN FINAL DEL LAYOUT
+        # --------------------------------------------------
+        
+        main_layout.addLayout(top_box)   # 40% del ancho        
         main_layout.addWidget(grupo_norma)
+              
+        
+        # Establecer política de tamaño para que se expanda verticalmente
+        contenido.setSizePolicy(
+            QSizePolicy.Policy.Expanding, 
+            QSizePolicy.Policy.MinimumExpanding
+        )
+        
+        # Agregar el scroll area al layout de la pestaña
+        pestana_layout = QVBoxLayout(pestana)
+        pestana_layout.addWidget(scroll_area)
+        pestana_layout.setContentsMargins(0, 0, 0, 0)
         
         tab_panel.addTab(pestana, "Características del Sector")
 
@@ -557,21 +689,23 @@ class ReportApp(QMainWindow):
         widget = QWidget()
         layout = QHBoxLayout(widget)
         
-        self.combo = QComboBox()
-        self.combo.addItems([
+        combo = QComboBox()
+        combo.addItems([
             "Residencial", "Comercio", "Comercio liviano", 
             "Comercio Pesado", "Servicios", "Industrial", 
             "Industria liviana", "Industria pesada", 
             "Dotacional", "Protección"
         ])
         
-        self.lista = QListWidget()
+        lista = QListWidget()
         btn_agregar = QPushButton("Agregar")
-        btn_agregar.clicked.connect(lambda: self.agregar_uso(self.combo, self.lista))
         
-        layout.addWidget(self.combo)
+        # Conectar con la función usando lambda y pasando los elementos específicos
+        btn_agregar.clicked.connect(lambda: self.agregar_uso(combo, lista))
+        
+        layout.addWidget(combo)
         layout.addWidget(btn_agregar)
-        layout.addWidget(self.lista)
+        layout.addWidget(lista)
         
         grupo = QGroupBox(nombre)
         grupo.setLayout(QVBoxLayout())
@@ -580,6 +714,7 @@ class ReportApp(QMainWindow):
         return grupo
 
     def agregar_uso(self, combo, lista):
+        
         item = QListWidgetItem(combo.currentText())
         lista.addItem(item)
         
@@ -620,7 +755,7 @@ class ReportApp(QMainWindow):
     # Estilo común para los grupos
     
         
-# ------------------------------------------------Pestañas Juridica --------------------------------------------------------------   
+# ------------------------------------------------Pestaña Informacion Juridica --------------------------------------------------------------   
     def crear_pestana_info_basica(self, tab_panel):
         pestana = QWidget()
         layout = QFormLayout()
