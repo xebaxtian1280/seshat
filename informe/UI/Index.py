@@ -4,7 +4,7 @@ from pathlib import Path
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                              QLineEdit, QPushButton, QLabel, QMessageBox, QProgressBar,
                              QFileDialog, QMenuBar, QMenu, QTabWidget, QTextEdit, 
-                             QFormLayout, QGroupBox, QSpinBox, QComboBox, QDateEdit, QListWidget, QListWidgetItem,QScrollArea,QTableWidgetItem,QTableWidget,
+                             QFormLayout, QGroupBox, QSpinBox, QComboBox, QDateEdit, QListWidget, QListWidgetItem,QScrollArea,QTableWidgetItem,QTableWidget,QGridLayout,
                              QSizePolicy, QCheckBox)
 from PyQt6.QtCore import Qt, QTimer, QDate
 from funciones import generar_informe
@@ -88,7 +88,7 @@ class ReportApp(QMainWindow):
         self.crear_pestana_datos_solicitud(tab_panel)
         self.crear_pestana_caracteristicas_sector(tab_panel)
         self.crear_pestana_caracteristicas_construccion(tab_panel)
-        self.crear_pestana_info_juridica(tab_panel)
+        self.crear_pestana_condiciones_valuacion(tab_panel)
         
         
         main_layout.addWidget(tab_panel)
@@ -1083,25 +1083,159 @@ class ReportApp(QMainWindow):
         if current_row >= 0:
             self.tabla_area.removeRow(current_row)
 
-# ------------------------------------------------Pestaña Informacion Juridica --------------------------------------------------------------   
+# ------------------------------------------------Pestaña Condiciones generales y Valoracion --------------------------------------------------------------   
     
-    def crear_pestana_info_juridica(self, tab_panel):
+        
+    
+    def crear_pestana_condiciones_valuacion(self, tab_panel):
+        # Crear el widget principal de la pestaña
         pestana = QWidget()
-        layout = QFormLayout()
         
-        self.estado_juridico = QComboBox()
-        self.estado_juridico.addItems(["En trámite", "Aprobado", "Rechazado", "En revisión"])
-        self.numero_escritura = QLineEdit()
-        self.fecha_escritura = QDateEdit()
-        self.observaciones = QTextEdit()
+        # Crear scroll area para toda la pestaña
+        scroll_area = QScrollArea(pestana)   
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         
-        layout.addRow("Estado jurídico:", self.estado_juridico)
-        layout.addRow("Número de escritura:", self.numero_escritura)
-        layout.addRow("Fecha de escritura:", self.fecha_escritura)
-        layout.addRow("Observaciones legales:", self.observaciones)
+        scroll_area.setStyleSheet("""
+            QScrollArea {
+                border: none;
+                background-color: white;
+            }
+            QScrollBar:vertical {
+                width: 10px;
+                background-color: #f0f0f0;
+            }
+            QScrollBar::handle:vertical {
+                background-color: #c0c0c0;
+                min-height: 20px;
+                border-radius: 4px;
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
+            }
+        """)
         
-        pestana.setLayout(layout)
-        tab_panel.addTab(pestana, "Información Jurídica")
+        # Crear el widget interno que contendrá los elementos
+        contenido = QWidget()
+        scroll_area.setWidget(contenido)
+        
+        # Layout principal vertical para el contenido        
+        layout_principal = QVBoxLayout(contenido)
+        layout_principal.setContentsMargins(10, 10, 10, 10)
+        layout_principal.setSpacing(15)
+        
+        # Configurar política de tamaño
+        contenido.setSizePolicy(
+            QSizePolicy.Policy.Expanding, 
+            QSizePolicy.Policy.MinimumExpanding
+        )
+    
+        # 1. Condiciones restrictivas y afectaciones
+        grupo_condiciones_restrictivas = QGroupBox("Condiciones restrictivas y afectaciones")
+        layout_condiciones_restrictivas = QGridLayout(grupo_condiciones_restrictivas)
+    
+        layout_condiciones_restrictivas.addWidget(QLabel("Problemas de estabilidad y suelos:"), 0, 0)
+        layout_condiciones_restrictivas.addWidget(QLineEdit(), 0, 1)
+    
+        layout_condiciones_restrictivas.addWidget(QLabel("Impacto ambiental y condiciones de salubridad:"), 1, 0)
+        layout_condiciones_restrictivas.addWidget(QLineEdit(), 1, 1)
+    
+        layout_condiciones_restrictivas.addWidget(QLabel("Seguridad:"), 2, 0)
+        layout_condiciones_restrictivas.addWidget(QLineEdit(), 2, 1)
+    
+        layout_principal.addWidget(grupo_condiciones_restrictivas)
+    
+        # 2. Condiciones generales
+        grupo_condiciones_generales = QGroupBox("Condiciones generales")
+        layout_condiciones_generales = QVBoxLayout(grupo_condiciones_generales)
+    
+        layout_condiciones_generales.addWidget(QLabel("Agregar condiciones:"))
+        boton_agregar_condicion = QPushButton("Agregar condición")
+        layout_condiciones_generales.addWidget(boton_agregar_condicion)
+    
+        # Espacio para agregar múltiples condiciones
+        lista_condiciones = QVBoxLayout()
+        layout_condiciones_generales.addLayout(lista_condiciones)
+    
+        def agregar_condicion():
+            campo_condicion = QLineEdit()
+            lista_condiciones.addWidget(campo_condicion)
+    
+        boton_agregar_condicion.clicked.connect(agregar_condicion)
+    
+        layout_principal.addWidget(grupo_condiciones_generales)
+    
+        # 3. Aspecto económico
+        grupo_aspecto_economico = QGroupBox("Aspecto económico")
+        layout_aspecto_economico = QGridLayout(grupo_aspecto_economico)
+    
+        layout_aspecto_economico.addWidget(QLabel("Metodologías valuatorias empleadas:"), 0, 0)
+        layout_metodologias = QVBoxLayout()
+        metodologias = [
+            "Método de comparación o mercado",
+            "Método de capitalización de rentas o ingresos",
+            "Método de costo de reposición",
+            "Método residual"
+        ]
+        for metodologia in metodologias:
+            layout_metodologias.addWidget(QCheckBox(metodologia))
+        layout_aspecto_economico.addLayout(layout_metodologias, 0, 1)
+    
+        layout_aspecto_economico.addWidget(QLabel("Justificación de las metodologías:"), 1, 0)
+        layout_aspecto_economico.addWidget(QTextEdit(), 1, 1)
+    
+        layout_aspecto_economico.addWidget(QLabel("Perspectivas de valorización:"), 2, 0)
+        combo_valorizacion = QComboBox()
+        combo_valorizacion.addItems(["Bajas", "Normales", "Altas"])
+        layout_aspecto_economico.addWidget(combo_valorizacion, 2, 1)
+    
+        layout_principal.addWidget(grupo_aspecto_economico)
+    
+        # 4. Valuación
+        grupo_valuacion = QGroupBox("Valuación")
+        layout_valuacion = QGridLayout(grupo_valuacion)
+    
+        layout_valuacion.addWidget(QLabel("Cuadro de liquidación (imágenes):"), 0, 0)
+        boton_agregar_imagen = QPushButton("Agregar imagen")
+        layout_valuacion.addWidget(boton_agregar_imagen, 0, 1)
+    
+        lista_imagenes = QVBoxLayout()
+        layout_valuacion.addLayout(lista_imagenes, 1, 0, 1, 2)
+    
+        def agregar_imagen():
+            etiqueta_imagen = QLabel()
+            etiqueta_imagen.setPixmap(QPixmap())  # Aquí puedes cargar una imagen real
+            lista_imagenes.addWidget(etiqueta_imagen)
+    
+        boton_agregar_imagen.clicked.connect(agregar_imagen)
+    
+        layout_valuacion.addWidget(QLabel("Valor adoptado:"), 2, 0)
+        valor_adoptado = QSpinBox()
+        valor_adoptado.setMaximum(1000000000)  # Limite máximo
+        layout_valuacion.addWidget(valor_adoptado, 2, 1)
+    
+        layout_valuacion.addWidget(QLabel("Valor en letras:"), 3, 0)
+        valor_en_letras = QLineEdit()
+        valor_en_letras.setReadOnly(True)
+        layout_valuacion.addWidget(valor_en_letras, 3, 1)
+    
+        def convertir_a_letras():
+            valor = valor_adoptado.value()
+            valor_en_letras.setText(num2words(valor, lang="es"))
+    
+        valor_adoptado.valueChanged.connect(convertir_a_letras)
+    
+        layout_principal.addWidget(grupo_valuacion)
+        
+        pestana_layout = QVBoxLayout(pestana)
+        pestana_layout.addWidget(scroll_area)
+        pestana_layout.setContentsMargins(0, 0, 0, 0)
+        
+        """ # Configurar el scroll area
+        scroll_area.setWidget(contenido)  """   
+    
+        # Agregar la pestaña al panel
+        tab_panel.addTab(pestana, "Condiciones generales y Valoración")
     
 
     
