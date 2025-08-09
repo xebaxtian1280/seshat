@@ -5,12 +5,13 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QLineEdit, QPushButton, QLabel, QMessageBox, QProgressBar,
                              QFileDialog, QMenuBar, QMenu, QTabWidget, QTextEdit, 
                              QFormLayout, QGroupBox, QSpinBox, QComboBox, QDateEdit, QListWidget, QListWidgetItem,QScrollArea,QTableWidgetItem,QTableWidget,QGridLayout,
-                             QSizePolicy, QCheckBox)
+                             QSizePolicy, QCheckBox, QDoubleSpinBox)
 from PyQt6.QtCore import Qt, QTimer, QDate
 from funciones import generar_informe
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtCore import QUrl, QFileInfo, Qt
 from PyQt6.QtGui import QPixmap
+from num2words import num2words
 
 import tkinter as tk
 
@@ -45,7 +46,8 @@ class ReportApp(QMainWindow):
         root.destroy()
         
         self.setWindowTitle("Sistema de Gestión de Informes")
-        self.setMinimumSize(1000, 700)
+        #self.setMinimumSize(1000, 700)
+        self.showMaximized()
         self.default_save_path = str(Path.home() / "/Proyectos/seshat/informe/Resultados")
         self.init_ui()
         
@@ -858,7 +860,7 @@ class ReportApp(QMainWindow):
         
         # Botón para agregar croquis
         btn_agregar_croquis = QPushButton("Agregar Croquis")
-        btn_agregar_croquis.clicked.connect(self.agregar_croquis)
+        btn_agregar_croquis.clicked.connect(lambda: self.agregar_imagen(self.croquis_container))
         
         layout_croquis.addLayout(self.croquis_container)
         layout_croquis.addWidget(btn_agregar_croquis)
@@ -1040,7 +1042,7 @@ class ReportApp(QMainWindow):
             # Mostrar imagen reducida
             label = QLabel()
             pixmap = QPixmap(file_name)
-            label.setPixmap(pixmap.scaled(100, 100, Qt.AspectRatioMode.KeepAspectRatio))
+            label.setPixmap(pixmap.scaled(200, 200, Qt.AspectRatioMode.KeepAspectRatio))
             
             # Campo de descripción
             descripcion = QLineEdit()
@@ -1120,15 +1122,23 @@ class ReportApp(QMainWindow):
         scroll_area.setWidget(contenido)
         
         # Layout principal vertical para el contenido        
-        layout_principal = QVBoxLayout(contenido)
+        layout_principal = QGridLayout(contenido)
         layout_principal.setContentsMargins(10, 10, 10, 10)
         layout_principal.setSpacing(15)
+        
+        # Configurar el mismo ancho para todas las columnas
+        columnas = 2  # Número de columnas en el layout
+        for i in range(columnas):
+            layout_principal.setColumnStretch(i, 1)  # Asignar la misma proporción de expansión
         
         # Configurar política de tamaño
         contenido.setSizePolicy(
             QSizePolicy.Policy.Expanding, 
             QSizePolicy.Policy.MinimumExpanding
         )
+        
+        """ # Crear un layout principal en forma de grid para dividir en dos columnas
+        layout_principal = QGridLayout(contenido)   """ 
     
         # 1. Condiciones restrictivas y afectaciones
         grupo_condiciones_restrictivas = QGroupBox("Condiciones restrictivas y afectaciones")
@@ -1143,7 +1153,7 @@ class ReportApp(QMainWindow):
         layout_condiciones_restrictivas.addWidget(QLabel("Seguridad:"), 2, 0)
         layout_condiciones_restrictivas.addWidget(QLineEdit(), 2, 1)
     
-        layout_principal.addWidget(grupo_condiciones_restrictivas)
+        layout_principal.addWidget(grupo_condiciones_restrictivas, 0, 0)
     
         # 2. Condiciones generales
         grupo_condiciones_generales = QGroupBox("Condiciones generales")
@@ -1163,7 +1173,7 @@ class ReportApp(QMainWindow):
     
         boton_agregar_condicion.clicked.connect(agregar_condicion)
     
-        layout_principal.addWidget(grupo_condiciones_generales)
+        layout_principal.addWidget(grupo_condiciones_generales,0,1)
     
         # 3. Aspecto económico
         grupo_aspecto_economico = QGroupBox("Aspecto económico")
@@ -1189,7 +1199,7 @@ class ReportApp(QMainWindow):
         combo_valorizacion.addItems(["Bajas", "Normales", "Altas"])
         layout_aspecto_economico.addWidget(combo_valorizacion, 2, 1)
     
-        layout_principal.addWidget(grupo_aspecto_economico)
+        layout_principal.addWidget(grupo_aspecto_economico,1,0)
     
         # 4. Valuación
         grupo_valuacion = QGroupBox("Valuación")
@@ -1198,34 +1208,37 @@ class ReportApp(QMainWindow):
         layout_valuacion.addWidget(QLabel("Cuadro de liquidación (imágenes):"), 0, 0)
         boton_agregar_imagen = QPushButton("Agregar imagen")
         layout_valuacion.addWidget(boton_agregar_imagen, 0, 1)
+        
     
         lista_imagenes = QVBoxLayout()
+        
         layout_valuacion.addLayout(lista_imagenes, 1, 0, 1, 2)
-    
-        def agregar_imagen():
-            etiqueta_imagen = QLabel()
-            etiqueta_imagen.setPixmap(QPixmap())  # Aquí puedes cargar una imagen real
-            lista_imagenes.addWidget(etiqueta_imagen)
-    
-        boton_agregar_imagen.clicked.connect(agregar_imagen)
-    
+        boton_agregar_imagen.clicked.connect(lambda:self.agregar_imagen(lista_imagenes))
+        
+        # Contenedor para imágenes y descripciones
+        self.valuation_container = QVBoxLayout()
+        
+        # Lista para almacenar las rutas de las imágenes
+        rutas_imagenes = [] 
+        
         layout_valuacion.addWidget(QLabel("Valor adoptado:"), 2, 0)
-        valor_adoptado = QSpinBox()
-        valor_adoptado.setMaximum(1000000000)  # Limite máximo
+        valor_adoptado = QDoubleSpinBox()
+        valor_adoptado.setRange(0, 1000000000000)  # Rango de 0 a 1 billón
+        valor_adoptado.setDecimals(0)  # Sin decimales
         layout_valuacion.addWidget(valor_adoptado, 2, 1)
     
         layout_valuacion.addWidget(QLabel("Valor en letras:"), 3, 0)
         valor_en_letras = QLineEdit()
         valor_en_letras.setReadOnly(True)
-        layout_valuacion.addWidget(valor_en_letras, 3, 1)
+        layout_valuacion.addWidget(valor_en_letras, 4, 0, 4, 2)
     
         def convertir_a_letras():
             valor = valor_adoptado.value()
-            valor_en_letras.setText(num2words(valor, lang="es"))
+            valor_en_letras.setText(num2words(valor, lang="es")+ " Pesos")
     
         valor_adoptado.valueChanged.connect(convertir_a_letras)
     
-        layout_principal.addWidget(grupo_valuacion)
+        layout_principal.addWidget(grupo_valuacion,1,1)
         
         pestana_layout = QVBoxLayout(pestana)
         pestana_layout.addWidget(scroll_area)
@@ -1236,7 +1249,52 @@ class ReportApp(QMainWindow):
     
         # Agregar la pestaña al panel
         tab_panel.addTab(pestana, "Condiciones generales y Valoración")
-    
+        
+        
+    def agregar_imagen(self,layout_destino=None):
+        # Abrir un cuadro de diálogo para seleccionar una imagen
+        ruta_imagen, _ = QFileDialog.getOpenFileName(
+            self, 
+            "Seleccionar imagen", 
+            "./Resultados/Imagenes",  # Carpeta actual
+            "Imágenes (*.png *.jpg *.jpeg *.bmp *.gif)"
+        )
+        
+        if ruta_imagen:  # Si se seleccionó una imagen
+            
+            contenedor = QWidget()
+            layout = QVBoxLayout(contenedor)
+            
+            # Mostrar imagen reducida
+            label = QLabel()
+            #label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+            pixmap = QPixmap(ruta_imagen)
+            label.setPixmap(pixmap.scaled(label.width(), label.height(), Qt.AspectRatioMode.KeepAspectRatio))
+            
+            # Campo de descripción
+            descripcion = QLineEdit()
+            descripcion.setPlaceholderText("Descripción de la imagen")
+            
+            # Botón para eliminar
+            btn_eliminar = QPushButton("X")
+            btn_eliminar.setStyleSheet("color: red;")
+            btn_eliminar.clicked.connect(lambda: self.eliminar_imagen(contenedor))
+            
+            layout.addWidget(label)
+            layout.addWidget(descripcion)
+            layout.addWidget(btn_eliminar)
+            
+            #self.lista_imagenes.addWidget(contenedor)
+            # Agregar el contenedor al layout proporcionado
+            
+            
+            layout_destino.addWidget(contenedor)
+            
+            
+            
+    def eliminar_imagen(self, widget):
+        self.lista_imagenes.removeWidget(widget)
+        widget.deleteLater()
 
     
     def seleccionar_ubicacion(self):
