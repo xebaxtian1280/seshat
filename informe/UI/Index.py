@@ -12,6 +12,8 @@ from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtCore import QUrl, QFileInfo, Qt
 from PyQt6.QtGui import QPixmap
 from num2words import num2words
+from Pestana_Imagenes import agregar_pestana_imagenes
+from Pestana_Datos_solicitud import PestanaDatosSolicitud
 
 import tkinter as tk
 
@@ -87,10 +89,12 @@ class ReportApp(QMainWindow):
         tab_panel = QTabWidget()
         
         # Crear pestañas
-        self.crear_pestana_datos_solicitud(tab_panel)
+        agregar_pestana_datos_solicitud = PestanaDatosSolicitud(tab_panel)
+        #self.crear_pestana_datos_solicitud(tab_panel)
         self.crear_pestana_caracteristicas_sector(tab_panel)
         self.crear_pestana_caracteristicas_construccion(tab_panel)
         self.crear_pestana_condiciones_valuacion(tab_panel)
+        agregar_pestana_imagenes(tab_panel)
         
         
         main_layout.addWidget(tab_panel)
