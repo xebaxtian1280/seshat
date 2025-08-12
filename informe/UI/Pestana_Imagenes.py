@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QFileDialog, QGroupBox, QTabWidget, QScrollArea
+    QWidget, QVBoxLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QFileDialog, QScrollArea
 )
 from PyQt6.QtGui import (QPixmap,QTransform)
 from PyQt6.QtCore import Qt
@@ -55,9 +55,12 @@ class PestañaImagenes(QWidget):
         # Mostrar la imagen
         label_imagen = QLabel()
         pixmap = QPixmap(ruta_imagen)
-        #label_imagen.setPixmap(pixmap.scaled(200, 200, Qt.AspectRatioMode.KeepAspectRatio))
-        label_imagen.setPixmap(pixmap.scaled(label_imagen.width(), label_imagen.height(), Qt.AspectRatioMode.KeepAspectRatio))
-        layout_contenedor.addWidget(label_imagen)
+        
+        self.imagen_width = label_imagen.width  # Ancho fijo para la vista previa
+        self.imagen_height = label_imagen.height  # Alto fijo para la vista previa      
+        
+        label_imagen.setPixmap(pixmap.scaled(self.imagen_width(), self.imagen_height(), Qt.AspectRatioMode.KeepAspectRatio))
+        layout_contenedor.addWidget(label_imagen, alignment=Qt.AlignmentFlag.AlignCenter)
         
         # Campo de texto con el nombre del archivo
         nombre_archivo = QLineEdit()
@@ -90,7 +93,7 @@ class PestañaImagenes(QWidget):
             nonlocal rotacion
             rotacion = (rotacion + 90) % 360
             pixmap_rotado = pixmap.transformed(QTransform().rotate(rotacion))
-            label_imagen.setPixmap(pixmap_rotado.scaled(label_imagen.width(), label_imagen.height(), Qt.AspectRatioMode.KeepAspectRatio))
+            label_imagen.setPixmap(pixmap_rotado.scaled(self.imagen_width(), self.imagen_height(), Qt.AspectRatioMode.KeepAspectRatio))
             # Actualizar la lista
             for img in self.lista_imagenes:
                 if img["ruta"] == ruta_imagen:

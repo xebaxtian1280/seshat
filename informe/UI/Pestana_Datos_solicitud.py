@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QFormLayout, QLineEdit, QTextEdit, QComboBox,
-    QDateEdit, QPushButton, QLabel, QTabWidget, QMessageBox
+    QDateEdit, QPushButton, QLabel, QTabWidget, QScrollArea
 )
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtCore import QDate
@@ -187,9 +187,12 @@ class PestanaDatosSolicitud(QWidget):
         # Agregar el mapa debajo del grupo del inmueble
         right_column.addWidget(grupo_mapa)
         
-        #Agregar pestaña al Panel
+        #Agregar pestaña al Panel con barra de desplazamiento
         
-        tab_panel.addTab(self, "Datos de la Solicitud")
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setWidget(self)        
+        tab_panel.addTab(scroll_area, "Datos de la Solicitud")
     
         # Cargar mapa inicial
         self.actualizar_mapa()
