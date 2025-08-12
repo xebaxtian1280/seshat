@@ -95,9 +95,7 @@ class ReportApp(QMainWindow):
         PestanaCaracteristicasSector(tab_panel)
         PestanaCaracteristicasConstruccion(tab_panel)
         PestanaCondicionesValuacion(tab_panel)
-        #self.crear_pestana_condiciones_valuacion(tab_panel)
-        agregar_pestana_imagenes(tab_panel)
-        
+        agregar_pestana_imagenes(tab_panel)        
         
         main_layout.addWidget(tab_panel)
         

@@ -1,10 +1,10 @@
 import sys
 import time
 from pathlib import Path
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+from PyQt6.QtWidgets import ( QWidget, QVBoxLayout, 
                              QLineEdit, QPushButton, QLabel, QMessageBox, QProgressBar,
-                             QFileDialog, QMenuBar, QMenu, QTabWidget, QTextEdit, 
-                             QFormLayout, QGroupBox, QSpinBox, QComboBox, QDateEdit, QListWidget, QListWidgetItem,QScrollArea,QTableWidgetItem,QTableWidget,QGridLayout,
+                             QTabWidget, QTextEdit, 
+                             QGroupBox, QComboBox,QScrollArea,QGridLayout,
                              QSizePolicy, QCheckBox, QDoubleSpinBox)
 from PyQt6.QtCore import Qt, QTimer, QDate
 
