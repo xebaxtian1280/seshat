@@ -10,6 +10,8 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import  Qt
+from Estilos import Estilos
+from Funciones import Funciones
 
 
 class PestanaCaracteristicasSector(QWidget):
@@ -17,23 +19,9 @@ class PestanaCaracteristicasSector(QWidget):
         super().__init__()
         
         # Aquí va el contenido de la función crear_pestana_caracteristicas_sector
-        group_style = """
-            QGroupBox {
-                font-weight: bold;
-                font-size: 14px;
-                margin-top: 10px;
-                border: 1px solid #cccccc;
-                padding-top: 15px;
-                
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 3px;
-            }
-        """
+        self.group_style = Estilos.cargar_estilos(self, "styles.css")
         pestana = QWidget()
-        
+        print(self.group_style)
         # Crear scroll area para toda la pestaña
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
@@ -54,7 +42,7 @@ class PestanaCaracteristicasSector(QWidget):
         
         # Grupo 1: Delimitación del sector
         grupo_delimitacion = QGroupBox("Delimitación del Sector")
-        grupo_delimitacion.setStyleSheet(group_style)
+        grupo_delimitacion.setStyleSheet(self.group_style)
         form_delimitacion = QFormLayout(grupo_delimitacion)
         
         self.norte = QLineEdit()
@@ -73,7 +61,7 @@ class PestanaCaracteristicasSector(QWidget):
         # Grupo: Vias Publicas
         altura_textos = 70
         grupo_vias = QGroupBox("Vias Publicas")
-        grupo_vias.setStyleSheet(group_style)
+        grupo_vias.setStyleSheet(self.group_style)
         contenido_vias = QWidget() 
         form_vias = QFormLayout(grupo_vias)        
            
@@ -103,7 +91,7 @@ class PestanaCaracteristicasSector(QWidget):
         
         # Grupo 2: Amoblamiento urbano
         grupo_amoblamiento = QGroupBox("Amoblamiento urbano")
-        grupo_amoblamiento.setStyleSheet(group_style)
+        grupo_amoblamiento.setStyleSheet(self.group_style)
         layout_amoblamiento = QVBoxLayout(grupo_amoblamiento)     
         
            
@@ -112,7 +100,7 @@ class PestanaCaracteristicasSector(QWidget):
         
         # Nuevo Grupo: Servicios Públicos
         grupo_servicios = QGroupBox("Servicios Públicos")
-        grupo_servicios.setStyleSheet(group_style)
+        grupo_servicios.setStyleSheet(self.group_style)
         servicios_layout = QVBoxLayout(grupo_servicios)    
         
         # Crear widget para dos columnas
@@ -152,7 +140,7 @@ class PestanaCaracteristicasSector(QWidget):
                 
         # Grupo 3: Norma urbanística
         grupo_norma = QGroupBox("Norma urbanística")
-        grupo_norma.setStyleSheet(group_style)
+        grupo_norma.setStyleSheet(self.group_style)
         layout_norma = QHBoxLayout(grupo_norma)
         
         # Instrumentos de OT
@@ -165,24 +153,8 @@ class PestanaCaracteristicasSector(QWidget):
         
         # Subgrupo Usos
 
-
-        subgroup_style = """
-            QGroupBox {
-                font-weight: bold;
-                font-size: 13px;
-                border: 1px solid #e0e0e0;
-                margin-top: 5px;
-                padding-top: 12px;
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                left: 5px;
-                padding: 0 2px;
-            }
-        """
-        
         subgrupo_usos = QGroupBox("Usos")   
-        subgrupo_usos.setStyleSheet(subgroup_style)
+        subgrupo_usos.setStyleSheet(self.group_style)
         
             # Crear scroll area
         scroll_usos = QScrollArea()
@@ -200,7 +172,8 @@ class PestanaCaracteristicasSector(QWidget):
         # Imágenes
         self.imagenes_usos_layout = QVBoxLayout()
         btn_agregar_imagen = QPushButton("Agregar imagen")
-        btn_agregar_imagen.clicked.connect(self.agregar_imagen_usos)
+        btn_agregar_imagen.setStyleSheet(self.group_style)
+        btn_agregar_imagen.clicked.connect(lambda: Funciones.agregar_imagen(self, self.imagenes_usos_layout))
         form_usos.addRow(btn_agregar_imagen)
         form_usos.addRow(self.imagenes_usos_layout)
         
@@ -235,7 +208,7 @@ class PestanaCaracteristicasSector(QWidget):
         # Imágenes tratamientos
         self.imagenes_tratamientos_layout = QVBoxLayout()
         btn_agregar_imagen_trat = QPushButton("Agregar imagen")
-        btn_agregar_imagen_trat.clicked.connect(self.agregar_imagen_tratamientos)
+        btn_agregar_imagen_trat.clicked.connect(lambda : Funciones.agregar_imagen(self, self.imagenes_tratamientos_layout))
         form_tratamientos.addRow(btn_agregar_imagen_trat)
         form_tratamientos.addRow(self.imagenes_tratamientos_layout)
         
@@ -250,11 +223,6 @@ class PestanaCaracteristicasSector(QWidget):
         
         layout_norma.addLayout(right_column_norma)
         layout_norma.addLayout(left_column_norma)
-        
-        # layout_norma.addWidget(subgrupo_usos)
-        # layout_norma.addWidget(subgrupo_tratamientos)
-        
-        #Agrega Grupo norma a la columna de la derecha
         
         right_column.addWidget(grupo_amoblamiento)
         right_column.addWidget(grupo_servicios)
@@ -304,7 +272,7 @@ class PestanaCaracteristicasSector(QWidget):
         
         lista = QListWidget()
         btn_agregar = QPushButton("Agregar")
-        
+        btn_agregar.setStyleSheet(self.group_style)
         # Conectar con la función usando lambda y pasando los elementos específicos
         btn_agregar.clicked.connect(lambda: self.agregar_uso(combo, lista))
         
@@ -345,8 +313,9 @@ class PestanaCaracteristicasSector(QWidget):
         pixmap = QPixmap(file_path)
         label.setPixmap(pixmap.scaled(100, 100, Qt.AspectRatioMode.KeepAspectRatio))
         
-        btn_eliminar = QPushButton("X")
-        btn_eliminar.setStyleSheet("color: red;")
+        btn_eliminar = QPushButton("x")
+        btn_eliminar.setObjectName("botonEliminar")
+        btn_eliminar.setStyleSheet(self.group_style)
         btn_eliminar.clicked.connect(lambda: self.eliminar_imagen(contenedor))
         
         hbox.addWidget(label)

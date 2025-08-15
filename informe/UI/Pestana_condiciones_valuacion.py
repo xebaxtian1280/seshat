@@ -20,7 +20,7 @@ class PestanaCondicionesValuacion(QWidget):
         super().__init__()
         
         # Aplicar estilos desde el archivo CSS
-        Estilos.cargar_estilos(self, "styles.css")
+        self.group_style = Estilos.cargar_estilos(self, "styles.css")
         
         # Crear el widget principal de la pestaña
         pestana = QWidget()
@@ -30,24 +30,7 @@ class PestanaCondicionesValuacion(QWidget):
         scroll_area.setWidgetResizable(True)
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         
-        scroll_area.setStyleSheet("""
-            QScrollArea {
-                border: none;
-                background-color: white;
-            }
-            QScrollBar:vertical {
-                width: 10px;
-                background-color: #f0f0f0;
-            }
-            QScrollBar::handle:vertical {
-                background-color: #c0c0c0;
-                min-height: 20px;
-                border-radius: 4px;
-            }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                height: 0px;
-            }
-        """)
+        scroll_area.setStyleSheet(self.group_style)  # Aplicar estilos al scroll area
         
         # Crear el widget interno que contendrá los elementos
         contenido = QWidget()

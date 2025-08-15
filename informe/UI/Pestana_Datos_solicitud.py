@@ -5,25 +5,13 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtCore import QDate
 from PyQt6.QtGui import QIcon
+from Estilos import Estilos
 
 class PestanaDatosSolicitud(QWidget):
     def __init__(self,  tab_panel: QTabWidget):
         super().__init__()
     
-        group_style = """
-                QGroupBox {
-                    font-weight: bold;
-                    font-size: 14px;
-                    margin-top: 10px;
-                    border: 1px solid #cccccc;
-                    padding-top: 15px;
-                }
-                QGroupBox::title {
-                    subcontrol-origin: margin;
-                    left: 10px;
-                    padding: 0 3px;
-                }
-            """
+        self.group_style = Estilos.cargar_estilos(self, "styles.css")
                 
         # layout principal
         main_layout = QHBoxLayout(self)
@@ -33,7 +21,7 @@ class PestanaDatosSolicitud(QWidget):
         
         # Grupo Datos de la Solicitud
         grupo_solicitud = QGroupBox("Datos del Cliente")
-        grupo_solicitud.setStyleSheet(group_style)
+        grupo_solicitud.setStyleSheet(self.group_style)
         solicitud_layout = QFormLayout(grupo_solicitud)
         
         # Campos de solicitud
@@ -43,16 +31,19 @@ class PestanaDatosSolicitud(QWidget):
         self.destinatario = QLineEdit()
         self.fecha_visita = QDateEdit(QDate.currentDate())
         self.fecha_informe = QDateEdit(QDate.currentDate())
+        self.tipo_avaluo = QComboBox()
+        self.tipo_avaluo.addItems(["Comercial", "Jurídico", "Financiero", "Seguros"])
         
         solicitud_layout.addRow("Cliente:", self.cliente)
         solicitud_layout.addRow("Documento de identificación:", self.doc_identidad)
         solicitud_layout.addRow("Destinatario del Avalúo:", self.destinatario)
         solicitud_layout.addRow("Fecha de la visita:", self.fecha_visita)
         solicitud_layout.addRow("Fecha del informe:", self.fecha_informe)
+        solicitud_layout.addRow("Tipo de avalúo solicitado:", self.tipo_avaluo)
         
         # Grupo Información Jurídica y Catastral
         grupo_juridico = QGroupBox("Información Jurídica y Catastral")
-        grupo_juridico.setStyleSheet(group_style)
+        grupo_juridico.setStyleSheet(self.group_style)
         juridico_layout = QFormLayout(grupo_juridico)
         
         # Campos jurídicos
@@ -69,26 +60,7 @@ class PestanaDatosSolicitud(QWidget):
         # Botón para agregar matrículas
         btn_agregar_matricula = QPushButton("Agregar Matrícula")
         btn_agregar_matricula.clicked.connect(self.agregar_campo_matricula)
-        btn_agregar_matricula.setStyleSheet("""
-            QPushButton {
-                background-color: #e0e0e0;
-                padding: 5px;
-                border-radius: 3px;
-            }
-            QPushButton:hover {
-                background-color: #d0d0d0;
-            }
-        """)
-        
-        self.cedula_catastral = QLineEdit()
-        self.modo_adquisicion = QComboBox()
-        self.modo_adquisicion.addItems([
-            "Compraventa", 
-            "Adjudicación en Sucesión", 
-            "Transferencia a título de fiducia mercantil", 
-            "Compra parcial"
-        ])
-        self.limitaciones = QTextEdit()
+        btn_agregar_matricula.setStyleSheet(self.group_style)
         
         juridico_layout.addRow("Propietario:", self.propietario)
         juridico_layout.addRow("ID Propietario:", self.id_propietario)
@@ -98,38 +70,37 @@ class PestanaDatosSolicitud(QWidget):
         juridico_layout.addRow("Matrícula Inmobiliaria:", self.matricula_container)
         juridico_layout.addRow(btn_agregar_matricula)
         
-        juridico_layout.addRow("Cédula Catastral:", self.cedula_catastral)
-        juridico_layout.addRow("Modo de adquisición:", self.modo_adquisicion)
-        juridico_layout.addRow("Limitaciones y gravámenes:", self.limitaciones)
+        
         
         left_column.addWidget(grupo_solicitud)
         left_column.addWidget(grupo_juridico)
         left_column.addStretch() 
         
         # Columna derecha - Datos del inmueble
-        grupo_inmueble = QGroupBox("Datos del Inmueble")
+        self.grupo_inmueble = QGroupBox("Datos del Inmueble segun MI-")
         
-        grupo_inmueble.setStyleSheet("""
-            QGroupBox {
-                font-weight: bold;
-                font-size: 14px;
-                margin-top: 10px;
-                border: 1px solid #cccccc;
-            }
-        """)
-        right_layout = QFormLayout(grupo_inmueble)
+        self.grupo_inmueble.setStyleSheet(self.group_style)
+        right_layout = QFormLayout(self.grupo_inmueble)
         
         # Campos nuevos del inmueble
         self.direccion_inmueble = QLineEdit()
         self.barrio_inmueble = QLineEdit()
         self.municipio_inmueble = QLineEdit()
         self.departamento_inmueble = QLineEdit()
+        self.cedula_catastral = QLineEdit()
+        self.limitaciones = QTextEdit()
+        
+        self.modo_adquisicion = QComboBox()
+        self.modo_adquisicion.addItems([
+            "Compraventa", 
+            "Adjudicación en Sucesión", 
+            "Transferencia a título de fiducia mercantil", 
+            "Compra parcial"
+        ])
         
         self.tipo_inmueble = QComboBox()
         self.tipo_inmueble.addItems(["Apartamento", "Casa", "Oficina", "Bodega", "Local", "Lote", "Finca", "Consultorio", "Hospital", "Colegio", "Edificio"])
         
-        self.tipo_avaluo = QComboBox()
-        self.tipo_avaluo.addItems(["Comercial", "Jurídico", "Financiero", "Seguros"])
         
         self.latitud = QLineEdit()
         self.latitud.setPlaceholderText("4.6097")
@@ -149,7 +120,10 @@ class PestanaDatosSolicitud(QWidget):
         right_layout.addRow("Barrio / Vereda:", self.barrio_inmueble)
         right_layout.addRow("Municipio:", self.municipio_inmueble)
         right_layout.addRow("Departamento:", self.departamento_inmueble)
-        right_layout.addRow("Tipo de avalúo:", self.tipo_avaluo)
+        right_layout.addRow("Cédula Catastral:", self.cedula_catastral)
+        right_layout.addRow("Modo de adquisición:", self.modo_adquisicion)
+        right_layout.addRow("Limitaciones y gravámenes:", self.limitaciones)
+        
         right_layout.addRow(QLabel("Coordenadas:"))
         right_layout.addRow("Latitud:", self.latitud)
         right_layout.addRow("Longitud:", self.longitud)
@@ -161,7 +135,7 @@ class PestanaDatosSolicitud(QWidget):
         right_column = QVBoxLayout()
         
          # Agregar grupos a la columna izquierda
-        right_column.addWidget(grupo_inmueble)
+        right_column.addWidget(self.grupo_inmueble)
         right_column.addStretch()
     
         
@@ -170,7 +144,7 @@ class PestanaDatosSolicitud(QWidget):
                 
         # Grupo para el mapa
         grupo_mapa = QGroupBox("Ubicación Geográfica")
-        grupo_mapa.setStyleSheet(group_style)
+        grupo_mapa.setStyleSheet(self.group_style)
         mapa_layout = QVBoxLayout(grupo_mapa)
         
         # Widget para el mapa
@@ -256,40 +230,19 @@ class PestanaDatosSolicitud(QWidget):
         '''
         
         self.web_view.setHtml(mapa_html)
-        # self.habilitar_permisos_webengine()
-        
-    # def habilitar_permisos_webengine(self):
-    #     # Configuraciones esenciales para QtWebEngine
-    #     settings = self.web_view.settings()
-    #     settings.setAttribute(QWebEngineSettings.WebAttribute.LocalStorageEnabled, True)
-    #     settings.setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
-    #     settings.setAttribute(QWebEngineSettings.WebAttribute.JavascriptCanOpenWindows, True)
-    #     settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls, True)
-    #     settings.setUnknownUrlSchemePolicy(QWebEngineSettings.UnknownUrlSchemePolicy.AllowAllUnknownUrlSchemes)
         
     def agregar_campo_matricula(self):
+        
+        
+        
         campo = QLineEdit()
         campo.setPlaceholderText("Ingrese número de matrícula")
-        campo.setStyleSheet("""
-            QLineEdit {
-                margin-bottom: 5px;
-                border: 1px solid #ccc;
-                padding: 3px;
-            }
-        """)
+        campo.setStyleSheet(self.group_style)
+        campo.focusInEvent = lambda texto: self.actualizar_titulo(campo.text()) 
+        campo.textChanged.connect(lambda: self.actualizar_titulo(campo.text()))
         btn_eliminar = QPushButton("×")
-        btn_eliminar.setStyleSheet("""
-            QPushButton {
-                color: #ff0000;
-                font-weight: bold;
-                border: none;
-                min-width: 20px;
-                max-width: 20px;
-            }
-            QPushButton:hover {
-                background-color: #ffe0e0;
-            }
-        """)
+        btn_eliminar.setObjectName("botonEliminar")
+        btn_eliminar.setStyleSheet(self.group_style)
         
         # Contenedor para el campo y el botón
         campo_container = QWidget()
@@ -309,6 +262,10 @@ class PestanaDatosSolicitud(QWidget):
         
         # Eliminar los widgets hijos
         contenedor_a_eliminar.deleteLater()
+        
+    def actualizar_titulo(self, texto):
+        # Actualizar el título del grupo_inmueble
+        self.grupo_inmueble.setTitle(f"Datos del Inmueble segun MI-{texto}")
     
     def obtener_matriculas(self):
         matriculas = []
@@ -327,8 +284,3 @@ class PestanaDatosSolicitud(QWidget):
         campo.setClearButtonEnabled(True)
         self.documentacion_layout.addWidget(campo)
 
-
-""" # Agregar la pestaña al QTabWidget
-def agregar_pestana_datos_solicitud(tab_widget):
-    pestaña = PestanaDatosSolicitud()
-    tab_widget.addTab(pestaña, "Datos de la solicitud") """

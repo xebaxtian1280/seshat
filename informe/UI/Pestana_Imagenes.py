@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtGui import (QPixmap,QTransform)
 from PyQt6.QtCore import Qt
+from Estilos import Estilos
 
 
 class PestañaImagenes(QWidget):
@@ -10,9 +11,12 @@ class PestañaImagenes(QWidget):
         super().__init__()
         self.layout_principal = QVBoxLayout(self)
         
+        self.group_style = Estilos.cargar_estilos(self, "styles.css")
+        
         # Crear un área de desplazamiento
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setStyleSheet(self.group_style)  # Aplicar estilos al scroll area
         self.layout_principal.addWidget(self.scroll_area)
         
         # Contenedor interno para el contenido desplazable
@@ -31,6 +35,7 @@ class PestañaImagenes(QWidget):
         
         # Botón para cargar múltiples imágenes
         btn_cargar_imagenes = QPushButton("Cargar Imágenes")
+        btn_cargar_imagenes.setStyleSheet(self.group_style)
         btn_cargar_imagenes.clicked.connect(self.cargar_imagenes)
         self.layout_principal.addWidget(btn_cargar_imagenes)
         

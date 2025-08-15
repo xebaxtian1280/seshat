@@ -22,29 +22,14 @@ class PestanaCaracteristicasConstruccion(QWidget):
         
         pestana = QWidget()
         
+        self.group_style = Estilos.cargar_estilos(self,"styles.css")
+        
         # Crear scroll area para toda la pestaña
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         
-        scroll_area.setStyleSheet("""
-            QScrollArea {
-                border: none;
-                background-color: white;
-            }
-            QScrollBar:vertical {
-                width: 10px;
-                background-color: #f0f0f0;
-            }
-            QScrollBar::handle:vertical {
-                background-color: #c0c0c0;
-                min-height: 20px;
-                border-radius: 4px;
-            }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                height: 0px;
-            }
-        """)
+        scroll_area.setStyleSheet(self.group_style)
         
         # Cargar estilos desde el archivo CSS
         group_style =  Estilos.cargar_estilos(self,"styles.css")
@@ -140,11 +125,6 @@ class PestanaCaracteristicasConstruccion(QWidget):
         
         # Grupo 4: Estado de conservación
         
-        """ fila_inferior = QWidget()
-        layout_fila_i = QHBoxLayout(v)
-        layout_fila_i.setContentsMargins(0, 0, 0, 0)
-        layout_fila_i.setSpacing(15) """
-        
         grupo_estado = QGroupBox("Estado de Conservación")
         grupo_estado.setStyleSheet(group_style)
         form_estado = QFormLayout(grupo_estado)
@@ -154,9 +134,6 @@ class PestanaCaracteristicasConstruccion(QWidget):
         
         self.estructura.setFixedHeight(100)
         self.acabados.setFixedHeight(100)
-        
-        """ layout_fila_i.addWidget(self.estructura)        
-        layout_fila_i.addWidget(self.acabados) """
         
         form_estado.addRow("Estructura:", self.estructura)
         form_estado.addRow("Acabados:", self.acabados)
@@ -257,8 +234,9 @@ class PestanaCaracteristicasConstruccion(QWidget):
         layout_fila.addWidget(grupo_croquis, 4)
         
         # Organizar grupos en el layout principal
-        layout_principal.addWidget(fila_superior)
         layout_principal.addWidget(grupo_area)
+        layout_principal.addWidget(fila_superior)
+        
         layout_principal.addWidget(grupo_estado)
         layout_principal.addStretch()
         
@@ -272,37 +250,6 @@ class PestanaCaracteristicasConstruccion(QWidget):
         # Agregar fila inicial a la tabla
         self.agregar_fila_area()
     # Métodos auxiliares
-    def agregar_croquis(self):
-        file_name, _ = QFileDialog.getOpenFileName(
-            self, "Seleccionar croquis", "", "Imágenes (*.png *.jpg *.jpeg)"
-        )
-        if file_name:
-            contenedor = QWidget()
-            layout = QHBoxLayout(contenedor)
-            
-            # Mostrar imagen reducida
-            label = QLabel()
-            pixmap = QPixmap(file_name)
-            label.setPixmap(pixmap.scaled(200, 200, Qt.AspectRatioMode.KeepAspectRatio))
-            
-            # Campo de descripción
-            descripcion = QLineEdit()
-            descripcion.setPlaceholderText("Descripción del croquis")
-            
-            # Botón para eliminar
-            btn_eliminar = QPushButton("X")
-            btn_eliminar.setStyleSheet("color: red;")
-            btn_eliminar.clicked.connect(lambda: self.eliminar_croquis(contenedor))
-            
-            layout.addWidget(label)
-            layout.addWidget(descripcion)
-            layout.addWidget(btn_eliminar)
-            
-            self.croquis_container.addWidget(contenedor)
-
-    def eliminar_croquis(self, widget):
-        self.croquis_container.removeWidget(widget)
-        widget.deleteLater()
 
     def agregar_fila_area(self):
         row_count = self.tabla_area.rowCount()

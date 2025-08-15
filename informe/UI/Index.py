@@ -18,21 +18,7 @@ from Pestana_condiciones_valuacion import PestanaCondicionesValuacion
 import tkinter as tk
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
-group_style = """
-            QGroupBox {
-                font-weight: bold;
-                font-size: 14px;
-                margin-top: 10px;
-                border: 1px solid #cccccc;
-                padding-top: 15px;
-                
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 3px;
-            }
-        """
+
 
 class ReportApp(QMainWindow):
     

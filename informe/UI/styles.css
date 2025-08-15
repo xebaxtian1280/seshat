@@ -1,14 +1,59 @@
 
-
 QGroupBox {
     font-weight: bold;
     font-size: 14px;
     margin-top: 10px;
-    border: 1px solid #cccccc;
     padding-top: 15px;
-}
-QGroupBox::title {
-    subcontrol-origin: margin;
+} 
+QGroupBox::title {    
     left: 10px;
-    padding: 0 3px;
+    padding: 0 5px;
+    font-weight: bold;
+    font-size: 32px;
+}
+QPushButton {
+    background-color: #e0e0e0;
+    padding: 5px;
+    border-radius: 3px;
+}
+QPushButton:hover {
+    background-color: #d0d0d0;
+}
+
+QLineEdit {
+    margin-bottom: 5px;
+    border: 1px solid #ccc;
+    padding: 3px;
+}
+
+/* Estilo de los botones de eliminar */
+
+#botonEliminar {
+    color: #ff0000;
+    font-weight: bold;
+    border: none;
+    min-width: 20px;
+    max-width: 20px;
+}
+#botonEliminar:hover {
+    background-color: #ffe0e0;
+}
+
+/*Estilo de las barras de desplazamiento*/
+
+QScrollArea {
+    border: none;
+    background-color: white;
+}
+QScrollBar:vertical {
+    width: 10px;
+    background-color: #f0f0f0;
+}
+QScrollBar::handle:vertical {
+    background-color: #c0c0c0;
+    min-height: 20px;
+    border-radius: 4px;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
 }

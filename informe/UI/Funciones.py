@@ -19,7 +19,7 @@ import subprocess
 import os
 
 class Funciones:
-
+    
 
     def generar_informe(texto, template_path="Base/Informe.tex", output_name="Resultados/informe"):
         """
@@ -88,13 +88,15 @@ class Funciones:
             descripcion.setPlaceholderText("Descripción de la imagen")
             
             # Botón para eliminar
-            btn_eliminar = QPushButton("X")
-            btn_eliminar.setStyleSheet("color: red;")
+            btn_eliminar = QPushButton("x")
+            btn_eliminar.setObjectName("botonEliminar")
+            
+            btn_eliminar.setStyleSheet(Estilos.cargar_estilos(self, "styles.css"))
             btn_eliminar.clicked.connect(lambda: eliminar_imagen(self,contenedor))
             
             layout.addWidget(label, alignment=Qt.AlignmentFlag.AlignCenter)
             layout.addWidget(descripcion)
-            layout.addWidget(btn_eliminar)
+            layout.addWidget(btn_eliminar, alignment=Qt.AlignmentFlag.AlignCenter)
             
             #self.lista_imagenes.addWidget(contenedor)
             # Agregar el contenedor al layout proporcionado
