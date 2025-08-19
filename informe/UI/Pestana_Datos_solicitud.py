@@ -6,6 +6,7 @@ from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtCore import QDate
 from PyQt6.QtGui import QIcon
 from Estilos import Estilos
+from DB import DB
 
 class PestanaDatosSolicitud(QWidget):
     def __init__(self,  tab_panel: QTabWidget):
@@ -49,13 +50,17 @@ class PestanaDatosSolicitud(QWidget):
         # Campos jurídicos
         self.propietario = QLineEdit()
         self.id_propietario = QLineEdit()
-        self.doc_propiedad = QTextEdit()
-        self.doc_propiedad.setPlainText("Copia simple de la Escritura Pública No. 4126 del 26 de Noviembre de 1997, otorgada en la Notaria 2 de Bucaramanga.")
         
         # Contenedor para matrículas dinámicas
         self.matricula_container = QWidget()
         self.matricula_layout = QVBoxLayout(self.matricula_container)
         self.matricula_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # Documentación dinámica
+        grupo_documentos = QGroupBox("Documentación Aportada")
+        self.documentacion_layout = QVBoxLayout(grupo_documentos)
+        self.btn_agregar_doc = QPushButton("Agregar Documento")
+        self.btn_agregar_doc.clicked.connect(self.agregar_campo_documento)
         
         # Botón para agregar matrículas
         btn_agregar_matricula = QPushButton("Agregar Matrícula")
@@ -64,7 +69,8 @@ class PestanaDatosSolicitud(QWidget):
         
         juridico_layout.addRow("Propietario:", self.propietario)
         juridico_layout.addRow("ID Propietario:", self.id_propietario)
-        juridico_layout.addRow("Documento de propiedad:", self.doc_propiedad)
+        juridico_layout.addRow(grupo_documentos)
+        juridico_layout.addRow(self.btn_agregar_doc)
         
         self.agregar_campo_matricula()    
         juridico_layout.addRow("Matrícula Inmobiliaria:", self.matricula_container)
@@ -107,11 +113,13 @@ class PestanaDatosSolicitud(QWidget):
         self.longitud = QLineEdit()
         self.longitud.setPlaceholderText("-74.0817")
         
-        # Documentación dinámica
-        grupo_documentos = QGroupBox("Documentación Aportada")
-        self.documentacion_layout = QVBoxLayout(grupo_documentos)
-        self.btn_agregar_doc = QPushButton("Agregar Documento")
-        self.btn_agregar_doc.clicked.connect(self.agregar_campo_documento)
+        self.doc_propiedad = QTextEdit()
+        self.doc_propiedad.setPlainText("Copia simple de la Escritura Pública No. 4126 del 26 de Noviembre de 1997, otorgada en la Notaria 2 de Bucaramanga.")
+        
+        self.btn_guardar_inmueble = QPushButton("Guardar informacion del Inmueble")
+        self.btn_agregar_doc.setStyleSheet(self.group_style)
+        self.btn_guardar_inmueble.clicked.connect(self.guardar_informacion_inmueble)
+
         
         # Campos iniciales
         self.agregar_campo_documento()  # Primer campo por defecto
@@ -127,9 +135,10 @@ class PestanaDatosSolicitud(QWidget):
         right_layout.addRow(QLabel("Coordenadas:"))
         right_layout.addRow("Latitud:", self.latitud)
         right_layout.addRow("Longitud:", self.longitud)
-        right_layout.addRow(QLabel("Documentación aportada:"))
-        right_layout.addWidget(grupo_documentos)
-        right_layout.addWidget(self.btn_agregar_doc)
+        right_layout.addRow(QLabel("Documento de Propiedad:"))
+        right_layout.addWidget(self.doc_propiedad)
+        right_layout.addWidget(self.btn_guardar_inmueble)
+        #right_layout.addWidget(self.btn_agregar_doc)
         
         # Columna izquierda - Contenedor vertical
         right_column = QVBoxLayout()
@@ -170,6 +179,32 @@ class PestanaDatosSolicitud(QWidget):
     
         # Cargar mapa inicial
         self.actualizar_mapa()
+        
+    def guardar_informacion_inmueble(self):
+        # Obtener datos del inmueble
+        inmueble_data = {
+            "direccion": self.direccion_inmueble.text().strip(),
+            "tipo_inmueble": self.tipo_inmueble.currentText(),
+            "barrio": self.barrio_inmueble.text().strip(),
+            "municipio": self.municipio_inmueble.text().strip(),
+            "departamento": self.departamento_inmueble.text().strip(),
+            "cedula_catastral": self.cedula_catastral.text().strip(),
+            "modo_adquisicion": self.modo_adquisicion.currentText(),
+            "limitaciones": self.limitaciones.toPlainText().strip(),
+            "latitud": self.latitud.text().strip(),
+            "longitud": self.longitud.text().strip(),
+            "doc_propiedad": self.doc_propiedad.toPlainText().strip()
+        }
+        
+        db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+        db.conectar()
+        
+        # Aquí podrías guardar los datos en una base de datos o archivo
+        query_insertar = """
+        INSERT INTO inmuebles (direccion, tipo_inmueble, area, numero_habitaciones, numero_banos, valor, antiguedad, estado)
+        VALUES ({inmueble_data[0]}, {inmueble_data[1]}, {inmueble_data[0]}, %{inmueble_data[0]}, %{inmueble_data[0]}, %{inmueble_data[0]}, %{inmueble_data[0]}, %{inmueble_data[0]});
+        """
+        print("Información del inmueble guardada:", inmueble_data)
         
     def actualizar_mapa(self):
         # Obtener coordenadas de los campos
@@ -233,8 +268,6 @@ class PestanaDatosSolicitud(QWidget):
         
     def agregar_campo_matricula(self):
         
-        
-        
         campo = QLineEdit()
         campo.setPlaceholderText("Ingrese número de matrícula")
         campo.setStyleSheet(self.group_style)
@@ -282,5 +315,18 @@ class PestanaDatosSolicitud(QWidget):
         campo = QLineEdit()
         campo.setPlaceholderText("Nombre del documento")
         campo.setClearButtonEnabled(True)
-        self.documentacion_layout.addWidget(campo)
-
+        
+        btn_eliminar = QPushButton("×")
+        btn_eliminar.setObjectName("botonEliminar")
+        btn_eliminar.setStyleSheet(self.group_style)
+        
+        # Contenedor para el campo y el botón
+        campo_container = QWidget()
+        layout_container = QHBoxLayout(campo_container)
+        layout_container.addWidget(campo)
+        layout_container.addWidget(btn_eliminar)
+        layout_container.setContentsMargins(0, 0, 0, 0)
+        
+        # Conectar el botón de eliminar
+        btn_eliminar.clicked.connect(lambda: self.eliminar_campo_matricula(campo_container))
+        self.documentacion_layout.addWidget(campo_container)

@@ -9,6 +9,8 @@ from Estilos import Estilos
 class PestañaImagenes(QWidget):
     def __init__(self):
         super().__init__()
+        
+        
         self.layout_principal = QVBoxLayout(self)
         
         self.group_style = Estilos.cargar_estilos(self, "styles.css")

@@ -5,7 +5,6 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QMessageBox, QProgressBar,
                              QFileDialog, QMenuBar, QMenu, QTabWidget)
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtCore import  Qt
 
 # Importar las pestañas
 
@@ -14,8 +13,7 @@ from Pestana_Datos_solicitud import PestanaDatosSolicitud
 from Pestana_caracteristicas_sector import PestanaCaracteristicasSector
 from Pestana_caracteristicas_construccion import PestanaCaracteristicasConstruccion
 from Pestana_condiciones_valuacion import PestanaCondicionesValuacion
-
-import tkinter as tk
+from Pestana_seguimiento import agregar_pestana_seguimiento
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
@@ -25,22 +23,12 @@ class ReportApp(QMainWindow):
     def __init__(self):
         super().__init__()
         
-        root = tk.Tk()
-        root.withdraw()  # Oculta la ventana principal
-        
-        ancho = root.winfo_screenwidth()
-        alto = root.winfo_screenheight()
-        
-        root.destroy()
-        
         self.setWindowTitle("Sistema de Gestión de Informes")
         #self.setMinimumSize(1000, 700)
         self.showMaximized()
         self.default_save_path = str(Path.home() / "/Proyectos/seshat/informe/Resultados")
         self.init_ui()
-        
-    
-        
+
     def init_ui(self):
         # Configurar widget central
         central_widget = QWidget()
@@ -74,16 +62,19 @@ class ReportApp(QMainWindow):
         main_layout.addWidget(menu_bar)
         
         # Panel de pestañas
-        tab_panel = QTabWidget()
+        self.tab_panel = QTabWidget()
+        
         
         # Crear pestañas
-        PestanaDatosSolicitud(tab_panel)        
-        PestanaCaracteristicasSector(tab_panel)
-        PestanaCaracteristicasConstruccion(tab_panel)
-        PestanaCondicionesValuacion(tab_panel)
-        agregar_pestana_imagenes(tab_panel)        
+        agregar_pestana_seguimiento(self.tab_panel)
+        PestanaDatosSolicitud(self.tab_panel)        
+        PestanaCaracteristicasSector(self.tab_panel)
+        PestanaCaracteristicasConstruccion(self.tab_panel)
+        PestanaCondicionesValuacion(self.tab_panel)
+        agregar_pestana_imagenes(self.tab_panel)       
         
-        main_layout.addWidget(tab_panel)
+        
+        main_layout.addWidget(self.tab_panel)
         
         # Barra de progreso
         self.progress_bar = QProgressBar()

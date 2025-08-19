@@ -21,7 +21,7 @@ class PestanaCaracteristicasSector(QWidget):
         # Aquí va el contenido de la función crear_pestana_caracteristicas_sector
         self.group_style = Estilos.cargar_estilos(self, "styles.css")
         pestana = QWidget()
-        print(self.group_style)
+       
         # Crear scroll area para toda la pestaña
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
