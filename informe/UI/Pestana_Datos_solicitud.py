@@ -47,10 +47,6 @@ class PestanaDatosSolicitud(QWidget):
         grupo_juridico.setStyleSheet(self.group_style)
         juridico_layout = QFormLayout(grupo_juridico)
         
-        # Campos jurídicos
-        self.propietario = QLineEdit()
-        self.id_propietario = QLineEdit()
-        
         # Contenedor para matrículas dinámicas
         self.matricula_container = QWidget()
         self.matricula_layout = QVBoxLayout(self.matricula_container)
@@ -67,8 +63,12 @@ class PestanaDatosSolicitud(QWidget):
         btn_agregar_matricula.clicked.connect(self.agregar_campo_matricula)
         btn_agregar_matricula.setStyleSheet(self.group_style)
         
-        juridico_layout.addRow("Propietario:", self.propietario)
-        juridico_layout.addRow("ID Propietario:", self.id_propietario)
+        # Botón para radicar solicitud
+        btn_radicar_solicitud = QPushButton("Radicar Solicitud")
+        btn_radicar_solicitud.clicked.connect(self.radicar_solicitud)
+        btn_radicar_solicitud.setStyleSheet(self.group_style)
+        
+        
         juridico_layout.addRow(grupo_documentos)
         juridico_layout.addRow(self.btn_agregar_doc)
         
@@ -76,7 +76,8 @@ class PestanaDatosSolicitud(QWidget):
         juridico_layout.addRow("Matrícula Inmobiliaria:", self.matricula_container)
         juridico_layout.addRow(btn_agregar_matricula)
         
-        
+        if self.cliente.text() == "":
+            juridico_layout.addRow(btn_radicar_solicitud)
         
         left_column.addWidget(grupo_solicitud)
         left_column.addWidget(grupo_juridico)
@@ -120,6 +121,9 @@ class PestanaDatosSolicitud(QWidget):
         self.btn_agregar_doc.setStyleSheet(self.group_style)
         self.btn_guardar_inmueble.clicked.connect(self.guardar_informacion_inmueble)
 
+        # Campos jurídicos
+        self.propietario = QLineEdit()
+        self.id_propietario = QLineEdit()
         
         # Campos iniciales
         self.agregar_campo_documento()  # Primer campo por defecto
@@ -137,6 +141,8 @@ class PestanaDatosSolicitud(QWidget):
         right_layout.addRow("Longitud:", self.longitud)
         right_layout.addRow(QLabel("Documento de Propiedad:"))
         right_layout.addWidget(self.doc_propiedad)
+        right_layout.addRow("Propietario:", self.propietario)
+        right_layout.addRow("ID Propietario:", self.id_propietario)
         right_layout.addWidget(self.btn_guardar_inmueble)
         #right_layout.addWidget(self.btn_agregar_doc)
         
@@ -179,6 +185,32 @@ class PestanaDatosSolicitud(QWidget):
     
         # Cargar mapa inicial
         self.actualizar_mapa()
+        
+    
+        
+    def radicar_solicitud(self):
+        # Obtener datos de la solicitud
+        solicitud_data = {
+            "cliente": self.cliente.text().strip(),
+            "doc_identidad": self.doc_identidad.text().strip(),
+            "destinatario": self.destinatario.text().strip(),
+            "fecha_visita": self.fecha_visita.date().toString("yyyy-MM-dd"),
+            "fecha_informe": self.fecha_informe.date().toString("yyyy-MM-dd"),
+            "tipo_avaluo": self.tipo_avaluo.currentText()
+        }
+        
+        # Validar campos requeridos
+        if not solicitud_data["cliente"] or not solicitud_data["doc_identidad"] or not solicitud_data["tipo_avaluo"]:
+            print("Por favor complete todos los campos requeridos.")
+            return
+        
+        # Guardar los datos en una base de datos o archivo
+        db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+        db.conectar()
+        db.insertar(
+            """INSERT INTO "Avaluos" (nombre_cliente, id_cliente, destinatario, fecha_visita, tipo_avaluo, fecha_avaluo) VALUES (%s, %s, %s, %s, %s, %s)"""
+            , (solicitud_data["cliente"], solicitud_data["doc_identidad"], solicitud_data["destinatario"], solicitud_data["fecha_visita"],solicitud_data["tipo_avaluo"], solicitud_data["fecha_informe"]))
+        print("Solicitud radicada:", solicitud_data)
         
     def guardar_informacion_inmueble(self):
         # Obtener datos del inmueble

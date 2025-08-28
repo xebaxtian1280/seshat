@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import (
     QPushButton, QLabel, QScrollArea, QHBoxLayout, QComboBox, QHeaderView
 )
 from PyQt6.QtCore import Qt
+from DB import DB 
 
 class PestanaSeguimiento(QWidget):
     def __init__(self):
@@ -83,11 +84,48 @@ class PestanaSeguimiento(QWidget):
         # Tabla de resultados
         self.tabla_resultados = QTableWidget()
         self.tabla_resultados.setColumnCount(7)
-        self.tabla_resultados.setHorizontalHeaderLabels(["ID Avaluo", "Nombre Cliente", "ID cliente", "Matricula Inmobiliaria", "Perito", "Revisor", "Acciones"])
+        self.tabla_resultados.setHorizontalHeaderLabels(["ID Avaluo", "Nombre Cliente", "ID cliente", "No. de Inmuebles", "Perito", "Revisor", "Acciones"])
         self.tabla_resultados.horizontalHeader().setStretchLastSection(True)
         self.tabla_resultados.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.layout_contenedor.addWidget(self.tabla_resultados, stretch=1)
         
+        self.cargar_datos_seguimiento()
+        
+    def cargar_datos_seguimiento(self):
+        """
+        Consulta la tabla 'Avaluos' de la base de datos y agrega los datos a la tabla_resultados.
+        """
+        try:
+            # Crear una instancia de la clase DB
+            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db.conectar()
+            # Consulta SQL para obtener los datos de la tabla 'Avaluos'
+            consulta = """
+            SELECT a."Avaluo_id" , a.nombre_cliente , a.id_cliente
+            from "Avaluos" a 
+            """
+            
+            # Ejecutar la consulta
+            
+            resultados = db.consultar(consulta)
+            
+            # Limpiar la tabla antes de agregar nuevos datos
+            self.tabla_resultados.setRowCount(0)
+            print(f"Resultados obtenidos: {resultados}")
+            
+            # Agregar los resultados a la tabla_resultados
+            for fila, resultado in enumerate(resultados):
+                self.tabla_resultados.insertRow(fila)
+                for columna, valor in enumerate(resultado):
+                    self.tabla_resultados.setItem(fila, columna, QTableWidgetItem(str(valor)))
+                
+                # Agregar un botón de acción en la última columna
+                boton_accion = QPushButton("Ver")
+                boton_accion.clicked.connect(lambda _, id_avaluo=resultado[0]: self.ver_avaluo(id_avaluo))
+                self.tabla_resultados.setCellWidget(fila, 6, boton_accion)
+        
+        except Exception as e:
+            print(f"Error al cargar los datos de seguimiento: {e}")    
     def buscar_seguimiento(self):
         """
         Función para buscar seguimientos según los filtros ingresados.

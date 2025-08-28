@@ -76,6 +76,7 @@ class ReportApp(QMainWindow):
         
         main_layout.addWidget(self.tab_panel)
         
+        
         # Barra de progreso
         self.progress_bar = QProgressBar()
         self.progress_bar.hide()

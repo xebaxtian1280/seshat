@@ -58,7 +58,9 @@ class DB:
         """
         try:
             with self.connection.cursor() as cursor:
+                print(query, valores)
                 cursor.execute(query, valores)
+                
                 self.connection.commit()
                 print("Registro insertado exitosamente.")
         except psycopg2.Error as e:
