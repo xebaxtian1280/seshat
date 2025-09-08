@@ -13,7 +13,7 @@ from Pestana_Datos_solicitud import PestanaDatosSolicitud
 from Pestana_caracteristicas_sector import PestanaCaracteristicasSector
 from Pestana_caracteristicas_construccion import PestanaCaracteristicasConstruccion
 from Pestana_condiciones_valuacion import PestanaCondicionesValuacion
-from Pestana_seguimiento import agregar_pestana_seguimiento
+from Pestana_seguimiento import PestanaSeguimiento
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
@@ -66,12 +66,12 @@ class ReportApp(QMainWindow):
         
         
         # Crear pestañas
-        agregar_pestana_seguimiento(self.tab_panel)
-        PestanaDatosSolicitud(self.tab_panel)        
+        PestanaSeguimiento(self.tab_panel)
+        """ PestanaDatosSolicitud(self.tab_panel)        
         PestanaCaracteristicasSector(self.tab_panel)
         PestanaCaracteristicasConstruccion(self.tab_panel)
         PestanaCondicionesValuacion(self.tab_panel)
-        agregar_pestana_imagenes(self.tab_panel)       
+        agregar_pestana_imagenes(self.tab_panel)  """      
         
         
         main_layout.addWidget(self.tab_panel)

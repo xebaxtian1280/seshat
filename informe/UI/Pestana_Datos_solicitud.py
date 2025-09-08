@@ -9,9 +9,9 @@ from Estilos import Estilos
 from DB import DB
 
 class PestanaDatosSolicitud(QWidget):
-    def __init__(self,  tab_panel: QTabWidget):
+    def __init__(self,  tab_panel: QTabWidget, id_avaluo=None):
         super().__init__()
-    
+        self.id_avaluo = id_avaluo
         self.group_style = Estilos.cargar_estilos(self, "styles.css")
                 
         # layout principal
@@ -33,7 +33,7 @@ class PestanaDatosSolicitud(QWidget):
         self.fecha_visita = QDateEdit(QDate.currentDate())
         self.fecha_informe = QDateEdit(QDate.currentDate())
         self.tipo_avaluo = QComboBox()
-        self.tipo_avaluo.addItems(["Comercial", "Jurídico", "Financiero", "Seguros"])
+        self.tipo_avaluo.addItems(["","Comercial", "Jurídico", "Financiero", "Seguros"])
         
         solicitud_layout.addRow("Cliente:", self.cliente)
         solicitud_layout.addRow("Documento de identificación:", self.doc_identidad)
@@ -149,7 +149,7 @@ class PestanaDatosSolicitud(QWidget):
         # Columna izquierda - Contenedor vertical
         right_column = QVBoxLayout()
         
-         # Agregar grupos a la columna izquierda
+        # Agregar grupos a la columna izquierda
         right_column.addWidget(self.grupo_inmueble)
         right_column.addStretch()
     
@@ -184,10 +184,49 @@ class PestanaDatosSolicitud(QWidget):
         tab_panel.addTab(scroll_area, "Datos de la Solicitud")
     
         # Cargar mapa inicial
-        self.actualizar_mapa()
+        self.actualizar_mapa()        
+        self.cargar_datos_solicitud(self.id_avaluo)
         
+    def cargar_datos_solicitud(self, id_avaluo):
+        """
+        Carga los datos de la solicitud desde la base de datos utilizando el id_avaluo.
+        
+        :param id_avaluo: ID del avalúo para buscar los datos en la base de datos.
+        """
+        try:
+            # Crear una instancia de la clase DB
+            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db.conectar()
+            
+            print(f"Cargando datos para el avalúo con ID: {self.id_avaluo}")
     
-        
+            # Consulta SQL para obtener los datos de la solicitud
+            consulta = """
+            select a.nombre_cliente , a.id_cliente , a.destinatario, a.fecha_visita ,a.fecha_avaluo , a.tipo_avaluo
+            FROM "Avaluos" a 
+            left join inmuebles i on a."Avaluo_id" = i.avaluo_id 
+            WHERE a."Avaluo_id" = 2
+            """.replace("2", str(id_avaluo))
+            resultado = db.consultar(consulta)
+            
+            # Verificar si se encontraron datos
+            if resultado:
+                
+                self.cliente.setText(resultado[0][0])  # Primer campo: cliente
+                self.doc_identidad.setText(str(resultado[0][1]))  # Segundo campo: doc_identidad
+                self.destinatario.setText(resultado[0][2])  # Tercer campo: destinatario
+                self.fecha_visita.setDate(resultado[0][3].date())  # Cuarto campo: fecha_visita  
+                self.fecha_informe.setDate(resultado[0][4].date())  # Quinto campo: fecha_informe
+                
+                index_tipo = self.tipo_avaluo.findText(resultado[0][5])  # Sexto campo: tipo_avaluo
+                if index_tipo != -1:
+                    self.tipo_avaluo.setCurrentIndex(index_tipo)
+            else:
+                print(f"No se encontraron datos para el avalúo con ID: {id_avaluo}")
+    
+        except Exception as e:
+            print(f"Error al cargar los datos de la solicitud: {e}")
+    
     def radicar_solicitud(self):
         # Obtener datos de la solicitud
         solicitud_data = {
