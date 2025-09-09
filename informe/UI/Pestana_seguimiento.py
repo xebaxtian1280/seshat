@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QGroupBox, QLineEdit, QTableWidget, QTableWidgetItem,
     QPushButton, QLabel, QScrollArea, QHBoxLayout, QComboBox, QHeaderView, QTabWidget
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal, QObject
 from DB import DB 
 
 from Pestana_Imagenes import agregar_pestana_imagenes
@@ -12,6 +12,10 @@ from Pestana_caracteristicas_construccion import PestanaCaracteristicasConstrucc
 from Pestana_condiciones_valuacion import PestanaCondicionesValuacion
 
 class PestanaSeguimiento(QWidget):
+    
+    # Señal personalizada para enviar el id_avaluo
+    id_avaluo_seleccionado = pyqtSignal(str)
+    
     def __init__(self, tab_panel: QTabWidget):
         super().__init__()
         
@@ -200,6 +204,7 @@ class PestanaSeguimiento(QWidget):
         boton = self.sender()  # Obtener el botón que disparó la señal
         id_avaluo = boton.property("id_avaluo")  # Recuperar el id_avaluo
         print(f"Botón presionado con id_avaluo: {id_avaluo}")
+        self.id_avaluo_seleccionado.emit(id_avaluo)  # Emitir la señal con el id_avaluo
         self.agregar_pestanas_avaluo(id_avaluo, self.tab_panel)
     
     def agregar_pestanas_avaluo(self, id_avaluo, tab_panel):

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.3.15)  10 MAR 2025 06:46
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.3.15)  8 SEP 2025 21:52
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -323,17 +323,7 @@ Package: multicol 2021/10/28 v1.9b multicolumn formatting (FMi)
 \mult@nat@firstbox=\box96
 \colbreak@box=\box97
 \mc@col@check@num=\count290
-) (./Informe.aux
-LaTeX Info: Redefining \. on input line 11.
-LaTeX Info: Redefining \% on input line 11.
-
-
-LaTeX Warning: Label `fig:tratamiento' multiply defined.
-
-
-LaTeX Warning: Label `fig:tratamiento' multiply defined.
-
-)
+) (./Informe.aux)
 \openout1 = `Informe.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 53.
@@ -352,7 +342,8 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 53.
 LaTeX Font Info:    ... okay on input line 53.
 LaTeX Info: Redefining \. on input line 53.
 LaTeX Info: Redefining \% on input line 53.
- (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+
+(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count291
 \scratchdimen=\dimen170
@@ -408,15 +399,21 @@ e
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-<Imagenes/Geovalores.png, id=1, 578.16pt x 155.49pt>
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 123.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
-<Imagenes/QR.png, id=3, 118.19156pt x 122.70844pt>
+Runaway argument?
+{
+! Paragraph ended before \@ssect was complete.
+<to be read again> 
+                   \par 
+l.94 
+     
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
+
+<Imagenes/QR.png, id=1, 118.19156pt x 122.70844pt>
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 123.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 122.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -429,12 +426,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
 
 
- <./Imagenes/Geovalores.png> <./Imagenes/QR.png>] (./Informe.toc
+ <./Imagenes/QR.png>]
+(./Informe.toc
 LaTeX Info: Redefining \. on input line 1.
 LaTeX Info: Redefining \% on input line 1.
 LaTeX Font Info:    Trying to load font information for U+msa on input line 3.
-
-(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
+ (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
 LaTeX Font Info:    Trying to load font information for U+msb on input line 3.
@@ -442,10 +439,8 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 3.
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 48.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 48.
+LaTeX Info: Redefining \% on input line 48.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
 Package pdftex.def Info: Imagenes/QR.png  used on input line 48.
@@ -465,13 +460,11 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 \tf@toc=\write3
 \openout3 = `Informe.toc'.
 
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 127.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 126.
+LaTeX Info: Redefining \% on input line 126.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 127.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 126.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 
@@ -483,15 +476,51 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-23.02707pt}.
 
 [3]
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 182.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+! Extra alignment tab has been changed to \cr.
+<recently read> \endtemplate 
+                             
+l.139 	\textbf{Destinatario del avalúo:} &
+                                            %DESTINATARIO%". \\
+You have given more \span or & marks than there were
+in the preamble to the \halign or \valign now in progress.
+So I'll assume that you meant to type \cr instead.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.170 FECHA_
+            VISITA%
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.171 
+      
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.174 FECHA_
+            INFORME%
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.175 
+      
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
 Package pdftex.def Info: Imagenes/QR.png  used on input line 182.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
-
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 35.02707pt, for example:
@@ -503,25 +532,23 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [4
 
 ]
-Underfull \hbox (badness 1097) in paragraph at lines 209--209
+Underfull \hbox (badness 1097) in paragraph at lines 208--208
 []\OT1/cmr/bx/n/12 Numero Ma-tri-cu-la In-mo-bi-
  []
 
-<Imagenes/ubicacion1.png, id=27, 956.57375pt x 482.80376pt>
+<Imagenes/ubicacion1.png, id=28, 956.57375pt x 482.80376pt>
 File: Imagenes/ubicacion1.png Graphic file (type png)
 <use Imagenes/ubicacion1.png>
-Package pdftex.def Info: Imagenes/ubicacion1.png  used on input line 226.
+Package pdftex.def Info: Imagenes/ubicacion1.png  used on input line 225.
 (pdftex.def)             Requested size: 341.43437pt x 172.32845pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 237.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 244.
+LaTeX Info: Redefining \% on input line 244.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 237.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 244.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -532,17 +559,19 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-23.02707pt}.
 
 [5]
-Underfull \hbox (badness 10000) in paragraph at lines 251--252
+
+LaTeX Warning: Reference `fig:Usos' on page 6 undefined on input line 250.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 250--251
 
  []
 
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 258.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 259.
+LaTeX Info: Redefining \% on input line 259.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 258.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 259.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -553,33 +582,32 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-23.02707pt}.
 
 [6 <./Imagenes/ubicacion1.png>]
-<Norma/AreaAc.png, id=37, 846.16125pt x 638.385pt>
+<Norma/AreaAc.png, id=38, 846.16125pt x 638.385pt>
 File: Norma/AreaAc.png Graphic file (type png)
 <use Norma/AreaAc.png>
-Package pdftex.def Info: Norma/AreaAc.png  used on input line 263.
+Package pdftex.def Info: Norma/AreaAc.png  used on input line 262.
 (pdftex.def)             Requested size: 341.43437pt x 257.58989pt.
-<Norma/AreaAcL.jpeg, id=38, 678.535pt x 364.36125pt>
+<Norma/AreaAcL.jpeg, id=39, 678.535pt x 364.36125pt>
 File: Norma/AreaAcL.jpeg Graphic file (type jpg)
 <use Norma/AreaAcL.jpeg>
-Package pdftex.def Info: Norma/AreaAcL.jpeg  used on input line 264.
+Package pdftex.def Info: Norma/AreaAcL.jpeg  used on input line 263.
 (pdftex.def)             Requested size: 341.43437pt x 183.34215pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 299--300
+Underfull \hbox (badness 10000) in paragraph at lines 298--299
 
  []
 
 
-Underfull \vbox (badness 1292) has occurred while \output is active []
+Underfull \hbox (badness 10000) in paragraph at lines 300--301
 
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 300.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+ []
+
+LaTeX Info: Redefining \. on input line 307.
+LaTeX Info: Redefining \% on input line 307.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 300.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 307.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
-
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 35.02707pt, for example:
@@ -589,82 +617,79 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-23.02707pt}.
 
 [7 <./Norma/AreaAc.png> <./Norma/AreaAcL.jpeg>]
-Underfull \hbox (badness 10000) in paragraph at lines 301--302
+Underfull \hbox (badness 10000) in paragraph at lines 315--316
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 316--317
+Underfull \hbox (badness 10000) in paragraph at lines 317--325
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 318--326
-
- []
-
-<Norma/Tratamiento.png, id=44, 733.74126pt x 546.04pt>
+<Norma/Tratamiento.png, id=45, 733.74126pt x 546.04pt>
 File: Norma/Tratamiento.png Graphic file (type png)
 <use Norma/Tratamiento.png>
-Package pdftex.def Info: Norma/Tratamiento.png  used on input line 341.
+Package pdftex.def Info: Norma/Tratamiento.png  used on input line 340.
 (pdftex.def)             Requested size: 426.79135pt x 317.61992pt.
-<Norma/TratamientoL.jpeg, id=45, 828.09375pt x 382.42876pt>
+<Norma/TratamientoL.jpeg, id=46, 828.09375pt x 382.42876pt>
 File: Norma/TratamientoL.jpeg Graphic file (type jpg)
 <use Norma/TratamientoL.jpeg>
-Package pdftex.def Info: Norma/TratamientoL.jpeg  used on input line 342.
+Package pdftex.def Info: Norma/TratamientoL.jpeg  used on input line 341.
 (pdftex.def)             Requested size: 426.79135pt x 197.1018pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<Norma/Edificabilidad.jpeg, id=46, 1057.9525pt x 765.86125pt>
+<Norma/Edificabilidad.jpeg, id=47, 1057.9525pt x 765.86125pt>
 File: Norma/Edificabilidad.jpeg Graphic file (type jpg)
 <use Norma/Edificabilidad.jpeg>
-Package pdftex.def Info: Norma/Edificabilidad.jpeg  used on input line 350.
+Package pdftex.def Info: Norma/Edificabilidad.jpeg  used on input line 349.
 (pdftex.def)             Requested size: 298.75264pt x 216.26271pt.
-<Norma/Edificabilidad1.jpeg, id=47, 677.53125pt x 199.74625pt>
+<Norma/Edificabilidad1.jpeg, id=48, 677.53125pt x 199.74625pt>
 File: Norma/Edificabilidad1.jpeg Graphic file (type jpg)
 <use Norma/Edificabilidad1.jpeg>
-Package pdftex.def Info: Norma/Edificabilidad1.jpeg  used on input line 351.
+Package pdftex.def Info: Norma/Edificabilidad1.jpeg  used on input line 350.
 (pdftex.def)             Requested size: 298.75264pt x 88.07758pt.
-<Norma/Edificabilidad3.png, id=48, 139.52126pt x 311.1625pt>
+<Norma/Edificabilidad3.png, id=49, 139.52126pt x 311.1625pt>
 File: Norma/Edificabilidad3.png Graphic file (type png)
 <use Norma/Edificabilidad3.png>
-Package pdftex.def Info: Norma/Edificabilidad3.png  used on input line 351.
+Package pdftex.def Info: Norma/Edificabilidad3.png  used on input line 350.
 (pdftex.def)             Requested size: 42.68173pt x 95.18692pt.
-<Norma/Edificabilidad2.png, id=49, 989.6975pt x 311.1625pt>
+<Norma/Edificabilidad2.png, id=50, 989.6975pt x 311.1625pt>
 File: Norma/Edificabilidad2.png Graphic file (type png)
 <use Norma/Edificabilidad2.png>
-Package pdftex.def Info: Norma/Edificabilidad2.png  used on input line 352.
+Package pdftex.def Info: Norma/Edificabilidad2.png  used on input line 351.
 (pdftex.def)             Requested size: 298.75264pt x 93.92871pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<Norma/sectornormativo.png, id=50, 940.51375pt x 655.44875pt>
+<Norma/sectornormativo.png, id=51, 940.51375pt x 655.44875pt>
 File: Norma/sectornormativo.png Graphic file (type png)
 <use Norma/sectornormativo.png>
-Package pdftex.def Info: Norma/sectornormativo.png  used on input line 362.
+Package pdftex.def Info: Norma/sectornormativo.png  used on input line 361.
 (pdftex.def)             Requested size: 213.39568pt x 148.70976pt.
-<Norma/sectornormativo1.png, id=51, 238.8925pt x 190.7125pt>
+<Norma/sectornormativo1.png, id=52, 238.8925pt x 190.7125pt>
 File: Norma/sectornormativo1.png Graphic file (type png)
 <use Norma/sectornormativo1.png>
-Package pdftex.def Info: Norma/sectornormativo1.png  used on input line 363.
+Package pdftex.def Info: Norma/sectornormativo1.png  used on input line 362.
 (pdftex.def)             Requested size: 128.0387pt x 102.21495pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<Norma/Edificabilidad4.png, id=52, 410.53375pt x 311.1625pt>
+<Norma/Edificabilidad4.png, id=53, 410.53375pt x 311.1625pt>
 File: Norma/Edificabilidad4.png Graphic file (type png)
 <use Norma/Edificabilidad4.png>
-Package pdftex.def Info: Norma/Edificabilidad4.png  used on input line 370.
+Package pdftex.def Info: Norma/Edificabilidad4.png  used on input line 369.
 (pdftex.def)             Requested size: 128.0387pt x 97.04337pt.
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 371.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+
+Underfull \vbox (badness 1609) has occurred while \output is active []
+
+LaTeX Info: Redefining \. on input line 370.
+LaTeX Info: Redefining \% on input line 370.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 371.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 370.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
+
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 35.02707pt, for example:
@@ -676,13 +701,11 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [8]
 Overfull \vbox (9.72084pt too high) has occurred while \output is active []
 
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 371.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 370.
+LaTeX Info: Redefining \% on input line 370.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 371.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 370.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 
@@ -698,13 +721,11 @@ d4.png>]
 
 LaTeX Warning: Text page 10 contains only floats.
 
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 371.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 370.
+LaTeX Info: Redefining \% on input line 370.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 371.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 370.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -717,13 +738,11 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [10 <./Norma/Edificabilidad.jpeg> <./Norma/Edificabilidad1.jpeg> <./Norma/Edifi
 cabilidad3.png> <./Norma/Edificabilidad2.png> <./Norma/sectornormativo.png> <./
 Norma/sectornormativo1.png>]
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 443.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 442.
+LaTeX Info: Redefining \% on input line 442.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 443.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 442.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 
@@ -735,6 +754,11 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-23.02707pt}.
 
 [11]
+Underfull \hbox (badness 10000) in paragraph at lines 452--453
+
+ []
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 453--454
 
  []
@@ -749,18 +773,11 @@ Underfull \hbox (badness 10000) in paragraph at lines 455--456
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 456--457
-
- []
-
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 496.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 495.
+LaTeX Info: Redefining \% on input line 495.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 496.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 495.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -771,22 +788,20 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-23.02707pt}.
 
 [12]
-Underfull \hbox (badness 10000) in paragraph at lines 498--501
+Underfull \hbox (badness 10000) in paragraph at lines 497--500
 
  []
 
 <Imagenes/PLANO.png, id=75, 614.295pt x 794.97pt>
 File: Imagenes/PLANO.png Graphic file (type png)
 <use Imagenes/PLANO.png>
-Package pdftex.def Info: Imagenes/PLANO.png  used on input line 502.
+Package pdftex.def Info: Imagenes/PLANO.png  used on input line 501.
 (pdftex.def)             Requested size: 341.43437pt x 441.85648pt.
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 507.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 506.
+LaTeX Info: Redefining \% on input line 506.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 507.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 506.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -797,13 +812,11 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-23.02707pt}.
 
 [13 <./Imagenes/PLANO.png>]
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 628.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 627.
+LaTeX Info: Redefining \% on input line 627.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 628.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 627.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 
@@ -815,13 +828,11 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-23.02707pt}.
 
 [14]
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 677.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 676.
+LaTeX Info: Redefining \% on input line 676.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 677.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 676.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 
@@ -833,13 +844,9 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-23.02707pt}.
 
 [15]
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 695.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 695.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 694.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 
@@ -853,13 +860,11 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [16]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 723.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 722.
+LaTeX Info: Redefining \% on input line 722.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 723.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 722.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 
@@ -871,13 +876,9 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-23.02707pt}.
 
 [17]
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 756.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 756.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 755.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 
@@ -892,30 +893,28 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 <Imagenes/Valoracion1.png, id=95, 1271.75125pt x 291.0875pt>
 File: Imagenes/Valoracion1.png Graphic file (type png)
 <use Imagenes/Valoracion1.png>
-Package pdftex.def Info: Imagenes/Valoracion1.png  used on input line 761.
+Package pdftex.def Info: Imagenes/Valoracion1.png  used on input line 760.
 (pdftex.def)             Requested size: 426.79135pt x 97.68924pt.
 <Imagenes/Firma.png, id=96, 880.28876pt x 324.21124pt>
 File: Imagenes/Firma.png Graphic file (type png)
 <use Imagenes/Firma.png>
-Package pdftex.def Info: Imagenes/Firma.png  used on input line 769.
+Package pdftex.def Info: Imagenes/Firma.png  used on input line 768.
 (pdftex.def)             Requested size: 176.05463pt x 64.8411pt.
 <Imagenes/RentaParcial1.png, id=97, 773.89125pt x 239.89626pt>
 File: Imagenes/RentaParcial1.png Graphic file (type png)
 <use Imagenes/RentaParcial1.png>
-Package pdftex.def Info: Imagenes/RentaParcial1.png  used on input line 778.
+Package pdftex.def Info: Imagenes/RentaParcial1.png  used on input line 777.
 (pdftex.def)             Requested size: 426.79135pt x 132.30206pt.
 <Imagenes/RentaTotal1.png, id=98, 773.89125pt x 141.52875pt>
 File: Imagenes/RentaTotal1.png Graphic file (type png)
 <use Imagenes/RentaTotal1.png>
-Package pdftex.def Info: Imagenes/RentaTotal1.png  used on input line 784.
+Package pdftex.def Info: Imagenes/RentaTotal1.png  used on input line 783.
 (pdftex.def)             Requested size: 426.79135pt x 78.05267pt.
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 787.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 786.
+LaTeX Info: Redefining \% on input line 786.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 787.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 786.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 
@@ -931,88 +930,84 @@ l1.png> <./Imagenes/RentaTotal1.png>]
 <Imagenes/1.jpg, id=107, 1156.32pt x 2055.68pt>
 File: Imagenes/1.jpg Graphic file (type jpg)
 <use Imagenes/1.jpg>
-Package pdftex.def Info: Imagenes/1.jpg  used on input line 793.
+Package pdftex.def Info: Imagenes/1.jpg  used on input line 792.
 (pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
 <Imagenes/2.jpg, id=108, 1156.32pt x 2055.68pt>
 File: Imagenes/2.jpg Graphic file (type jpg)
 <use Imagenes/2.jpg>
-Package pdftex.def Info: Imagenes/2.jpg  used on input line 793.
+Package pdftex.def Info: Imagenes/2.jpg  used on input line 792.
 (pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
 <Imagenes/3.jpg, id=109, 1156.32pt x 2055.68pt>
 File: Imagenes/3.jpg Graphic file (type jpg)
 <use Imagenes/3.jpg>
-Package pdftex.def Info: Imagenes/3.jpg  used on input line 795.
+Package pdftex.def Info: Imagenes/3.jpg  used on input line 794.
 (pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
 <Imagenes/4.jpg, id=110, 1156.32pt x 2055.68pt>
 File: Imagenes/4.jpg Graphic file (type jpg)
 <use Imagenes/4.jpg>
-Package pdftex.def Info: Imagenes/4.jpg  used on input line 795.
+Package pdftex.def Info: Imagenes/4.jpg  used on input line 794.
 (pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
 <Imagenes/5.jpg, id=111, 2055.68pt x 1156.32pt>
 File: Imagenes/5.jpg Graphic file (type jpg)
 <use Imagenes/5.jpg>
-Package pdftex.def Info: Imagenes/5.jpg  used on input line 797.
+Package pdftex.def Info: Imagenes/5.jpg  used on input line 796.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/6.jpg, id=112, 1156.32pt x 2055.68pt>
 File: Imagenes/6.jpg Graphic file (type jpg)
 <use Imagenes/6.jpg>
-Package pdftex.def Info: Imagenes/6.jpg  used on input line 797.
+Package pdftex.def Info: Imagenes/6.jpg  used on input line 796.
 (pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
 <Imagenes/9.jpg, id=113, 1156.32pt x 2055.68pt>
 File: Imagenes/9.jpg Graphic file (type jpg)
 <use Imagenes/9.jpg>
-Package pdftex.def Info: Imagenes/9.jpg  used on input line 807.
+Package pdftex.def Info: Imagenes/9.jpg  used on input line 806.
 (pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
 <Imagenes/7.jpg, id=114, 2055.68pt x 1156.32pt>
 File: Imagenes/7.jpg Graphic file (type jpg)
 <use Imagenes/7.jpg>
-Package pdftex.def Info: Imagenes/7.jpg  used on input line 807.
+Package pdftex.def Info: Imagenes/7.jpg  used on input line 806.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/8.jpg, id=115, 1156.32pt x 2055.68pt>
 File: Imagenes/8.jpg Graphic file (type jpg)
 <use Imagenes/8.jpg>
-Package pdftex.def Info: Imagenes/8.jpg  used on input line 809.
+Package pdftex.def Info: Imagenes/8.jpg  used on input line 808.
 (pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
 <Imagenes/12.jpg, id=116, 2055.68pt x 1156.32pt>
 File: Imagenes/12.jpg Graphic file (type jpg)
 <use Imagenes/12.jpg>
-Package pdftex.def Info: Imagenes/12.jpg  used on input line 809.
+Package pdftex.def Info: Imagenes/12.jpg  used on input line 808.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/13.jpg, id=117, 2055.68pt x 1156.32pt>
 File: Imagenes/13.jpg Graphic file (type jpg)
 <use Imagenes/13.jpg>
-Package pdftex.def Info: Imagenes/13.jpg  used on input line 811.
+Package pdftex.def Info: Imagenes/13.jpg  used on input line 810.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/14.jpg, id=118, 2055.68pt x 1156.32pt>
 File: Imagenes/14.jpg Graphic file (type jpg)
 <use Imagenes/14.jpg>
-Package pdftex.def Info: Imagenes/14.jpg  used on input line 811.
+Package pdftex.def Info: Imagenes/14.jpg  used on input line 810.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/15.jpg, id=119, 2055.68pt x 1156.32pt>
 File: Imagenes/15.jpg Graphic file (type jpg)
 <use Imagenes/15.jpg>
-Package pdftex.def Info: Imagenes/15.jpg  used on input line 813.
+Package pdftex.def Info: Imagenes/15.jpg  used on input line 812.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/16.jpg, id=120, 2055.68pt x 1156.32pt>
 File: Imagenes/16.jpg Graphic file (type jpg)
 <use Imagenes/16.jpg>
-Package pdftex.def Info: Imagenes/16.jpg  used on input line 813.
+Package pdftex.def Info: Imagenes/16.jpg  used on input line 812.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 
-Overfull \hbox (13.17206pt too wide) in paragraph at lines 805--818
+Overfull \hbox (13.17206pt too wide) in paragraph at lines 804--817
 [][] 
  []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 819.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 819.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 818.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 
@@ -1028,58 +1023,56 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 <Imagenes/17.jpg, id=124, 1156.32pt x 2055.68pt>
 File: Imagenes/17.jpg Graphic file (type jpg)
 <use Imagenes/17.jpg>
-Package pdftex.def Info: Imagenes/17.jpg  used on input line 821.
+Package pdftex.def Info: Imagenes/17.jpg  used on input line 820.
 (pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
 <Imagenes/18.jpg, id=125, 2055.68pt x 1156.32pt>
 File: Imagenes/18.jpg Graphic file (type jpg)
 <use Imagenes/18.jpg>
-Package pdftex.def Info: Imagenes/18.jpg  used on input line 821.
+Package pdftex.def Info: Imagenes/18.jpg  used on input line 820.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/19.jpg, id=126, 2055.68pt x 1156.32pt>
 File: Imagenes/19.jpg Graphic file (type jpg)
 <use Imagenes/19.jpg>
-Package pdftex.def Info: Imagenes/19.jpg  used on input line 823.
+Package pdftex.def Info: Imagenes/19.jpg  used on input line 822.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/20.jpg, id=127, 2055.68pt x 1156.32pt>
 File: Imagenes/20.jpg Graphic file (type jpg)
 <use Imagenes/20.jpg>
-Package pdftex.def Info: Imagenes/20.jpg  used on input line 823.
+Package pdftex.def Info: Imagenes/20.jpg  used on input line 822.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/21.jpg, id=128, 2055.68pt x 1156.32pt>
 File: Imagenes/21.jpg Graphic file (type jpg)
 <use Imagenes/21.jpg>
-Package pdftex.def Info: Imagenes/21.jpg  used on input line 825.
+Package pdftex.def Info: Imagenes/21.jpg  used on input line 824.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/22.jpg, id=129, 2055.68pt x 1156.32pt>
 File: Imagenes/22.jpg Graphic file (type jpg)
 <use Imagenes/22.jpg>
-Package pdftex.def Info: Imagenes/22.jpg  used on input line 825.
+Package pdftex.def Info: Imagenes/22.jpg  used on input line 824.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/23.jpg, id=130, 2055.68pt x 1156.32pt>
 File: Imagenes/23.jpg Graphic file (type jpg)
 <use Imagenes/23.jpg>
-Package pdftex.def Info: Imagenes/23.jpg  used on input line 827.
+Package pdftex.def Info: Imagenes/23.jpg  used on input line 826.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/24.jpg, id=131, 2055.68pt x 1156.32pt>
 File: Imagenes/24.jpg Graphic file (type jpg)
 <use Imagenes/24.jpg>
-Package pdftex.def Info: Imagenes/24.jpg  used on input line 827.
+Package pdftex.def Info: Imagenes/24.jpg  used on input line 826.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 
-Overfull \hbox (13.17206pt too wide) in paragraph at lines 819--833
+Overfull \hbox (13.17206pt too wide) in paragraph at lines 818--832
 [][] 
  []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 834.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 833.
+LaTeX Info: Redefining \% on input line 833.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 834.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 833.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 
@@ -1096,68 +1089,64 @@ g>]
 <Imagenes/25.jpg, id=135, 2055.68pt x 1156.32pt>
 File: Imagenes/25.jpg Graphic file (type jpg)
 <use Imagenes/25.jpg>
-Package pdftex.def Info: Imagenes/25.jpg  used on input line 836.
+Package pdftex.def Info: Imagenes/25.jpg  used on input line 835.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/26.jpg, id=136, 2055.68pt x 1156.32pt>
 File: Imagenes/26.jpg Graphic file (type jpg)
 <use Imagenes/26.jpg>
-Package pdftex.def Info: Imagenes/26.jpg  used on input line 836.
+Package pdftex.def Info: Imagenes/26.jpg  used on input line 835.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/27.jpg, id=137, 2055.68pt x 1156.32pt>
 File: Imagenes/27.jpg Graphic file (type jpg)
 <use Imagenes/27.jpg>
-Package pdftex.def Info: Imagenes/27.jpg  used on input line 838.
+Package pdftex.def Info: Imagenes/27.jpg  used on input line 837.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/28.jpg, id=138, 2055.68pt x 1156.32pt>
 File: Imagenes/28.jpg Graphic file (type jpg)
 <use Imagenes/28.jpg>
-Package pdftex.def Info: Imagenes/28.jpg  used on input line 838.
+Package pdftex.def Info: Imagenes/28.jpg  used on input line 837.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/29.jpg, id=139, 2055.68pt x 1156.32pt>
 File: Imagenes/29.jpg Graphic file (type jpg)
 <use Imagenes/29.jpg>
-Package pdftex.def Info: Imagenes/29.jpg  used on input line 840.
+Package pdftex.def Info: Imagenes/29.jpg  used on input line 839.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/30.jpg, id=140, 2055.68pt x 1156.32pt>
 File: Imagenes/30.jpg Graphic file (type jpg)
 <use Imagenes/30.jpg>
-Package pdftex.def Info: Imagenes/30.jpg  used on input line 840.
+Package pdftex.def Info: Imagenes/30.jpg  used on input line 839.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/31.jpg, id=141, 2055.68pt x 1156.32pt>
 File: Imagenes/31.jpg Graphic file (type jpg)
 <use Imagenes/31.jpg>
-Package pdftex.def Info: Imagenes/31.jpg  used on input line 842.
+Package pdftex.def Info: Imagenes/31.jpg  used on input line 841.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/32.jpg, id=142, 4111.36pt x 2312.64pt>
 File: Imagenes/32.jpg Graphic file (type jpg)
 <use Imagenes/32.jpg>
-Package pdftex.def Info: Imagenes/32.jpg  used on input line 842.
+Package pdftex.def Info: Imagenes/32.jpg  used on input line 841.
 (pdftex.def)             Requested size: 199.16928pt x 112.0041pt.
 <Imagenes/33.jpg, id=143, 2055.68pt x 1156.32pt>
 File: Imagenes/33.jpg Graphic file (type jpg)
 <use Imagenes/33.jpg>
-Package pdftex.def Info: Imagenes/33.jpg  used on input line 844.
+Package pdftex.def Info: Imagenes/33.jpg  used on input line 843.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/34.jpg, id=144, 2055.68pt x 1156.32pt>
 File: Imagenes/34.jpg Graphic file (type jpg)
 <use Imagenes/34.jpg>
-Package pdftex.def Info: Imagenes/34.jpg  used on input line 844.
+Package pdftex.def Info: Imagenes/34.jpg  used on input line 843.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 
-Overfull \hbox (13.17206pt too wide) in paragraph at lines 834--847
+Overfull \hbox (13.17206pt too wide) in paragraph at lines 833--846
 [][] 
  []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 848.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 848.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 847.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 
@@ -1173,13 +1162,11 @@ jpg> <./Imagenes/21.jpg> <./Imagenes/22.jpg> <./Imagenes/23.jpg> <./Imagenes/24
 .jpg>]
 Overfull \vbox (6.13133pt too high) has occurred while \output is active []
 
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 848.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
+LaTeX Info: Redefining \. on input line 847.
+LaTeX Info: Redefining \% on input line 847.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 848.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 847.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 
@@ -1196,55 +1183,51 @@ jpg> <./Imagenes/29.jpg> <./Imagenes/30.jpg> <./Imagenes/31.jpg> <./Imagenes/32
 <Imagenes/35.jpg, id=151, 2055.68pt x 1156.32pt>
 File: Imagenes/35.jpg Graphic file (type jpg)
 <use Imagenes/35.jpg>
-Package pdftex.def Info: Imagenes/35.jpg  used on input line 851.
+Package pdftex.def Info: Imagenes/35.jpg  used on input line 850.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/36.jpg, id=152, 2055.68pt x 1156.32pt>
 File: Imagenes/36.jpg Graphic file (type jpg)
 <use Imagenes/36.jpg>
-Package pdftex.def Info: Imagenes/36.jpg  used on input line 851.
+Package pdftex.def Info: Imagenes/36.jpg  used on input line 850.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/37.jpg, id=153, 2055.68pt x 1156.32pt>
 File: Imagenes/37.jpg Graphic file (type jpg)
 <use Imagenes/37.jpg>
-Package pdftex.def Info: Imagenes/37.jpg  used on input line 853.
+Package pdftex.def Info: Imagenes/37.jpg  used on input line 852.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/38.jpg, id=154, 1156.32pt x 2055.68pt>
 File: Imagenes/38.jpg Graphic file (type jpg)
 <use Imagenes/38.jpg>
-Package pdftex.def Info: Imagenes/38.jpg  used on input line 853.
+Package pdftex.def Info: Imagenes/38.jpg  used on input line 852.
 (pdftex.def)             Requested size: 85.35826pt x 151.7227pt.
 <Imagenes/39.jpg, id=155, 2055.68pt x 1156.32pt>
 File: Imagenes/39.jpg Graphic file (type jpg)
 <use Imagenes/39.jpg>
-Package pdftex.def Info: Imagenes/39.jpg  used on input line 855.
+Package pdftex.def Info: Imagenes/39.jpg  used on input line 854.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/40.jpg, id=156, 2055.68pt x 1156.32pt>
 File: Imagenes/40.jpg Graphic file (type jpg)
 <use Imagenes/40.jpg>
-Package pdftex.def Info: Imagenes/40.jpg  used on input line 855.
+Package pdftex.def Info: Imagenes/40.jpg  used on input line 854.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/44.jpg, id=157, 2055.68pt x 1156.32pt>
 File: Imagenes/44.jpg Graphic file (type jpg)
 <use Imagenes/44.jpg>
-Package pdftex.def Info: Imagenes/44.jpg  used on input line 857.
+Package pdftex.def Info: Imagenes/44.jpg  used on input line 856.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 <Imagenes/42.jpg, id=158, 2055.68pt x 1156.32pt>
 File: Imagenes/42.jpg Graphic file (type jpg)
 <use Imagenes/42.jpg>
-Package pdftex.def Info: Imagenes/42.jpg  used on input line 857.
+Package pdftex.def Info: Imagenes/42.jpg  used on input line 856.
 (pdftex.def)             Requested size: 199.16928pt x 112.02174pt.
 
-Overfull \hbox (13.17206pt too wide) in paragraph at lines 848--863
+Overfull \hbox (13.17206pt too wide) in paragraph at lines 847--862
 [][] 
  []
 
-File: Imagenes/Geovalores.png Graphic file (type png)
-<use Imagenes/Geovalores.png>
-Package pdftex.def Info: Imagenes/Geovalores.png  used on input line 948.
-(pdftex.def)             Requested size: 104.0643pt x 27.98698pt.
 File: Imagenes/QR.png Graphic file (type png)
 <use Imagenes/QR.png>
-Package pdftex.def Info: Imagenes/QR.png  used on input line 948.
+Package pdftex.def Info: Imagenes/QR.png  used on input line 947.
 (pdftex.def)             Requested size: 29.5478pt x 30.67703pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1257,35 +1240,40 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [24 <./Imagenes/35.jpg> <./Imagenes/36.jpg> <./Imagenes/37.jpg> <./Imagenes/38.
 jpg> <./Imagenes/39.jpg> <./Imagenes/40.jpg> <./Imagenes/44.jpg> <./Imagenes/42
 .jpg>] (./Informe.aux
-LaTeX Info: Redefining \. on input line 10.
-LaTeX Info: Redefining \% on input line 10.
+LaTeX Info: Redefining \. on input line 9.
+LaTeX Info: Redefining \% on input line 9.
 )
 
-LaTeX Warning: There were multiply-defined labels.
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
  ) 
 Here is how much of TeX's memory you used:
- 6646 strings out of 478287
- 108745 string characters out of 5849289
- 507315 words of memory out of 5000000
- 24705 multiletter control sequences out of 15000+600000
- 478745 words of font info for 64 fonts, out of 8000000 for 9000
+ 6641 strings out of 478287
+ 108610 string characters out of 5849289
+ 506107 words of memory out of 5000000
+ 24700 multiletter control sequences out of 15000+600000
+ 479097 words of font info for 65 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 68i,17n,77p,802b,621s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 68i,17n,77p,802b,732s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/share/texli
 ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/tex
 mf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texlive/texmf-dis
-t/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts
-/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/
-public/amsfonts/cm/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
-msfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/
-cm/cmr8.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1200.pfb></usr/sh
-are/texmf/fonts/type1/public/cm-super/sfrm0600.pfb></usr/share/texmf/fonts/type
-1/public/cm-super/sfrm1200.pfb>
-Output written on Informe.pdf (24 pages, 27503444 bytes).
+t/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/
+amsfonts/cm/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8
+.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl12.pfb><
+/usr/share/texmf/fonts/type1/public/cm-super/sfbx1200.pfb></usr/share/texmf/fon
+ts/type1/public/cm-super/sfrm0600.pfb></usr/share/texmf/fonts/type1/public/cm-s
+uper/sfrm1200.pfb>
+Output written on Informe.pdf (24 pages, 27370251 bytes).
 PDF statistics:
- 206 PDF objects out of 1000 (max. 8388607)
- 86 compressed objects within 1 object stream
+ 214 PDF objects out of 1000 (max. 8388607)
+ 92 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 296 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 291 words of extra memory for PDF output out of 10000 (max. 10000000)
 

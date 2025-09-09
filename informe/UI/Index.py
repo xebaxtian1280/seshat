@@ -1,4 +1,4 @@
-import sys
+import sys, os
 import time
 from pathlib import Path
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
@@ -14,6 +14,7 @@ from Pestana_caracteristicas_sector import PestanaCaracteristicasSector
 from Pestana_caracteristicas_construccion import PestanaCaracteristicasConstruccion
 from Pestana_condiciones_valuacion import PestanaCondicionesValuacion
 from Pestana_seguimiento import PestanaSeguimiento
+from DB import DB
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
@@ -64,9 +65,15 @@ class ReportApp(QMainWindow):
         # Panel de pestañas
         self.tab_panel = QTabWidget()
         
+        # Crear las pestañas
+        self.pestana_seguimiento = PestanaSeguimiento(self.tab_panel)
+        
+        # Conectar la señal de PestanaSeguimiento
+        self.pestana_seguimiento.id_avaluo_seleccionado.connect(self.recibir_id_avaluo)
+        
         
         # Crear pestañas
-        PestanaSeguimiento(self.tab_panel)
+        #PestanaSeguimiento(self.tab_panel)
         """ PestanaDatosSolicitud(self.tab_panel)        
         PestanaCaracteristicasSector(self.tab_panel)
         PestanaCaracteristicasConstruccion(self.tab_panel)
@@ -81,7 +88,14 @@ class ReportApp(QMainWindow):
         self.progress_bar = QProgressBar()
         self.progress_bar.hide()
         main_layout.addWidget(self.progress_bar)
-        
+    
+    def recibir_id_avaluo(self, id_avaluo):
+        """
+        Maneja el id_avaluo recibido desde PestanaSeguimiento.
+        """
+        print(f"ID Avaluo recibido en Index: {id_avaluo}")
+        # Pasar el id_avaluo a la pestaña Datos de Solicitud
+        self.id_avaluo = id_avaluo
     
     def seleccionar_ubicacion(self):
         directory = QFileDialog.getExistingDirectory(
@@ -133,48 +147,113 @@ class ReportApp(QMainWindow):
             self.progress_bar.hide()
     
     def procesar_informe(self):
+        
+        print("El id avaluo actual es:", getattr(self, 'id_avaluo', None))
+        self.id_avaluo = getattr(self, 'id_avaluo', None)
+        db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+        db.conectar()
+        
         # Recolectar datos de todas las pestañas
+        success, resultado = False, "No se ha iniciado la generación del informe." 
+        try:
+            # Crear una instancia de la clase DB
+            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db.conectar()
+            
+            print(f"Cargando datos para el avalúo con ID: {self.id_avaluo}")
+    
+            # Consulta SQL para obtener los datos de la solicitud
+            consulta = """
+            select a.nombre_cliente , a.id_cliente , a.destinatario, a.fecha_visita ,a.fecha_avaluo , a.tipo_avaluo
+            FROM "Avaluos" a 
+            left join inmuebles i on a."Avaluo_id" = i.avaluo_id 
+            WHERE a."Avaluo_id" = 2
+            """.replace("2", str(self.id_avaluo))
+            resultado = db.consultar(consulta)
+            contenido = ""
+            # Verificar si se encontraron datos
+            if resultado:       
+                  
+                success, resultado = self.generar_informe(resultado, "./Base/Informe.tex","./Resultados/informe")             
+
+            else:
+                print(f"No se encontraron datos para el avalúo con ID: {self.id_avaluo}")
+    
+        except Exception as e:
+            print(f"Error al cargar los datos de la solicitud: {e}")
         
         # Obtener todas las matrículas
-        matriculas = []
+        """ matriculas = []
         for i in range(self.matricula_layout.count()):
             item = self.matricula_layout.itemAt(i)
             if item and isinstance(item, QHBoxLayout):
                 line_edit = item.itemAt(0).widget()
                 if line_edit and line_edit.text():
-                    matriculas.append(line_edit.text())
+                    matriculas.append(line_edit.text()) """
         
-        contenido = f"""
-        --- DATOS DE LA SOLICITUD ---
-        Cliente: {self.cliente.text()}
-        Documento ID: {self.doc_identidad.text()}
-        Destinatario: {self.destinatario.text()}
-        Fecha Visita: {self.fecha_visita.date().toString("dd/MM/yyyy")}
-        Fecha Informe: {self.fecha_informe.date().toString("dd/MM/yyyy")}
         
-        --- INFORMACIÓN JURÍDICA ---
-        Propietario: {self.propietario.text()}
-        ID Propietario: {self.id_propietario.text()}
-        Documento Propiedad: {self.doc_propiedad.toPlainText()}
-        Matrícula: {self.matricula_inmobiliaria.text()}
-        Cédula Catastral: {self.cedula_catastral.text()}
-        Adquisición: {self.modo_adquisicion.currentText()}
-        Limitaciones: {self.limitaciones.toPlainText()}
-        
-        --- CARACTERÍSTICAS DEL SECTOR ---
-        Zona: {self.zona.currentText()}
-        Equipamientos: {self.equipamientos.toPlainText()}
-        Infraestructura: {self.infrastructure.toPlainText()}
-        Riesgos: {self.riesgos.toPlainText()}
-        """
         
         file_path = f"{self.default_save_path}/informe_{time.strftime('%Y%m%d-%H%M%S')}"
-        success, resultado = generar_informe(contenido, file_path)
+        
         
         if success:
             QMessageBox.information(self, "Éxito", f"Informe guardado en:\n{resultado}")
         else:
             QMessageBox.critical(self, "Error", f"Error al generar informe:\n{resultado}")
+
+    def generar_informe(self, texto, template_path="Base/Informe.tex", output_name="../Resultados"):
+        """
+        Genera un informe LaTeX desde una plantilla y texto dinámico.
+        
+        Args:
+            texto (str): Contenido a insertar
+            template_path (str): Ruta de la plantilla .tex
+            output_name (str): Nombre base del archivo de salida
+        """
+        
+        # Leer plantilla
+        print("template_path", template_path)
+
+        try:
+            with open(template_path, "r", encoding="utf-8") as f:
+                plantilla = f.read()
+        except FileNotFoundError:
+            print(f"Error: No se encontró {template_path}")
+            return
+
+        # Escapar caracteres especiales de LaTeX
+        #texto_procesado = texto.replace("&", "\&").replace("%", "\%").replace("$", "\$")
+        cliente= texto[0][0]
+        documento_id=str(texto[0][1])
+        destinatario=texto[0][2]
+        fecha_visita=texto[0][3].date().strftime("%d/%m/%Y")
+        fecha_informe=texto[0][4].date().strftime("%d/%m/%Y") 
+        # Reemplazar marcadores en la plantilla
+        informe_final = plantilla.replace("%CLIENTE%", cliente)
+        informe_final = informe_final.replace("%DOCUMENTO_ID%", documento_id)
+        informe_final = informe_final.replace("%DESTINATARIO%", destinatario)
+        informe_final = informe_final.replace("FECHA_VISITA%", fecha_visita)
+        informe_final = informe_final.replace("FECHA_INFORME%", fecha_informe)
+        informe_final = informe_final.replace("%TIPO_AVALUO%", texto[0][5])       
+        
+        # Guardar archivo .tex
+        with open(f"{output_name}.tex", "w", encoding="utf-8") as f:
+            f.write(informe_final)
+            return True, f"{output_name}.tex"
+        
+        # Compilar a PDF
+        """ try:
+            subprocess.run(["pdflatex", f"{output_name}.tex"], check=True)
+            print(f"\nPDF generado: {output_name}.pdf")
+            
+            # Limpiar archivos auxiliares
+            for ext in [".aux", ".log", ".out"]:
+                archivo = f"{output_name}{ext}"
+                if os.path.exists(archivo):
+                    os.remove(archivo)
+                    
+        except FileNotFoundError:
+            print("\n¡Error! Necesitas LaTeX instalado (pdflatex)") """
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

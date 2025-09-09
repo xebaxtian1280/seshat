@@ -6,7 +6,7 @@
 \contentsline {subsection}{\numberline {1.4}Ubicación del inmueble}{4}{}%
 \contentsline {subsection}{\numberline {1.5}Fecha de visita}{4}{}%
 \contentsline {subsection}{\numberline {1.6}Fecha del informe}{4}{}%
-\contentsline {subsection}{\numberline {1.7}Documentación aportada}{5}{}%
+\contentsline {subsection}{\numberline {1.7}Documentación aportada}{4}{}%
 \contentsline {subsection}{\numberline {1.8}Vigencia del avalúo}{5}{}%
 \contentsline {section}{\numberline {2}Información jurídica}{5}{}%
 \contentsline {subsection}{\numberline {2.1}Datos generales}{5}{}%
@@ -15,7 +15,7 @@
 \contentsline {subsection}{\numberline {3.2}Amoblamiento urbano}{6}{}%
 \contentsline {subsection}{\numberline {3.3}Normatividad urbanística}{6}{}%
 \contentsline {subsubsection}{\numberline {3.3.1}Usos}{6}{}%
-\contentsline {subsubsection}{\numberline {3.3.2}Tratamiento}{8}{}%
+\contentsline {subsubsection}{\numberline {3.3.2}Tratamiento}{7}{}%
 \contentsline {subsection}{\numberline {3.4}Servicios Públicos}{11}{}%
 \contentsline {subsection}{\numberline {3.5}Vías publicas de acceso}{11}{}%
 \contentsline {subsubsection}{\numberline {3.5.1}Principales}{11}{}%

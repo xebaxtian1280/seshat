@@ -55,7 +55,7 @@
 
 % ---------------------- Datos generales del inmueble --------------------
 
-\newcommand{\Direccion}[1]{%DIRECCION%}
+\newcommand{\Direccion}[1]{}
 \newcommand{\VeredaBarrio}[1]{Comuneros}
 \newcommand{\Municipio}[1]{Bucaramanga}
 \newcommand{\Departamento}[1]{Santander}
@@ -90,7 +90,7 @@
 
 \section*{Solicitado Por}
 
-\subsection*{\Propietarios}
+\subsection*{%CLIENTE%}
 
 \bigskip 
 \bigskip 
@@ -128,13 +128,15 @@
 
 \section{Información básica}
 
+%INFO_BASICA%
+
 \subsection{Identificación del cliente}
 
 \begin{tabular}{ l p{7.5cm} }
 	
 	\textbf{Cliente:} & \Propietarios. \\
-	\textbf{Documento de identificación:} & Nit. 830.122.566-1.\\
-	\textbf{Destinatario del avalúo:} & \Propietarios. \\
+	\textbf{Documento de identificación:} & %DOCUMENTO_ID%.\\
+	\textbf{Destinatario del avalúo:} & %DESTINATARIO%". \\
 	
 \end{tabular}
 
@@ -145,7 +147,7 @@ El presente estudio se realiza con el fin de conocer los factores físicos, econ
 
 \subsection{Tipo de avalúo}
 
-Comercial.
+%TIPO_AVALUO%
 
 \subsection{Ubicación del inmueble}
 
@@ -156,9 +158,7 @@ Comercial.
 	\item[Departamento: ] \Departamento.
 	\item[Municipio: ] \Municipio.
 %	\item[Barrio o Vereda: ] \VeredaBarrio.
-	\item[Coordenadas: ] \textbf{Log:} 	
- -73.127821, \textbf{Lat:} 	
- 7.137223. 
+	\item[Coordenadas: ] %\textbf{Log:} -73.127821, \textbf{Lat:} 7.137223. %
 	%\item[Localidad:] 11-Suba.
 	%\item[UPL:] 16-Bosa.
 	%\item[Sector:] 009129-Villa Del Prado.
@@ -167,11 +167,11 @@ Comercial.
  
 \subsection{Fecha de visita}
  
-03 de Agosto del 2024.
+FECHA_VISITA%
 
 \subsection{Fecha del informe}
 
-16 de Agosto del 2024.
+FECHA_INFORME%
 
 \subsection{Documentación aportada}
 
