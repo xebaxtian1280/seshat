@@ -200,6 +200,7 @@ class PestanaSeguimiento(QWidget):
             print(f"Error al cargar los datos de seguimiento: {e}")   
             
         # Método para manejar el clic del botón
+    
     def manejar_click_boton(self):
         boton = self.sender()  # Obtener el botón que disparó la señal
         id_avaluo = boton.property("id_avaluo")  # Recuperar el id_avaluo
@@ -264,6 +265,7 @@ class PestanaSeguimiento(QWidget):
     
         except Exception as e:
             print(f"Error al agregar las pestañas: {e}") 
+    
     def buscar_seguimiento(self):
         """
         Función para buscar seguimientos según los filtros ingresados.

@@ -246,10 +246,42 @@ class PestanaDatosSolicitud(QWidget):
         # Guardar los datos en una base de datos o archivo
         db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
         db.conectar()
-        db.insertar(
-            """INSERT INTO "Avaluos" (nombre_cliente, id_cliente, destinatario, fecha_visita, tipo_avaluo, fecha_avaluo) VALUES (%s, %s, %s, %s, %s, %s)"""
-            , (solicitud_data["cliente"], solicitud_data["doc_identidad"], solicitud_data["destinatario"], solicitud_data["fecha_visita"],solicitud_data["tipo_avaluo"], solicitud_data["fecha_informe"]))
-        print("Solicitud radicada:", solicitud_data)
+        #db.insertar(
+        #   """INSERT INTO "Avaluos" (nombre_cliente, id_cliente, destinatario, fecha_visita, tipo_avaluo, fecha_avaluo) VALUES (%s, %s, %s, %s, %s, %s)"""
+        #    , (solicitud_data["cliente"], solicitud_data["doc_identidad"], solicitud_data["destinatario"], solicitud_data["fecha_visita"],solicitud_data["tipo_avaluo"], solicitud_data["fecha_informe"]))
+        #print("Solicitud radicada:", solicitud_data)
+        
+        # Recorrer los elementos de matricula_layout y obtener los textos de los QLineEdit
+        
+        matriculas = []
+        for i in range(self.matricula_layout.count()):
+            widget = self.matricula_layout.itemAt(i).widget().findChild(QLineEdit)
+            print(f"Procesando widget en índice {i}: {widget}")
+            if isinstance(widget, QLineEdit):  # Verificar que el widget sea un QLineEdit
+                texto_matricula = widget.text().strip()
+                if texto_matricula:  # Solo agregar si no está vacío
+                    matriculas.append(texto_matricula)
+                    print(f"Matrícula agregada: {texto_matricula}")
+
+        print(f"Números de matrícula obtenidos: {matriculas}")
+
+        # Guardar los datos del inmueble y las matrículas en la base de datos
+        consulta_inmueble = """
+        INSERT INTO "Inmuebles" (direccion, tipo_inmueble, barrio, municipio, departamento, cedula_catastral, modo_adquisicion, limitaciones, latitud, longitud, doc_propiedad)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        RETURNING id_inmueble
+        """
+        #id_inmueble = db.insertar(consulta_inmueble, tuple(inmueble_data.values()))
+        #print(f"Inmueble guardado con ID: {id_inmueble}")
+
+        # Guardar las matrículas asociadas al inmueble
+        consulta_matricula = """
+        INSERT INTO "Matriculas" (id_inmueble, numero_matricula)
+        VALUES (%s, %s)
+        """
+        """ for matricula in matriculas:
+            db.insertar(consulta_matricula, (id_inmueble, matricula))
+        print("Matrículas guardadas correctamente.") """
         
     def guardar_informacion_inmueble(self):
         # Obtener datos del inmueble

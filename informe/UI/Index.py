@@ -1,4 +1,5 @@
 import sys, os
+import subprocess
 import time
 from pathlib import Path
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
@@ -27,7 +28,8 @@ class ReportApp(QMainWindow):
         self.setWindowTitle("Sistema de Gestión de Informes")
         #self.setMinimumSize(1000, 700)
         self.showMaximized()
-        self.default_save_path = str(Path.home() / "/Proyectos/seshat/informe/Resultados")
+        self.default_save_path = ""
+        self.file_path = None
         self.init_ui()
 
     def init_ui(self):
@@ -113,6 +115,7 @@ class ReportApp(QMainWindow):
             "Seleccionar ubicación de guardado",
             self.default_save_path
         )
+        
         if directory:
             self.default_save_path = directory
             QMessageBox.information(self, "Ubicación actualizada", 
@@ -150,31 +153,56 @@ class ReportApp(QMainWindow):
         
         print("El id avaluo actual es:", getattr(self, 'id_avaluo', None))
         self.id_avaluo = getattr(self, 'id_avaluo', None)
+        
+        # Conectar a la base de datos
         db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
         db.conectar()
+        
+        
+            
+        
         
         # Recolectar datos de todas las pestañas
         success, resultado = False, "No se ha iniciado la generación del informe." 
         try:
-            # Crear una instancia de la clase DB
-            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
-            db.conectar()
-            
+                        
             print(f"Cargando datos para el avalúo con ID: {self.id_avaluo}")
     
             # Consulta SQL para obtener los datos de la solicitud
             consulta = """
-            select a.nombre_cliente , a.id_cliente , a.destinatario, a.fecha_visita ,a.fecha_avaluo , a.tipo_avaluo
+            select a.nombre_cliente , a.id_cliente , a.destinatario, a.fecha_visita ,a.fecha_avaluo , a.tipo_avaluo, a.file_path
             FROM "Avaluos" a 
             left join inmuebles i on a."Avaluo_id" = i.avaluo_id 
             WHERE a."Avaluo_id" = 2
             """.replace("2", str(self.id_avaluo))
+            
             resultado = db.consultar(consulta)
-            contenido = ""
+            
+            if self.default_save_path == "" and resultado[0][6] == None:
+                QMessageBox.warning(self, "Ubicación no seleccionada", 
+                                    "Por favor, selecciona una ubicación para guardar el informe.")
+                self.crea_proyecto()
+                
+            
+            
             # Verificar si se encontraron datos
+            
+            if self.file_path == None and resultado[0][6] == None:
+                
+                self.file_path = f"{self.default_save_path}/informe_{time.strftime('%Y%m%d-%H%M%S')}.tex"
+                print("Guardando en:", self.file_path)
+                db.insertar(
+                    """UPDATE "Avaluos" SET file_path = %s WHERE "Avaluo_id" = %s"""
+                    , (self.file_path, str(self.id_avaluo)))
+                print("Path guardado:", self.file_path)
+                
+            else:
+                self.file_path = resultado[0][6]
+                print("Ruta del archivo:", self.file_path)
+                
             if resultado:       
                   
-                success, resultado = self.generar_informe(resultado, "./Base/Informe.tex","./Resultados/informe")             
+                success, resultado = self.generar_informe(resultado, "./Base/Informe.tex",self.file_path)             
 
             else:
                 print(f"No se encontraron datos para el avalúo con ID: {self.id_avaluo}")
@@ -190,18 +218,15 @@ class ReportApp(QMainWindow):
                 line_edit = item.itemAt(0).widget()
                 if line_edit and line_edit.text():
                     matriculas.append(line_edit.text()) """
-        
-        
-        
-        file_path = f"{self.default_save_path}/informe_{time.strftime('%Y%m%d-%H%M%S')}"
-        
+
+        db.cerrar_conexion()
         
         if success:
             QMessageBox.information(self, "Éxito", f"Informe guardado en:\n{resultado}")
         else:
             QMessageBox.critical(self, "Error", f"Error al generar informe:\n{resultado}")
 
-    def generar_informe(self, texto, template_path="Base/Informe.tex", output_name="../Resultados"):
+    def generar_informe(self, texto, template_path="Base/Informe.tex", output_name="../Resultados/informe"):
         """
         Genera un informe LaTeX desde una plantilla y texto dinámico.
         
@@ -212,7 +237,7 @@ class ReportApp(QMainWindow):
         """
         
         # Leer plantilla
-        print("template_path", template_path)
+        print("template_path", output_name)
 
         try:
             with open(template_path, "r", encoding="utf-8") as f:
@@ -228,21 +253,43 @@ class ReportApp(QMainWindow):
         destinatario=texto[0][2]
         fecha_visita=texto[0][3].date().strftime("%d/%m/%Y")
         fecha_informe=texto[0][4].date().strftime("%d/%m/%Y") 
+        tipo_avaluo = texto[0][5]
         # Reemplazar marcadores en la plantilla
         informe_final = plantilla.replace("%CLIENTE%", cliente)
         informe_final = informe_final.replace("%DOCUMENTO_ID%", documento_id)
         informe_final = informe_final.replace("%DESTINATARIO%", destinatario)
         informe_final = informe_final.replace("FECHA_VISITA%", fecha_visita)
         informe_final = informe_final.replace("FECHA_INFORME%", fecha_informe)
-        informe_final = informe_final.replace("%TIPO_AVALUO%", texto[0][5])       
+        informe_final = informe_final.replace("%TIPO_AVALUO%", tipo_avaluo)       
         
         # Guardar archivo .tex
-        with open(f"{output_name}.tex", "w", encoding="utf-8") as f:
+        with open(output_name, "w", encoding="utf-8") as f:
             f.write(informe_final)
-            return True, f"{output_name}.tex"
+            print(f"Archivo .tex guardado en {output_name}")
+            
+        # Compilar el archivo .tex a PDF
+        try:
+            print(f"Compilando {output_name} a PDF...")
+            subprocess.run(["pdflatex", output_name], check=True,cwd=os.path.dirname(os.path.abspath(output_name)))  # Establecer el directorio de trabajo)
+            subprocess.run(["pdflatex", output_name], check=True,cwd=os.path.dirname(os.path.abspath(output_name)))  # Se ejecuta dos veces para referencias cruzadas)
+            print(f"PDF generado correctamente: {output_name}.pdf")
+
+            # Retornar el archivo PDF generado
+            return True, f"{output_name}.pdf"
+        except subprocess.CalledProcessError as e:
+            print(f"Error al compilar el archivo .tex: {e}")
+            return False, None
+        except FileNotFoundError:
+            print("Error: El comando 'pdflatex' no se encontró. Asegúrate de que está instalado y en el PATH.")
+            return False, None
+        except Exception as e:
+            print(f"Error inesperado: {e}")
+            return False, None
+            
+            
         
         # Compilar a PDF
-        """ try:
+        try:
             subprocess.run(["pdflatex", f"{output_name}.tex"], check=True)
             print(f"\nPDF generado: {output_name}.pdf")
             
@@ -251,10 +298,11 @@ class ReportApp(QMainWindow):
                 archivo = f"{output_name}{ext}"
                 if os.path.exists(archivo):
                     os.remove(archivo)
-                    
+            
+                 
         except FileNotFoundError:
-            print("\n¡Error! Necesitas LaTeX instalado (pdflatex)") """
-
+            print("\n¡Error! Necesitas LaTeX instalado (pdflatex)")
+        
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = ReportApp()
