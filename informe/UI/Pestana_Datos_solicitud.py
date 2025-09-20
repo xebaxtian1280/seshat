@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QFormLayout, QLineEdit, QTextEdit, QComboBox,
-    QDateEdit, QPushButton, QLabel, QTabWidget, QScrollArea
+    QDateEdit, QPushButton, QLabel, QTabWidget, QScrollArea, QMessageBox
 )
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtCore import QDate
@@ -13,6 +13,8 @@ class PestanaDatosSolicitud(QWidget):
         super().__init__()
         self.id_avaluo = id_avaluo
         self.group_style = Estilos.cargar_estilos(self, "styles.css")
+        self.inmuebles = {}  # Lista para almacenar los inmuebles asociados a la matricula
+        self.matricula_actual = None  # Variable para almacenar la matrícula actual
                 
         # layout principal
         main_layout = QHBoxLayout(self)
@@ -99,6 +101,7 @@ class PestanaDatosSolicitud(QWidget):
         
         self.modo_adquisicion = QComboBox()
         self.modo_adquisicion.addItems([
+            "",
             "Compraventa", 
             "Adjudicación en Sucesión", 
             "Transferencia a título de fiducia mercantil", 
@@ -106,7 +109,7 @@ class PestanaDatosSolicitud(QWidget):
         ])
         
         self.tipo_inmueble = QComboBox()
-        self.tipo_inmueble.addItems(["Apartamento", "Casa", "Oficina", "Bodega", "Local", "Lote", "Finca", "Consultorio", "Hospital", "Colegio", "Edificio"])
+        self.tipo_inmueble.addItems(["","Apartamento", "Casa", "Oficina", "Bodega", "Local", "Lote", "Finca", "Consultorio", "Hospital", "Colegio", "Edificio"])
         
         
         self.latitud = QLineEdit()
@@ -119,7 +122,7 @@ class PestanaDatosSolicitud(QWidget):
         
         self.btn_guardar_inmueble = QPushButton("Guardar informacion del Inmueble")
         self.btn_agregar_doc.setStyleSheet(self.group_style)
-        self.btn_guardar_inmueble.clicked.connect(self.guardar_informacion_inmueble)
+        self.btn_guardar_inmueble.clicked.connect(lambda: self.guardar_informacion_inmueble(self.matricula_actual))
 
         # Campos jurídicos
         self.propietario = QLineEdit()
@@ -283,31 +286,52 @@ class PestanaDatosSolicitud(QWidget):
             db.insertar(consulta_matricula, (id_inmueble, matricula))
         print("Matrículas guardadas correctamente.") """
         
-    def guardar_informacion_inmueble(self):
+        db.cerrar_conexion()
+        
+    def guardar_informacion_inmueble(self, matricula):
         # Obtener datos del inmueble
         inmueble_data = {
-            "direccion": self.direccion_inmueble.text().strip(),
             "tipo_inmueble": self.tipo_inmueble.currentText(),
+            "direccion": self.direccion_inmueble.text().strip(),            
             "barrio": self.barrio_inmueble.text().strip(),
             "municipio": self.municipio_inmueble.text().strip(),
             "departamento": self.departamento_inmueble.text().strip(),
             "cedula_catastral": self.cedula_catastral.text().strip(),
             "modo_adquisicion": self.modo_adquisicion.currentText(),
             "limitaciones": self.limitaciones.toPlainText().strip(),
-            "latitud": self.latitud.text().strip(),
             "longitud": self.longitud.text().strip(),
-            "doc_propiedad": self.doc_propiedad.toPlainText().strip()
-        }
+            "latitud": self.latitud.text().strip(),
+            "avaluo_id": self.id_avaluo,
+            "doc_propiedad": self.doc_propiedad.toPlainText().strip(),
+            "propietario": self.propietario.text().strip(),
+            "id_propietario": self.id_propietario.text().strip()
+        }     
         
-        db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
-        db.conectar()
         
-        # Aquí podrías guardar los datos en una base de datos o archivo
-        query_insertar = """
-        INSERT INTO inmuebles (direccion, tipo_inmueble, area, numero_habitaciones, numero_banos, valor, antiguedad, estado)
-        VALUES ({inmueble_data[0]}, {inmueble_data[1]}, {inmueble_data[0]}, %{inmueble_data[0]}, %{inmueble_data[0]}, %{inmueble_data[0]}, %{inmueble_data[0]}, %{inmueble_data[0]});
-        """
-        print("Información del inmueble guardada:", inmueble_data)
+        if matricula == "" or matricula is None:
+            """
+            Muestra un cuadro de advertencia con un color personalizado y centrado.
+            """
+            # Crear el cuadro de mensaje
+            QMessageBox.warning(
+                self,  # El widget padre (puede ser 'self' si estás dentro de una clase que hereda de QWidget)
+                "Advertencia",  # Título de la ventana
+                "Agrega una matrícula inmobiliaria",  # Mensaje de advertencia
+                QMessageBox.StandardButton.Ok  # Botón estándar
+            )
+            return
+        
+        else:      
+            
+            self.inmuebles[self.matricula_actual]=inmueble_data
+              
+            """ db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db.conectar() """
+            
+            # Aquí podrías guardar los datos en una base de datos o archivo
+            query_insertar = """insert into inmuebles (matricula_inmobiliaria, tipo_inmueble, direccion, barrio, municipio, departamento, cedula_catastral, modo_adquicision, limitaciones, longitud, latitud, avaluo_id, doc_propiedad, propietario, id_propietario) values """,(matricula, inmueble_data["tipo_inmueble"], inmueble_data["direccion"], inmueble_data["barrio"], inmueble_data["municipio"], inmueble_data["departamento"], inmueble_data["cedula_catastral"], inmueble_data["modo_adquisicion"], inmueble_data["limitaciones"], inmueble_data["longitud"], inmueble_data["latitud"], inmueble_data["avaluo_id"], inmueble_data["doc_propiedad"], inmueble_data["propietario"], inmueble_data["id_propietario"])
+            
+            print("Información del inmueble guardada:", self.inmuebles)
         
     def actualizar_mapa(self):
         # Obtener coordenadas de los campos
@@ -374,8 +398,8 @@ class PestanaDatosSolicitud(QWidget):
         campo = QLineEdit()
         campo.setPlaceholderText("Ingrese número de matrícula")
         campo.setStyleSheet(self.group_style)
-        campo.focusInEvent = lambda texto: self.actualizar_titulo(campo.text()) 
-        campo.textChanged.connect(lambda: self.actualizar_titulo(campo.text()))
+        campo.focusInEvent = lambda texto: self.actualizar_informacion_inmueble(campo.text()) 
+        campo.textChanged.connect(lambda: self.actualizar_informacion_inmueble(campo.text()))
         btn_eliminar = QPushButton("×")
         btn_eliminar.setObjectName("botonEliminar")
         btn_eliminar.setStyleSheet(self.group_style)
@@ -399,9 +423,24 @@ class PestanaDatosSolicitud(QWidget):
         # Eliminar los widgets hijos
         contenedor_a_eliminar.deleteLater()
         
-    def actualizar_titulo(self, texto):
+    def actualizar_informacion_inmueble(self, texto):
         # Actualizar el título del grupo_inmueble
         self.grupo_inmueble.setTitle(f"Datos del Inmueble segun MI-{texto}")
+        self.matricula_actual = texto  # Actualizar la matrícula actual
+        
+        self.tipo_inmueble.setCurrentText(self.inmuebles[texto]["tipo_inmueble"] if texto in self.inmuebles else "")
+        self.direccion_inmueble.setText(self.inmuebles[texto]["direccion"] if texto in self.inmuebles else "")
+        self.barrio_inmueble.setText(self.inmuebles[texto]["barrio"] if texto in self.inmuebles else "")
+        self.municipio_inmueble.setText(self.inmuebles[texto]["municipio"] if texto in self.inmuebles else "")
+        self.departamento_inmueble.setText(self.inmuebles[texto]["departamento"] if texto in self.inmuebles else "")
+        self.cedula_catastral.setText(self.inmuebles[texto]["cedula_catastral"] if texto in self.inmuebles else "")
+        self.modo_adquisicion.setCurrentText(self.inmuebles[texto]["modo_adquisicion"] if texto in self.inmuebles else "")
+        self.limitaciones.setPlainText(self.inmuebles[texto]["limitaciones"] if texto in self.inmuebles else "")
+        self.longitud.setText(self.inmuebles[texto]["longitud"] if texto in self.inmuebles else "")
+        self.latitud.setText(self.inmuebles[texto]["latitud"] if texto in self.inmuebles else "")
+        self.doc_propiedad.setPlainText(self.inmuebles[texto]["doc_propiedad"] if texto in self.inmuebles else "")
+        self.propietario.setText(self.inmuebles[texto]["propietario"] if texto in self.inmuebles else "")
+        self.id_propietario.setText(self.inmuebles[texto]["id_propietario"] if texto in self.inmuebles else "")
     
     def obtener_matriculas(self):
         matriculas = []
