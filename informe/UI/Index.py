@@ -16,6 +16,7 @@ from Pestana_caracteristicas_construccion import PestanaCaracteristicasConstrucc
 from Pestana_condiciones_valuacion import PestanaCondicionesValuacion
 from Pestana_seguimiento import PestanaSeguimiento
 from DB import DB
+from Funciones import Funciones
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
@@ -42,26 +43,32 @@ class ReportApp(QMainWindow):
         
         # Barra de menú integrada en el panel
         menu_bar = QMenuBar()
-        file_menu = QMenu("&Archivo", self)
+        self.file_menu = QMenu("&Archivo", self)
         
         # Acciones del menú
-        generar_action = file_menu.addAction("Generar Informe")
+        generar_action = self.file_menu.addAction("Seguimiento")
+        generar_action.triggered.connect(lambda: self.volver_a_seguimiento())
+        
+        generar_action = self.file_menu.addAction("Radicar Solicitud")
+        generar_action.triggered.connect(lambda: Funciones.agregar_pestanas_avaluo(self,"",self.tab_panel))
+        
+        generar_action = self.file_menu.addAction("Generar Informe")
         generar_action.triggered.connect(self.iniciar_generacion)
         
-        ubicacion_action = file_menu.addAction("Guardar Como")
+        ubicacion_action = self.file_menu.addAction("Guardar Como")
         ubicacion_action.triggered.connect(self.seleccionar_ubicacion)
         
-        crear_proyecto = file_menu.addAction("Crear Proyecto")
+        crear_proyecto = self.file_menu.addAction("Crear Proyecto")
         crear_proyecto.triggered.connect(self.crea_proyecto)
         
-        abrir_proyecto = file_menu.addAction("Abrir proyecto")
+        abrir_proyecto = self.file_menu.addAction("Abrir proyecto")
         abrir_proyecto.triggered.connect(self.carga_proyecto)
         
-        file_menu.addSeparator()
-        exit_action = file_menu.addAction("Salir")
+        self.file_menu.addSeparator()
+        exit_action = self.file_menu.addAction("Salir")
         exit_action.triggered.connect(self.close)
         
-        menu_bar.addMenu(file_menu)
+        menu_bar.addMenu(self.file_menu)
         main_layout.addWidget(menu_bar)
         
         # Panel de pestañas
@@ -90,6 +97,33 @@ class ReportApp(QMainWindow):
         self.progress_bar = QProgressBar()
         self.progress_bar.hide()
         main_layout.addWidget(self.progress_bar)
+        
+    def volver_a_seguimiento(self):
+        
+        """
+        Vuelve a la pestaña de seguimiento y cierra las demás pestañas.
+        """
+        
+        try:
+            # Crear las pestañas con el id_avaluo            
+            
+            for index in range(self.tab_panel.count()):
+                
+                widget = self.tab_panel.widget(index)
+                validacion=(self.tab_panel.tabText(index) == "PestanaDatosSolicitud")
+                
+                self.tab_panel.removeTab(index)
+            
+            # Crear las pestaña seguimiento
+            self.pestana_seguimiento = PestanaSeguimiento(self.tab_panel)
+            
+            # Conectar la señal de Pestaña Seguimiento
+            self.pestana_seguimiento.id_avaluo_seleccionado.connect(self.recibir_id_avaluo)
+                
+            
+    
+        except Exception as e:
+            print(f"Error al agregar las pestañas: {e}") 
     
     def recibir_id_avaluo(self, id_avaluo):
         """
@@ -109,6 +143,7 @@ class ReportApp(QMainWindow):
             self.default_save_path = directory
             QMessageBox.information(self, "Ubicación actualizada", 
                                    f"Los informes se guardarán en:\n{self.default_save_path}")
+    
     def crea_proyecto(self):
         directory = QFileDialog.getExistingDirectory(
             self,

@@ -61,11 +61,17 @@ class DB:
                 print(query, valores)
                 cursor.execute(query, valores)
                 
+                # Recuperar el valor devuelto por RETURNING
+                recuperado = cursor.fetchone()
+                
                 self.connection.commit()
-                print("Registro insertado exitosamente.")
+                print(f"Registro insertado exitosamente.{recuperado}")
+                # Retornar el valor recuperado (si existe)
+                return recuperado[0] if recuperado else None
         except psycopg2.Error as e:
             print(f"Error al insertar el registro: {e}")
             self.connection.rollback()
+            return None
 
     def actualizar(self, query, valores):
         """

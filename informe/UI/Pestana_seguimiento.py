@@ -10,6 +10,7 @@ from Pestana_Datos_solicitud import PestanaDatosSolicitud
 from Pestana_caracteristicas_sector import PestanaCaracteristicasSector
 from Pestana_caracteristicas_construccion import PestanaCaracteristicasConstruccion
 from Pestana_condiciones_valuacion import PestanaCondicionesValuacion
+from Funciones import Funciones
 
 class PestanaSeguimiento(QWidget):
     
@@ -206,7 +207,8 @@ class PestanaSeguimiento(QWidget):
         id_avaluo = boton.property("id_avaluo")  # Recuperar el id_avaluo
         print(f"Botón presionado con id_avaluo: {id_avaluo}")
         self.id_avaluo_seleccionado.emit(id_avaluo)  # Emitir la señal con el id_avaluo
-        self.agregar_pestanas_avaluo(id_avaluo, self.tab_panel)
+        Funciones.agregar_pestanas_avaluo(self, id_avaluo, self.tab_panel)
+        #self.agregar_pestanas_avaluo(id_avaluo, self.tab_panel)
     
     def agregar_pestanas_avaluo(self, id_avaluo, tab_panel):
         
@@ -250,10 +252,6 @@ class PestanaSeguimiento(QWidget):
             PestanaCaracteristicasConstruccion(self.tab_panel)
             PestanaCondicionesValuacion(self.tab_panel)
             agregar_pestana_imagenes(self.tab_panel)  """
-            
-            tab_panel.setCurrentIndex(index+1)
-            
-            seguimiento_index = tab_panel.indexOf(self)
             print("Cantidad de pesta;as : ",(seguimiento_index))
             if tab_panel.count()>1:
                 tab_panel.removeTab(index)
