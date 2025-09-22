@@ -7,6 +7,7 @@ from PyQt6.QtCore import QDate
 from PyQt6.QtGui import QIcon
 from Estilos import Estilos
 from DB import DB
+import webview
 
 class PestanaDatosSolicitud(QWidget):
     def __init__(self,  tab_panel: QTabWidget, id_avaluo=None):
@@ -72,7 +73,9 @@ class PestanaDatosSolicitud(QWidget):
         juridico_layout.addRow(grupo_documentos)
         juridico_layout.addRow(self.btn_agregar_doc)
         
-        self.agregar_campo_matricula()    
+        if id_avaluo == "":
+            self.agregar_campo_matricula()   
+         
         juridico_layout.addRow("Matrícula Inmobiliaria:", self.matricula_container)
         juridico_layout.addRow(btn_agregar_matricula)
         
@@ -222,11 +225,16 @@ class PestanaDatosSolicitud(QWidget):
                 index_tipo = self.tipo_avaluo.findText(resultado[0][5])  # Sexto campo: tipo_avaluo
                 if index_tipo != -1:
                     self.tipo_avaluo.setCurrentIndex(index_tipo)
+                    
+                self.cargar_inmuebles()
+            
             else:
                 print(f"No se encontraron datos para el avalúo con ID: {id_avaluo}")
-    
+            db.cerrar_conexion()
+            
         except Exception as e:
             print(f"Error al cargar los datos de la solicitud: {e}")
+            
     
     def radicar_solicitud(self):
         # Obtener datos de la solicitud
@@ -292,6 +300,16 @@ class PestanaDatosSolicitud(QWidget):
         db.cerrar_conexion()
         
     def guardar_informacion_inmueble(self, matricula):
+        
+        if self.matricula_actual in self.inmuebles:
+            QMessageBox.warning(
+                self, 
+                "Advertencia", 
+                f"La matrícula '{self.matricula_actual}' ya existe en el diccionario.", 
+                QMessageBox.StandardButton.Ok
+            )
+            return "Antes de agregar otra matricula, agrega una matricula nueva que no se encuentre repetida"
+        
         # Obtener datos del inmueble
         inmueble_data = {
             "tipo_inmueble": self.tipo_inmueble.currentText(),
@@ -322,26 +340,19 @@ class PestanaDatosSolicitud(QWidget):
                 "Agrega una matrícula inmobiliaria",  # Mensaje de advertencia
                 QMessageBox.StandardButton.Ok  # Botón estándar
             )
-            return
+            return ""
         
         else:      
             
             self.inmuebles[self.matricula_actual]=inmueble_data
-              
-            """ db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
-            db.conectar() """
-            
-            # Aquí podrías guardar los datos en una base de datos o archivo
-            query_insertar = """insert into inmuebles (matricula_inmobiliaria, tipo_inmueble, direccion, barrio, municipio, departamento, cedula_catastral, modo_adquicision, limitaciones, longitud, latitud, avaluo_id, doc_propiedad, propietario, id_propietario) values """,(matricula, inmueble_data["tipo_inmueble"], inmueble_data["direccion"], inmueble_data["barrio"], inmueble_data["municipio"], inmueble_data["departamento"], inmueble_data["cedula_catastral"], inmueble_data["modo_adquisicion"], inmueble_data["limitaciones"], inmueble_data["longitud"], inmueble_data["latitud"], inmueble_data["avaluo_id"], inmueble_data["doc_propiedad"], inmueble_data["propietario"], inmueble_data["id_propietario"])
             
             print("Información del inmueble guardada:", self.inmuebles)
+            return ""
         
     def actualizar_mapa(self):
         # Obtener coordenadas de los campos
         lat = self.latitud.text().strip() or "4.6097"  # Bogotá por defecto
         lon = self.longitud.text().strip() or "-74.0817"
-        
-
         
         # Generar HTML con el mapa
         mapa_html =  f'''
@@ -388,48 +399,64 @@ class PestanaDatosSolicitud(QWidget):
                     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 }}).addTo(map);
                 
-                L.marker([{lat}, {lon}]).addTo(map);
+                // Agregar marcador inicial
+                var marker = L.marker([{lat}, {lon}], {{draggable: true}}).addTo(map);
+
+                // Evento para capturar clics en el mapa
+                map.on('click', function(e) {{
+                    var coords = e.latlng; // Obtener las coordenadas del clic
+                    marker.setLatLng(coords); // Mover el marcador al nuevo punto
+
+                    // Enviar las coordenadas al backend
+                    pywebview.api.enviar_coordenadas(coords.lat, coords.lng);
+                }});
             </script>
         </body>
         </html>
         '''
         
+        """ # Crear la API y exponerla al frontend
+        api = API()
+        self.webview.create_window('Mapa', html=mapa_html, js_api=api)
+        self.webview.start() """
+        
         self.web_view.setHtml(mapa_html)
         
     def agregar_campo_matricula(self):
+        resultado = ""
         
-        if self.matricula_actual in self.inmuebles and self.matricula_layout.count()>1:
+        if self.matricula_actual and self.matricula_layout.count()>len(self.inmuebles):
+            resultado = self.guardar_informacion_inmueble(self.matricula_actual)
+            
+        if resultado == "" or self.matricula_layout.count()==0 or self.matricula_actual == len(self.inmuebles):
+            campo = QLineEdit()
+            campo.setPlaceholderText("Ingrese número de matrícula")
+            campo.setStyleSheet(self.group_style)
+            campo.focusInEvent = lambda texto: self.actualizar_informacion_inmueble(campo.text()) 
+            campo.textChanged.connect(lambda: self.actualizar_informacion_inmueble(campo.text()))
+            btn_eliminar = QPushButton("×")
+            btn_eliminar.setObjectName("botonEliminar")
+            btn_eliminar.setStyleSheet(self.group_style)
+            
+            # Contenedor para el campo y el botón
+            campo_container = QWidget()
+            layout_container = QHBoxLayout(campo_container)
+            layout_container.addWidget(campo)
+            layout_container.addWidget(btn_eliminar)
+            layout_container.setContentsMargins(0, 0, 0, 0)
+            
+            # Conectar el botón de eliminar
+            btn_eliminar.clicked.connect(lambda: self.eliminar_campo_matricula(campo_container))
+            
+            self.matricula_layout.addWidget(campo_container)
+        
+        else:
             QMessageBox.warning(
                 self, 
                 "Advertencia", 
-                f"La matrícula '{self.matricula_actual}' ya existe en el diccionario.", 
+                resultado, 
                 QMessageBox.StandardButton.Ok
             )
-            return
-        
-        if self.matricula_actual:
-            self.guardar_informacion_inmueble(self.matricula_actual)
-        
-        campo = QLineEdit()
-        campo.setPlaceholderText("Ingrese número de matrícula")
-        campo.setStyleSheet(self.group_style)
-        campo.focusInEvent = lambda texto: self.actualizar_informacion_inmueble(campo.text()) 
-        campo.textChanged.connect(lambda: self.actualizar_informacion_inmueble(campo.text()))
-        btn_eliminar = QPushButton("×")
-        btn_eliminar.setObjectName("botonEliminar")
-        btn_eliminar.setStyleSheet(self.group_style)
-        
-        # Contenedor para el campo y el botón
-        campo_container = QWidget()
-        layout_container = QHBoxLayout(campo_container)
-        layout_container.addWidget(campo)
-        layout_container.addWidget(btn_eliminar)
-        layout_container.setContentsMargins(0, 0, 0, 0)
-        
-        # Conectar el botón de eliminar
-        btn_eliminar.clicked.connect(lambda: self.eliminar_campo_matricula(campo_container))
-        
-        self.matricula_layout.addWidget(campo_container)
 
     def eliminar_campo_matricula(self, contenedor_a_eliminar):
         # Remover el widget contenedor del layout
@@ -439,10 +466,12 @@ class PestanaDatosSolicitud(QWidget):
         contenedor_a_eliminar.deleteLater()
         
     def actualizar_informacion_inmueble(self, texto):
+
+        
         # Actualizar el título del grupo_inmueble
         self.grupo_inmueble.setTitle(f"Datos del Inmueble segun MI-{texto}")
         self.matricula_actual = texto  # Actualizar la matrícula actual
-        
+        print(f"Matrícula actual cambiada a: {self.matricula_actual}")
         self.tipo_inmueble.setCurrentText(self.inmuebles[texto]["tipo_inmueble"] if texto in self.inmuebles else "")
         self.direccion_inmueble.setText(self.inmuebles[texto]["direccion"] if texto in self.inmuebles else "")
         self.barrio_inmueble.setText(self.inmuebles[texto]["barrio"] if texto in self.inmuebles else "")
@@ -451,13 +480,111 @@ class PestanaDatosSolicitud(QWidget):
         self.cedula_catastral.setText(self.inmuebles[texto]["cedula_catastral"] if texto in self.inmuebles else "")
         self.modo_adquisicion.setCurrentText(self.inmuebles[texto]["modo_adquisicion"] if texto in self.inmuebles else "")
         self.limitaciones.setPlainText(self.inmuebles[texto]["limitaciones"] if texto in self.inmuebles else "")
-        self.longitud.setText(self.inmuebles[texto]["longitud"] if texto in self.inmuebles else "")
-        self.latitud.setText(self.inmuebles[texto]["latitud"] if texto in self.inmuebles else "")
+        self.longitud.setText(str(self.inmuebles[texto]["longitud"]) if texto in self.inmuebles else "")
+        self.latitud.setText(str(self.inmuebles[texto]["latitud"]) if texto in self.inmuebles else "")
         self.doc_propiedad.setPlainText(self.inmuebles[texto]["doc_propiedad"] if texto in self.inmuebles else "")
         self.propietario.setText(self.inmuebles[texto]["propietario"] if texto in self.inmuebles else "")
-        self.id_propietario.setText(self.inmuebles[texto]["id_propietario"] if texto in self.inmuebles else "")
+        self.id_propietario.setText(str(self.inmuebles[texto]["id_propietario"]) if texto in self.inmuebles else "")
+    
+    
+    def cargar_inmuebles(self):
+        """
+        Carga todos los registros de la tabla 'inmuebles' desde la base de datos
+        y los agrega al diccionario self.inmuebles.
+        """
+                    
+        query = """ SELECT * FROM inmuebles WHERE avaluo_id = x; """.replace("x", str(self.id_avaluo))
+        print(f"Cargando inmuebles con la consulta: {query}")
+        
+        try:
+            # Ejecutar la consulta para obtener todos los registros de la tabla inmuebles
+            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db.conectar()            
+            
+            registros = db.consultar(query)
+            
+            print(f"Registros obtenidos: {registros}")
+    
+            # Limpiar el diccionario self.inmuebles antes de cargar nuevos datos
+            self.inmuebles = {}
+    
+            # Recorrer los registros y agregarlos al diccionario
+            for registro in registros:
+                matricula = registro[12]  # Suponiendo que esta es la clave única
+                print(f"Cargando inmueble con matrícula: {matricula}")
+                self.inmuebles[matricula] = {
+                    "tipo_inmueble": registro[1],
+                    "direccion": registro[2],
+                    "barrio": registro[3],
+                    "municipio": registro[4],
+                    "departamento": registro[5],
+                    "cedula_catastral": registro[6],
+                    "modo_adquisicion": registro[7],
+                    "limitaciones": registro[8],
+                    "longitud": registro[9],
+                    "latitud": registro[10],
+                    "avaluo_id": registro[11],
+                    "doc_propiedad": registro[13],
+                    "propietario": registro[14],
+                    "id_propietario": registro[15]
+                }                 
+                
+                # Crear el campo de texto para la matrícula
+                campo = QLineEdit()
+                campo.setText(matricula)
+                campo.setStyleSheet(self.group_style)
+                
+                # Conectar las señales usando una función auxiliar para capturar el valor actual
+                campo.focusInEvent = self.crear_focus_evento(campo)
+                campo.textChanged.connect(self.crear_text_changed_evento(campo))
+                
+                # Crear el botón de eliminar
+                btn_eliminar = QPushButton("×")
+                btn_eliminar.setObjectName("botonEliminar")
+                btn_eliminar.setStyleSheet(self.group_style)
+                btn_eliminar.clicked.connect(self.crear_eliminar_evento(campo))
+                
+                # Contenedor para el campo y el botón
+                campo_container = QWidget()
+                layout_container = QHBoxLayout(campo_container)
+                layout_container.addWidget(campo)
+                layout_container.addWidget(btn_eliminar)
+                layout_container.setContentsMargins(0, 0, 0, 0)              
+                
+                self.matricula_layout.addWidget(campo_container)
+    
+            print(f"Inmuebles cargados correctamente en el diccionario self.inmuebles: {self.inmuebles}")
+        except Exception as e:
+            print(f"Error al cargar los inmuebles desde la base de datos: {e}")
+    
+    def crear_focus_evento(self, campo):
+        """
+        Crea un evento para manejar el focusInEvent de un campo.
+        """
+        def evento_focus_in(texto):
+            self.actualizar_informacion_inmueble(campo.text())
+        return evento_focus_in
+    
+    def crear_text_changed_evento(self, campo):
+        """
+        Crea un evento para manejar el textChanged de un campo.
+        """
+        def evento_text_changed():
+            self.actualizar_informacion_inmueble(campo.text())
+        return evento_text_changed
+    
+    def crear_eliminar_evento(self, campo_container):
+        """
+        Crea un evento para manejar el clic en el botón de eliminar.
+        """
+        def evento_eliminar():
+            self.eliminar_campo_matricula(campo_container)
+        return evento_eliminar
     
     def obtener_matriculas(self):
+        
+        
+        
         matriculas = []
         for i in range(self.matricula_layout.count()):
             item = self.matricula_layout.itemAt(i)
