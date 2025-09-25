@@ -14,6 +14,7 @@ from PyQt6.QtGui import QPixmap
 from num2words import num2words
 from Estilos import Estilos
 from Pestana_Datos_solicitud import (PestanaDatosSolicitud)
+from Pestana_caracteristicas_sector import (PestanaCaracteristicasSector)
 
 
 import subprocess
@@ -59,6 +60,7 @@ class Funciones:
                 
             # Agregar las pestañas al QTabWidget
             PestanaDatosSolicitud(tab_panel, id_avaluo)   
+            PestanaCaracteristicasSector(tab_panel, id_avaluo)
             print(f"Movido a la pestaña existente 'PestanaDatosSolicitud' con id_avaluo: {id_avaluo}")
             """ PestanaCaracteristicasSector(self.tab_panel)
             PestanaCaracteristicasConstruccion(self.tab_panel)
@@ -122,47 +124,4 @@ class Funciones:
         except FileNotFoundError:
             print("\n¡Error! Necesitas LaTeX instalado (pdflatex)") """
             
-    def agregar_imagen(self,layout_destino=None):
-        # Abrir un cuadro de diálogo para seleccionar una imagen
-        ruta_imagen, _ = QFileDialog.getOpenFileName(
-            self, 
-            "Seleccionar imagen", 
-            "./Resultados/Imagenes",  # Carpeta actual
-            "Imágenes (*.png *.jpg *.jpeg *.bmp *.gif)"
-        )
-        
-        if ruta_imagen:  # Si se seleccionó una imagen
-            
-            contenedor = QWidget()
-            layout = QVBoxLayout(contenedor)
-            
-            # Mostrar imagen reducida
-            
-            label = QLabel()
-            pixmap = QPixmap(ruta_imagen)
-            label.setPixmap(pixmap.scaled(label.width(), label.height(), Qt.AspectRatioMode.KeepAspectRatio))            
-            
-            # Campo de descripción
-            descripcion = QLineEdit()
-            descripcion.setPlaceholderText("Descripción de la imagen")
-            
-            # Botón para eliminar
-            btn_eliminar = QPushButton("x")
-            btn_eliminar.setObjectName("botonEliminar")
-            
-            btn_eliminar.setStyleSheet(Estilos.cargar_estilos(self, "styles.css"))
-            btn_eliminar.clicked.connect(lambda: eliminar_imagen(self,contenedor))
-            
-            layout.addWidget(label, alignment=Qt.AlignmentFlag.AlignCenter)
-            layout.addWidget(descripcion)
-            layout.addWidget(btn_eliminar, alignment=Qt.AlignmentFlag.AlignCenter)
-            
-            #self.lista_imagenes.addWidget(contenedor)
-            # Agregar el contenedor al layout proporcionado
-            
-            
-            layout_destino.addWidget(contenedor)
-
-        def eliminar_imagen(self, widget):
-            #self.lista_imagenes.removeWidget(widget)
-            widget.deleteLater()
+    

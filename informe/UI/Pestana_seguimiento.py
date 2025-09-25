@@ -122,6 +122,7 @@ class PestanaSeguimiento(QWidget):
             self.filtro_nombre_perito.clear()
     
             # Agregar los nombres de los peritos al QComboBox
+            self.filtro_nombre_perito.addItem("")
             for resultado in resultados:
                 self.filtro_nombre_perito.addItem(resultado[0])  # resultado[0] contiene el nombre del perito
     
@@ -143,7 +144,7 @@ class PestanaSeguimiento(QWidget):
     
             # Limpiar el QComboBox antes de agregar nuevos datos
             self.filtro_nombre_revisor.clear()
-    
+            self.filtro_nombre_revisor.addItem("") 
             # Agregar los nombres de los peritos al QComboBox
             for resultado in resultados:
                 self.filtro_nombre_revisor.addItem(resultado[0])  # resultado[0] contiene el nombre del perito
@@ -255,6 +256,7 @@ class PestanaSeguimiento(QWidget):
                 
             # Agregar las pestañas al QTabWidget
             PestanaDatosSolicitud(tab_panel, id_avaluo)   
+            PestanaCaracteristicasSector(tab_panel, id_avaluo)
             print(f"Movido a la pestaña existente 'PestanaDatosSolicitud' con id_avaluo: {id_avaluo}")
             """ PestanaCaracteristicasSector(self.tab_panel)
             PestanaCaracteristicasConstruccion(self.tab_panel)

@@ -11,13 +11,13 @@ from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import  Qt
 from Estilos import Estilos
-from Funciones import Funciones
-
+from Funciones_imagenes import FuncionesImagenes
 
 class PestanaCaracteristicasSector(QWidget):
-    def __init__(self, tab_panel: QTabWidget):
+    def __init__(self, tab_panel: QTabWidget, id_avaluo = None):
         super().__init__()
         
+        self.id_avaluo = id_avaluo
         # Aquí va el contenido de la función crear_pestana_caracteristicas_sector
         self.group_style = Estilos.cargar_estilos(self, "styles.css")
         pestana = QWidget()
@@ -173,7 +173,7 @@ class PestanaCaracteristicasSector(QWidget):
         self.imagenes_usos_layout = QVBoxLayout()
         btn_agregar_imagen = QPushButton("Agregar imagen")
         btn_agregar_imagen.setStyleSheet(self.group_style)
-        btn_agregar_imagen.clicked.connect(lambda: Funciones.agregar_imagen(self, self.imagenes_usos_layout))
+        btn_agregar_imagen.clicked.connect(lambda: FuncionesImagenes.agregar_imagen(self, self.imagenes_usos_layout))
         form_usos.addRow(btn_agregar_imagen)
         form_usos.addRow(self.imagenes_usos_layout)
         
@@ -208,7 +208,7 @@ class PestanaCaracteristicasSector(QWidget):
         # Imágenes tratamientos
         self.imagenes_tratamientos_layout = QVBoxLayout()
         btn_agregar_imagen_trat = QPushButton("Agregar imagen")
-        btn_agregar_imagen_trat.clicked.connect(lambda : Funciones.agregar_imagen(self, self.imagenes_tratamientos_layout))
+        btn_agregar_imagen_trat.clicked.connect(lambda : FuncionesImagenes.agregar_imagen(self, self.imagenes_tratamientos_layout))
         form_tratamientos.addRow(btn_agregar_imagen_trat)
         form_tratamientos.addRow(self.imagenes_tratamientos_layout)
         
