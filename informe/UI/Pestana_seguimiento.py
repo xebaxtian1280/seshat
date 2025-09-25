@@ -186,6 +186,14 @@ class PestanaSeguimiento(QWidget):
                 self.tabla_resultados.insertRow(fila)
                 for columna, valor in enumerate(resultado):
                     self.tabla_resultados.setItem(fila, columna, QTableWidgetItem(str(valor)))
+                    
+                # Calcula y agrega el numero de matriculas por avaluo
+                
+                query = """ SELECT COUNT(*) FROM inmuebles WHERE avaluo_id = x; """.replace("x", str(resultado[0]))
+                id_avaluo = resultado[0]
+                numero_inmuebles = db.consultar(query, (id_avaluo,))
+                print(f"ID Avaluo: {resultado[0]}, Número de inmuebles: {numero_inmuebles[0][0]}")
+                self.tabla_resultados.setItem(fila, 5, QTableWidgetItem(str(numero_inmuebles[0][0])))
                 
                 # Agregar un botón de acción en la última columna
                 boton_accion = QPushButton("Ver")
@@ -196,7 +204,7 @@ class PestanaSeguimiento(QWidget):
                 # boton_accion.clicked.connect(lambda id_avaluo=id_avaluo: print(f"Botón presionado con id_avaluo: {id_avaluo}") or self.agregar_pestanas_avaluo(id_avaluo, tab_panel))
                 # Pasar el ID del avalúo al método agregar_pestanas_avaluo
                 self.tabla_resultados.setCellWidget(fila, 6, boton_accion)
-        
+            db.cerrar_conexion()
         except Exception as e:
             print(f"Error al cargar los datos de seguimiento: {e}")   
             

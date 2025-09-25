@@ -14,6 +14,7 @@ class PestanaDatosSolicitud(QWidget):
         super().__init__()
         self.id_avaluo = id_avaluo
         self.group_style = Estilos.cargar_estilos(self, "styles.css")
+        
         self.inmuebles = {}  # Lista para almacenar los inmuebles asociados a la matricula
         self.matricula_actual = None  # Variable para almacenar la matrícula actual
                 
@@ -121,6 +122,9 @@ class PestanaDatosSolicitud(QWidget):
         self.longitud = QLineEdit()
         self.longitud.setPlaceholderText("-74.0817")
         
+        self.latitud.textChanged.connect(self.actualizar_mapa)
+        self.longitud.textChanged.connect(self.actualizar_mapa)
+        
         self.doc_propiedad = QTextEdit()
         self.doc_propiedad.setPlainText("Copia simple de la Escritura Pública No. 4126 del 26 de Noviembre de 1997, otorgada en la Notaria 2 de Bucaramanga.")
         
@@ -133,7 +137,8 @@ class PestanaDatosSolicitud(QWidget):
         self.id_propietario = QLineEdit()
         
         # Campos iniciales
-        self.agregar_campo_documento()  # Primer campo por defecto
+        if id_avaluo == "":
+            self.agregar_campo_documento()  # Primer campo por defecto
         right_layout.addRow("Tipo de inmueble:", self.tipo_inmueble)
         right_layout.addRow("Dirección del inmueble:", self.direccion_inmueble)
         right_layout.addRow("Barrio / Vereda:", self.barrio_inmueble)
@@ -233,6 +238,15 @@ class PestanaDatosSolicitud(QWidget):
             
             else:
                 print(f"No se encontraron datos para el avalúo con ID: {id_avaluo}")
+                
+            consulta_documentacion = """ select documento, id_documentacin from documentacion_aportada where "Avaluo_id" = %s""".replace("%s", str(id_avaluo))
+            
+            resultado_documentacion = db.consultar(consulta_documentacion)
+            print(resultado_documentacion)
+            if resultado_documentacion:
+                for doc in resultado_documentacion:
+                    self.agregar_campo_documento(doc)
+            
             db.cerrar_conexion()
             
         except Exception as e:
@@ -240,6 +254,9 @@ class PestanaDatosSolicitud(QWidget):
             
     
     def radicar_solicitud(self):
+        
+        if self.matricula_actual not in self.inmuebles:
+            self.guardar_informacion_inmueble(self.matricula_actual)
         # Obtener datos de la solicitud
         solicitud_data = {
             "cliente": self.cliente.text().strip(),
@@ -261,16 +278,14 @@ class PestanaDatosSolicitud(QWidget):
         id_avaluo = db.insertar(
            """INSERT INTO "Avaluos" (nombre_cliente, id_cliente, destinatario, fecha_visita, tipo_avaluo, fecha_avaluo) VALUES (%s, %s, %s, %s, %s, %s) returning "Avaluo_id" """
             , (solicitud_data["cliente"], solicitud_data["doc_identidad"], solicitud_data["destinatario"], solicitud_data["fecha_visita"],solicitud_data["tipo_avaluo"], solicitud_data["fecha_informe"]))
-        print("Solicitud radicada:", solicitud_data)
-        
-        print(f"ID del avalúo radicado: {id_avaluo}")
+
         
         # Recorrer los elementos de matricula_layout y obtener los textos de los QLineEdit
         
         matriculas = []
         for i in range(self.matricula_layout.count()):
             widget = self.matricula_layout.itemAt(i).widget().findChild(QLineEdit)
-            print(f"Procesando widget en índice {i}: {widget}")
+            
             if isinstance(widget, QLineEdit):  # Verificar que el widget sea un QLineEdit
                 texto_matricula = widget.text().strip()
                 if texto_matricula:  # Solo agregar si no está vacío
@@ -278,29 +293,34 @@ class PestanaDatosSolicitud(QWidget):
                     db.insertar(
                         """insert into inmuebles (matricula_inmobiliaria, tipo_inmueble, direccion, barrio, municipio, departamento, cedula_catastral, modo_adquicision, limitaciones, longitud, latitud, avaluo_id, doc_propiedad, propietario, id_propietario) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) returning id_inmueble """,(texto_matricula, self.inmuebles[texto_matricula]["tipo_inmueble"], self.inmuebles[texto_matricula]["direccion"], self.inmuebles[texto_matricula]["barrio"], self.inmuebles[texto_matricula]["municipio"], self.inmuebles[texto_matricula]["departamento"], self.inmuebles[texto_matricula]["cedula_catastral"], self.inmuebles[texto_matricula]["modo_adquisicion"], self.inmuebles[texto_matricula]["limitaciones"], self.inmuebles[texto_matricula]["longitud"], self.inmuebles[texto_matricula]["latitud"], id_avaluo, self.inmuebles[texto_matricula]["doc_propiedad"], self.inmuebles[texto_matricula]["propietario"], self.inmuebles[texto_matricula]["id_propietario"]))
                     
-                    print(f"Matrícula agregada: {texto_matricula}")
 
+        # Lista para almacenar los textos de la documentación
+        documentacion = []
+
+        # Recorrer los widgets en el contenedor correspondiente
+        for i in range(self.documentacion_layout.count()):
+            widget = self.documentacion_layout.itemAt(i).widget().findChild(QLineEdit)
+            
+            if isinstance(widget, QLineEdit):  # Verificar que el widget sea un QLineEdit
+                texto_documento = widget.text().strip()
+                if texto_matricula:  # Solo agregar si no está vacío
+                    matriculas.append(texto_matricula)
+                    try:
+                        db.insertar(
+                            """
+                            INSERT INTO documentacion_aportada ("Avaluo_id", documento)
+                            VALUES (%s, %s) returning id_documentacin
+                            """,
+                            (id_avaluo, texto_documento)
+                        )
+                        print(f"Documento agregado: {texto_documento}")
+                    except Exception as e:
+                        print(f"Error al insertar el documento '{texto_documento}': {e}")
+        
         print(f"Números de matrícula obtenidos: {matriculas}")
 
-        # Guardar los datos del inmueble y las matrículas en la base de datos
-        consulta_inmueble = """
-        INSERT INTO "Inmuebles" (direccion, tipo_inmueble, barrio, municipio, departamento, cedula_catastral, modo_adquisicion, limitaciones, latitud, longitud, doc_propiedad)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        RETURNING id_inmueble
-        """
-        #id_inmueble = db.insertar(consulta_inmueble, tuple(inmueble_data.values()))
-        #print(f"Inmueble guardado con ID: {id_inmueble}")
-
-        # Guardar las matrículas asociadas al inmueble
-        consulta_matricula = """
-        INSERT INTO "Matriculas" (id_inmueble, numero_matricula)
-        VALUES (%s, %s)
-        """
-        """ for matricula in matriculas:
-            db.insertar(consulta_matricula, (id_inmueble, matricula))
-        print("Matrículas guardadas correctamente.") """
         
-        db.cerrar_conexion()
+        db.cerrar_conexion()  
         
     def guardar_informacion_inmueble(self, matricula):
         
@@ -463,6 +483,53 @@ class PestanaDatosSolicitud(QWidget):
     
     def agregar_matricula_nueva(self):
         
+        if self.matricula_actual:
+            
+            inmueble_data = {
+                "tipo_inmueble": self.tipo_inmueble.currentText(),
+                "direccion": self.direccion_inmueble.text().strip(),            
+                "barrio": self.barrio_inmueble.text().strip(),
+                "municipio": self.municipio_inmueble.text().strip(),
+                "departamento": self.departamento_inmueble.text().strip(),
+                "cedula_catastral": self.cedula_catastral.text().strip(),
+                "modo_adquisicion": self.modo_adquisicion.currentText(),
+                "limitaciones": self.limitaciones.toPlainText().strip(),
+                "longitud": self.longitud.text().strip(),
+                "latitud": self.latitud.text().strip(),
+                "avaluo_id": self.id_avaluo,
+                "doc_propiedad": self.doc_propiedad.toPlainText().strip(),
+                "propietario": self.propietario.text().strip(),
+                "id_propietario": self.id_propietario.text().strip()
+                }   
+            print(self.inmuebles[self.matricula_actual])
+            print(inmueble_data)
+            
+            auxiliar_comparar = False
+            
+            for clave, valor in inmueble_data.items():
+                valor_actual = self.inmuebles[self.matricula_actual].get(clave)
+                print(f"Comparando clave: {clave}, valor actual: {valor_actual}, nuevo valor: {valor}, resultado: {str(valor_actual) != str(valor)}")
+                if str(valor_actual) != str(valor):
+                    auxiliar_comparar = True 
+                    print("Se detectó un cambio en la clave:", clave)                   
+            print(auxiliar_comparar)
+            if auxiliar_comparar:
+                ## Crear el cuadro de diálogo
+                dialogo = QMessageBox(self)
+                dialogo.setWindowTitle(f"Guardar datos del Inmueble {self.matricula_actual}")
+                dialogo.setText(f"Se han realizado cambios en la matrícula {self.matricula_actual}. ¿Qué desea hacer?")
+
+                # Personalizar los botones
+                btn_aceptar = dialogo.addButton("Guardar Cambios", QMessageBox.ButtonRole.AcceptRole)
+                btn_descartar = dialogo.addButton("Descartar cambios", QMessageBox.ButtonRole.RejectRole)
+
+                # Mostrar el cuadro de diálogo y manejar la respuesta
+                dialogo.exec()
+                if dialogo.clickedButton() == btn_aceptar:
+                    self.actualizar_inmueble(self.matricula_actual)
+                else:
+                    print("Cambios descartados.")
+        
         # Crear el cuadro de diálogo
         dialogo = QInputDialog(self)    
         dialogo.setWindowTitle("Agregar Matrícula")
@@ -477,6 +544,9 @@ class PestanaDatosSolicitud(QWidget):
             
             if texto_matricula:  # Verificar que no esté vacío
                 # Crear el QLineEdit y asignar el texto ingresado
+                
+                 
+                
                 campo = QPushButton()
                 campo.setText(texto_matricula)                
                 campo.setStyleSheet(self.group_style)                
@@ -485,6 +555,7 @@ class PestanaDatosSolicitud(QWidget):
                 btn_eliminar = QPushButton("×")
                 btn_eliminar.setObjectName("botonEliminar")
                 btn_eliminar.setStyleSheet(self.group_style)
+                self.actualizar_informacion_inmueble(campo)
                 
                 # Contenedor para el campo y el botón
                 campo_container = QWidget()
@@ -497,6 +568,11 @@ class PestanaDatosSolicitud(QWidget):
                 btn_eliminar.clicked.connect(lambda: self.eliminar_campo_matricula(campo_container))
                 
                 self.matricula_layout.addWidget(campo_container)
+                
+                self.btn_guardar_inmueble.setText("Actualizar informacion del Inmueble")
+                self.btn_guardar_inmueble.clicked.disconnect()  # Desconectar señales anteriores
+                self.btn_guardar_inmueble.clicked.connect(lambda: self.actualizar_inmueble(texto_matricula))
+                self.matricula_actual = texto_matricula
                 
                 inmueble_data = {
                 "tipo_inmueble": self.tipo_inmueble.currentText(),
@@ -679,7 +755,7 @@ class PestanaDatosSolicitud(QWidget):
     
         if matricula in self.inmuebles:
             
-            # Confirmar eliminación
+            # Confirmar actualización
             respuesta = QMessageBox.question(
                 self,
                 "Confirmar actualizacion",
@@ -767,14 +843,13 @@ class PestanaDatosSolicitud(QWidget):
                 }                 
                 
                 # Crear el campo de texto para la matrícula
-                campo = QLineEdit()
+                campo = QPushButton()
                 campo.setText(matricula)
                 campo.setStyleSheet(self.group_style)
                 
                 # Conectar las señales usando una función auxiliar para capturar el valor actual
-                campo.focusInEvent = self.crear_focus_evento(campo)
-                campo.textChanged.connect(self.crear_text_changed_evento(campo))
-                
+                campo.clicked.connect(self.crear_focus_evento(campo))
+                self.actualizar_informacion_inmueble(campo)
                 # Crear el botón de eliminar
                 btn_eliminar = QPushButton("×")
                 btn_eliminar.setObjectName("botonEliminar")
@@ -791,7 +866,7 @@ class PestanaDatosSolicitud(QWidget):
                 btn_eliminar.clicked.connect(self.crear_eliminar_evento(campo_container))          
                 
                 self.matricula_layout.addWidget(campo_container)
-    
+            db.cerrar_conexion()
             print(f"Inmuebles cargados correctamente en el diccionario self.inmuebles: {self.inmuebles}")
         except Exception as e:
             print(f"Error al cargar los inmuebles desde la base de datos: {e}")
@@ -834,9 +909,40 @@ class PestanaDatosSolicitud(QWidget):
                     matriculas.append(line_edit.text().strip())
         return matriculas
 
-    def agregar_campo_documento(self):
+    def agregar_campo_documento(self, documento = None):
         campo = QLineEdit()
-        campo.setPlaceholderText("Nombre del documento")
+        print(f"agregar campo segun {self.id_avaluo}")
+        if documento:
+            print( documento[0])
+            campo.setText(documento[0])
+            campo.setProperty("id_documento", documento[1])
+            
+        elif self.id_avaluo is None:            
+            campo.setPlaceholderText("Nombre del documento")
+        
+        else:
+            # Crear el cuadro de diálogo
+            dialogo = QInputDialog(self)    
+            dialogo.setWindowTitle("Agregar Documento")
+            dialogo.setLabelText("Ingrese los datos del documento:")
+            dialogo.setInputMode(QInputDialog.InputMode.TextInput)
+            dialogo.setOkButtonText("Aceptar")
+            dialogo.setCancelButtonText("Cancelar")
+            
+            # Mostrar el cuadro de diálogo y capturar el resultado
+            if dialogo.exec() == QInputDialog.DialogCode.Accepted:
+                texto_documento = dialogo.textValue().strip()  # Capturar el texto ingresado
+                
+                if texto_documento:  # Verificar que no esté vacío
+                    
+                    campo.setText(texto_documento)
+                    db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+                    db.conectar()
+                    
+                    resultado_documento = db.insertar(""" insert into documentacion_aportada ("Avaluo_id", documento) values (%s, %s) returning id_documentacin """, (self.id_avaluo, texto_documento))
+                    
+                    campo.setProperty("id_documento", resultado_documento)
+            
         campo.setClearButtonEnabled(True)
         
         btn_eliminar = QPushButton("×")
@@ -851,5 +957,53 @@ class PestanaDatosSolicitud(QWidget):
         layout_container.setContentsMargins(0, 0, 0, 0)
         
         # Conectar el botón de eliminar
-        btn_eliminar.clicked.connect(lambda: self.eliminar_campo_matricula(campo_container))
+        btn_eliminar.clicked.connect(lambda: self.eliminar_documento(campo_container))
         self.documentacion_layout.addWidget(campo_container)
+
+    def eliminar_documento(self, contenedor):
+        """
+        Elimina el contenedor de documentos y su registro asociado en la base de datos.
+        
+        :param contenedor: El contenedor (QWidget) que contiene el campo del documento y el botón de eliminar.
+        """
+        try:
+            # Obtener el campo QLineEdit dentro del contenedor
+            campo = contenedor.findChild(QLineEdit)
+            # Confirmar eliminación
+            respuesta = QMessageBox.question(
+                self,
+                "Confirmar eliminación",
+                f"¿Está seguro de que desea eliminar la el documento '{campo.text()}' de la base de datos?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            
+            if respuesta == QMessageBox.StandardButton.Yes:
+                
+                db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+                db.conectar()
+                
+                if campo:
+                    # Obtener el id_documento de la propiedad del campo
+                    id_documento = campo.property("id_documento")
+                    
+                    print(f"Eliminando documento con id_documento: {id_documento}")
+                    if id_documento:
+                        # Conectar a la base de datos y eliminar el registro
+                        db.eliminar("DELETE FROM documentacion_aportada WHERE id_documentacin = %s", (id_documento,))
+                        
+                        print(f"Documento con id_documento {id_documento} eliminado de la base de datos.")
+                    else:
+                        print("Advertencia: No se encontró un id_documento asociado al campo.")
+                
+                # Eliminar el contenedor del layout
+                layout = self.documentacion_layout
+                for i in range(layout.count()):
+                    item = layout.itemAt(i)
+                    if item and item.widget() == contenedor:
+                        layout.takeAt(i)
+                        contenedor.deleteLater()
+                        print("Contenedor eliminado de la interfaz.")
+                        break
+                db.cerrar_conexion()
+        except Exception as e:
+            print(f"Error al eliminar el contenedor o el registro de la base de datos: {e}")
