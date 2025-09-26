@@ -72,12 +72,17 @@ class PestanaSeguimiento(QWidget):
         columna_2.addWidget(QLabel("ID del Perito:"))
         columna_2.addWidget(self.filtro_id_perito)
         
-        # Columna 3: Filtro del revisor y botón de búsqueda
+        # Columna 3: Filtro del revisor y botón de búsqueda y limpiar
         columna_3 = QVBoxLayout()
         self.filtro_nombre_revisor = QComboBox()
         
         self.boton_buscar = QPushButton("Buscar")
         self.boton_buscar.clicked.connect(self.buscar_seguimiento)
+        
+        self.boton_limpiar = QPushButton("Limpiar")
+        self.boton_limpiar.clicked.connect(self.limpiar_filtros)
+        
+        
         self.cargar_revisores()
         columna_2.addWidget(QLabel("Nombre del Revisor:"))
         columna_2.addWidget(self.filtro_nombre_revisor)
@@ -87,8 +92,10 @@ class PestanaSeguimiento(QWidget):
         # Agregar las columnas al layout de filtros
         self.layout_filtros.addLayout(columna_1)
         self.layout_filtros.addLayout(columna_2)        
-        self.layout_filtros.addWidget(self.boton_buscar, alignment=Qt.AlignmentFlag.AlignCenter) 
-        
+        self.layout_filtros.addWidget(self.boton_buscar, alignment=Qt.AlignmentFlag.AlignCenter )
+        self.layout_filtros.addWidget(self.boton_limpiar, alignment=Qt.AlignmentFlag.AlignCenter ) 
+         
+
         # Agregar el grupo de filtros al contenedor
         self.layout_contenedor.addWidget(self.grupo_filtros)
         
@@ -104,6 +111,20 @@ class PestanaSeguimiento(QWidget):
         
         tab_panel.addTab(self.scroll_area, "Seguimiento")       
     
+    def limpiar_filtros(self):
+        """
+        Limpia todos los filtros y actualiza la información de la tabla.
+        """
+        # Limpiar los valores de los filtros
+        self.filtro_id.clear()
+        self.filtro_matricula.clear()
+        self.filtro_id_cliente.clear()
+        self.filtro_nombre_perito.setCurrentIndex(0)  # Seleccionar el primer elemento (vacío)
+        self.filtro_id_perito.clear()
+        self.filtro_nombre_revisor.setCurrentIndex(0)  # Seleccionar el primer elemento (vacío)
+    
+        # Actualizar la información de la tabla
+        self.cargar_datos_seguimiento(self.tab_panel)
     
     def cargar_peritos(self):
         """
