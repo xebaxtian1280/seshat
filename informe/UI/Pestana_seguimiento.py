@@ -183,7 +183,15 @@ class PestanaSeguimiento(QWidget):
             self.tabla_resultados.setRowCount(0)
             
             # Agregar los resultados a la tabla_resultados
-            for fila, resultado in enumerate(resultados):
+            self.agregar_resultados_tabla(db, resultados)
+            db.cerrar_conexion()
+        except Exception as e:
+            print(f"Error al cargar los datos de seguimiento: {e}")   
+            
+        # Método para manejar el clic del botón
+    
+    def agregar_resultados_tabla(self, db, resultados):
+        for fila, resultado in enumerate(resultados):
                 self.tabla_resultados.insertRow(fila)
                 for columna, valor in enumerate(resultado):
                     self.tabla_resultados.setItem(fila, columna, QTableWidgetItem(str(valor)))
@@ -205,11 +213,6 @@ class PestanaSeguimiento(QWidget):
                 # boton_accion.clicked.connect(lambda id_avaluo=id_avaluo: print(f"Botón presionado con id_avaluo: {id_avaluo}") or self.agregar_pestanas_avaluo(id_avaluo, tab_panel))
                 # Pasar el ID del avalúo al método agregar_pestanas_avaluo
                 self.tabla_resultados.setCellWidget(fila, 6, boton_accion)
-            db.cerrar_conexion()
-        except Exception as e:
-            print(f"Error al cargar los datos de seguimiento: {e}")   
-            
-        # Método para manejar el clic del botón
     
     def manejar_click_boton(self):
         boton = self.sender()  # Obtener el botón que disparó la señal
@@ -275,40 +278,57 @@ class PestanaSeguimiento(QWidget):
             print(f"Error al agregar las pestañas: {e}") 
     
     def buscar_seguimiento(self):
+        # Construir la consulta SQL dinámica
+        query = """
+        SELECT 
+            a."Avaluo_id", 
+            a.nombre_cliente, 
+            a.id_cliente, 
+            CONCAT(p.nombre, ' ', p.apellido) AS perito_nombre,
+            CONCAT(r.nombre, ' ', r.apellido) AS revisor_nombre
+        FROM "Avaluos" a
+        LEFT JOIN 
+            peritos p ON a.id_peritos = p.id_peritos 
+        LEFT JOIN 
+            revisores r ON a.id_revisor = r.id_revisor
+        WHERE 1=1
         """
-        Función para buscar seguimientos según los filtros ingresados.
-        """
-        # Obtener valores de los filtros
-        id_filtro = self.filtro_id.text()
-        nombre_filtro = self.filtro_nombre.text()
-        
-        # Simular resultados de búsqueda
-        resultados = [
-            {"id": 1, "nombre": "Seguimiento 1"},
-            {"id": 2, "nombre": "Seguimiento 2"},
-            {"id": 3, "nombre": "Seguimiento 3"},
-        ]
-        
-        # Filtrar resultados
-        resultados_filtrados = [
-            r for r in resultados
-            if (not id_filtro or str(r["id"]) == id_filtro) and
-               (not nombre_filtro or nombre_filtro.lower() in r["nombre"].lower())
-        ]
+        parametros = []
+        # Agregar filtros dinámicamente
+        if self.filtro_id.text():
+            query += """ AND a."Avaluo_id" = %s"""
+            parametros.append(self.filtro_id.text())
+        """ if self.filtro_id_cliente.text():
+            query += " AND matricula_inmobiliaria ILIKE %s"
+            parametros.append(f"%{self.filtro_id_cliente.text()}%") """
+        if self.filtro_id_perito.text():
+            query += " AND a.id_cliente = %s"
+            parametros.append(self.filtro_id_perito.text())
+        if self.filtro_matricula.text():
+            query += " AND p.nombre ILIKE %s"
+            parametros.append(f"%{self.filtro_matricula.text()}%")
+        if self.filtro_nombre_perito.currentText():
+            query += " AND p.nombre = %s"
+            parametros.append(self.filtro_nombre_perito.currentText())
+        if self.filtro_nombre_revisor.currentText():
+            query += " AND r.nombre ILIKE %s"
+            parametros.append(f"%{self.filtro_nombre_revisor.currentText()}%")
+            
+        print("Consulta SQL:", query)
+        # Ejecutar la consulta
+        db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+        db.conectar()
+        resultados = db.consultar(query, parametros)
         
         # Limpiar la tabla
         self.tabla_resultados.setRowCount(0)
         
         # Agregar resultados a la tabla
-        for fila, resultado in enumerate(resultados_filtrados):
-            self.tabla_resultados.insertRow(fila)
-            self.tabla_resultados.setItem(fila, 0, QTableWidgetItem(str(resultado["id"])))
-            self.tabla_resultados.setItem(fila, 1, QTableWidgetItem(resultado["nombre"]))
-            
-            # Botón de acción
-            boton_accion = QPushButton("Ver")
-            boton_accion.clicked.connect(lambda _, id=resultado["id"]: self.ver_seguimiento(id))
-            self.tabla_resultados.setCellWidget(fila, 2, boton_accion)
+        
+         # Agregar los resultados a la tabla_resultados
+        self.agregar_resultados_tabla(db, resultados)
+        db.cerrar_conexion()
+    
     
     def ver_seguimiento(self, id):
         """

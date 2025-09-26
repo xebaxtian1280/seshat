@@ -109,10 +109,12 @@ class ReportApp(QMainWindow):
             
             for index in range(self.tab_panel.count()):
                 
-                widget = self.tab_panel.widget(index)
-                validacion=(self.tab_panel.tabText(index) == "PestanaDatosSolicitud")
+                """ widget = self.tab_panel.widget(index)
+                validacion=(self.tab_panel.tabText(index) == "PestanaDatosSolicitud") """
+                print(f"Cerrando pestaña: {self.tab_panel.tabText(index)} con idex {index}")
                 
-                self.tab_panel.removeTab(index)
+                self.tab_panel.removeTab(0)
+                
             
             # Crear las pestaña seguimiento
             self.pestana_seguimiento = PestanaSeguimiento(self.tab_panel)
