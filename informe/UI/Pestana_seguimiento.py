@@ -101,8 +101,8 @@ class PestanaSeguimiento(QWidget):
         
         # Tabla de resultados
         self.tabla_resultados = QTableWidget()
-        self.tabla_resultados.setColumnCount(7)
-        self.tabla_resultados.setHorizontalHeaderLabels(["ID Avaluo", "Nombre Cliente", "ID cliente", "Perito", "Revisor","No. de Inmuebles","Estado", "Acciones"])
+        self.tabla_resultados.setColumnCount(8)
+        self.tabla_resultados.setHorizontalHeaderLabels(["ID Avaluo", "Nombre Cliente", "ID cliente", "Perito", "Revisor","Estado","No. de Inmuebles" , "Acciones"])
         self.tabla_resultados.horizontalHeader().setStretchLastSection(True)
         self.tabla_resultados.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.layout_contenedor.addWidget(self.tabla_resultados, stretch=1)
@@ -188,7 +188,8 @@ class PestanaSeguimiento(QWidget):
                 a.nombre_cliente, 
                 a.id_cliente, 
                 CONCAT(p.nombre, ' ', p.apellido) AS perito_nombre,
-                CONCAT(r.nombre, ' ', r.apellido) AS revisor_nombre
+                CONCAT(r.nombre, ' ', r.apellido) AS revisor_nombre,
+                a.estado
             FROM "Avaluos" a
             LEFT JOIN 
                 peritos p ON a.id_peritos  = p.id_peritos 
@@ -218,12 +219,12 @@ class PestanaSeguimiento(QWidget):
                     self.tabla_resultados.setItem(fila, columna, QTableWidgetItem(str(valor)))
                     
                 # Calcula y agrega el numero de matriculas por avaluo
-                
+                self.tabla_resultados.setItem(fila, 7, QTableWidgetItem("En Proceso"))
                 query = """ SELECT COUNT(*) FROM inmuebles WHERE avaluo_id = x; """.replace("x", str(resultado[0]))
                 id_avaluo = resultado[0]
                 numero_inmuebles = db.consultar(query, (id_avaluo,))
                 print(f"ID Avaluo: {resultado[0]}, Número de inmuebles: {numero_inmuebles[0][0]}")
-                self.tabla_resultados.setItem(fila, 5, QTableWidgetItem(str(numero_inmuebles[0][0])))
+                self.tabla_resultados.setItem(fila, 6, QTableWidgetItem(str(numero_inmuebles[0][0])))
                 
                 # Agregar un botón de acción en la última columna
                 boton_accion = QPushButton("Ver")
@@ -233,7 +234,7 @@ class PestanaSeguimiento(QWidget):
                 boton_accion.clicked.connect(lambda:self.manejar_click_boton())
                 # boton_accion.clicked.connect(lambda id_avaluo=id_avaluo: print(f"Botón presionado con id_avaluo: {id_avaluo}") or self.agregar_pestanas_avaluo(id_avaluo, tab_panel))
                 # Pasar el ID del avalúo al método agregar_pestanas_avaluo
-                self.tabla_resultados.setCellWidget(fila, 6, boton_accion)
+                self.tabla_resultados.setCellWidget(fila, 7, boton_accion)
     
     def manejar_click_boton(self):
         boton = self.sender()  # Obtener el botón que disparó la señal

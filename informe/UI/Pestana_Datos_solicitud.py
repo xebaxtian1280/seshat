@@ -812,7 +812,7 @@ class PestanaDatosSolicitud(QWidget):
         # Extraer el texto de la matrícula inmobiliaria
         matricula = None
         for widget in contenedor_a_eliminar.children():
-            if isinstance(widget, QLineEdit):  # Suponiendo que el QLineEdit contiene la matrícula
+            if isinstance(widget, QPushButton):  # Suponiendo que el QLineEdit contiene la matrícula
                 matricula = widget.text().strip()
                 break
 
