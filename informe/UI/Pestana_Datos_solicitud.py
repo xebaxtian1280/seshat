@@ -3,11 +3,26 @@ from PyQt6.QtWidgets import (
     QDateEdit, QPushButton, QLabel, QTabWidget, QScrollArea, QMessageBox, QInputDialog
 )
 from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtCore import QDate
+from PyQt6.QtWebChannel import QWebChannel
+from PyQt6.QtCore import QDate, QObject, pyqtSlot
 from PyQt6.QtGui import QIcon
 from Estilos import Estilos
 from DB import DB
 import webview
+
+class Backend(QObject):
+    def __init__(self,ventana, parent=None):
+        super().__init__(parent)
+        self.ventana = ventana
+
+    @pyqtSlot(float, float)
+    def update_lat_lon(self, lat, lon):
+        """
+        Método expuesto al frontend para capturar las coordenadas.
+        """
+        print(f"Latitud: {lat}, Longitud: {lon}")
+        self.ventana.latitud.setText(str(lat))
+        self.ventana.longitud.setText(str(lon))
 
 class PestanaDatosSolicitud(QWidget):
     def __init__(self,  tab_panel: QTabWidget, id_avaluo=None):
@@ -38,6 +53,8 @@ class PestanaDatosSolicitud(QWidget):
         self.fecha_informe = QDateEdit(QDate.currentDate())
         self.tipo_avaluo = QComboBox()
         self.tipo_avaluo.addItems(["","Comercial", "Jurídico", "Financiero", "Seguros"])
+        self.municipio_inmueble = QLineEdit()
+        self.departamento_inmueble = QLineEdit()
         
         solicitud_layout.addRow("Cliente:", self.cliente)
         solicitud_layout.addRow("Documento de identificación:", self.doc_identidad)
@@ -45,6 +62,8 @@ class PestanaDatosSolicitud(QWidget):
         solicitud_layout.addRow("Fecha de la visita:", self.fecha_visita)
         solicitud_layout.addRow("Fecha del informe:", self.fecha_informe)
         solicitud_layout.addRow("Tipo de avalúo solicitado:", self.tipo_avaluo)
+        solicitud_layout.addRow("Municipio:", self.municipio_inmueble)
+        solicitud_layout.addRow("Departamento:", self.departamento_inmueble)
         
         # Grupo Información Jurídica y Catastral
         grupo_juridico = QGroupBox("Información Jurídica y Catastral")
@@ -99,8 +118,7 @@ class PestanaDatosSolicitud(QWidget):
         # Campos nuevos del inmueble
         self.direccion_inmueble = QLineEdit()
         self.barrio_inmueble = QLineEdit()
-        self.municipio_inmueble = QLineEdit()
-        self.departamento_inmueble = QLineEdit()
+        
         self.cedula_catastral = QLineEdit()
         self.limitaciones = QTextEdit()
         
@@ -122,8 +140,8 @@ class PestanaDatosSolicitud(QWidget):
         self.longitud = QLineEdit()
         self.longitud.setPlaceholderText("-74.0817")
         
-        self.latitud.textChanged.connect(self.actualizar_mapa)
-        self.longitud.textChanged.connect(self.actualizar_mapa)
+        """ self.latitud.textChanged.connect(self.actualizar_mapa)
+        self.longitud.textChanged.connect(self.actualizar_mapa) """
         
         self.doc_propiedad = QTextEdit()
         self.doc_propiedad.setPlainText("Copia simple de la Escritura Pública No. 4126 del 26 de Noviembre de 1997, otorgada en la Notaria 2 de Bucaramanga.")
@@ -139,18 +157,17 @@ class PestanaDatosSolicitud(QWidget):
         # Campos iniciales
         if id_avaluo == "":
             self.agregar_campo_documento()  # Primer campo por defecto
+        right_layout.addRow(QLabel("Coordenadas:"))
+        right_layout.addRow("Latitud:", self.latitud)
+        right_layout.addRow("Longitud:", self.longitud)
         right_layout.addRow("Tipo de inmueble:", self.tipo_inmueble)
         right_layout.addRow("Dirección del inmueble:", self.direccion_inmueble)
         right_layout.addRow("Barrio / Vereda:", self.barrio_inmueble)
-        right_layout.addRow("Municipio:", self.municipio_inmueble)
-        right_layout.addRow("Departamento:", self.departamento_inmueble)
+        
         right_layout.addRow("Cédula Catastral:", self.cedula_catastral)
         right_layout.addRow("Modo de adquisición:", self.modo_adquisicion)
         right_layout.addRow("Limitaciones y gravámenes:", self.limitaciones)
         
-        right_layout.addRow(QLabel("Coordenadas:"))
-        right_layout.addRow("Latitud:", self.latitud)
-        right_layout.addRow("Longitud:", self.longitud)
         right_layout.addRow(QLabel("Documento de Propiedad:"))
         right_layout.addWidget(self.doc_propiedad)
         right_layout.addRow("Propietario:", self.propietario)
@@ -161,9 +178,7 @@ class PestanaDatosSolicitud(QWidget):
         # Columna izquierda - Contenedor vertical
         right_column = QVBoxLayout()
         
-        # Agregar grupos a la columna izquierda
-        right_column.addWidget(self.grupo_inmueble)
-        right_column.addStretch()
+        
     
         
         main_layout.addLayout(left_column)
@@ -176,7 +191,13 @@ class PestanaDatosSolicitud(QWidget):
         
         # Widget para el mapa
         self.web_view = QWebEngineView()
-        self.web_view.setMinimumHeight(300)
+        self.web_view.setMinimumHeight(620)
+        
+        #Crea el Backend para la comunicación de las coodenadas
+        self.backend = Backend(self)
+        self.channel = QWebChannel()
+        self.channel.registerObject("qtObject", self.backend)
+        self.web_view.page().setWebChannel(self.channel)
         
         # Botón para actualizar mapa
         btn_actualizar = QPushButton("Actualizar Mapa")
@@ -188,6 +209,10 @@ class PestanaDatosSolicitud(QWidget):
         # Agregar el mapa debajo del grupo del inmueble
         right_column.addWidget(grupo_mapa)
         
+        # Agregar grupos a la columna izquierda
+        right_column.addWidget(self.grupo_inmueble)
+        right_column.addStretch()
+        
         #Agregar pestaña al Panel con barra de desplazamiento
         
         scroll_area = QScrollArea()
@@ -196,7 +221,7 @@ class PestanaDatosSolicitud(QWidget):
         tab_panel.addTab(scroll_area, "Datos de la Solicitud")
     
         # Cargar mapa inicial
-        self.actualizar_mapa()        
+        #self.actualizar_mapa()        
         self.cargar_datos_solicitud(self.id_avaluo)
         
     def cargar_datos_solicitud(self, id_avaluo):
@@ -377,73 +402,77 @@ class PestanaDatosSolicitud(QWidget):
         lat = self.latitud.text().strip() or "4.6097"  # Bogotá por defecto
         lon = self.longitud.text().strip() or "-74.0817"
         
+       
         # Generar HTML con el mapa
-        mapa_html =  f'''
+        """
+        Carga un mapa interactivo en el QWebEngineView.
+        """
+        mapa_html = f"""
         <!DOCTYPE html>
-        <html>
+        <html lang="en">
         <head>
-            <title>Mapa del Inmueble</title>
-            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Mapa</title>
             <style>
-                #map {{ 
-                    height: 300px;
+                #map {{
+                    height: 100%;
                     width: 100%;
                 }}
+                html, body {{
+                    margin: 0;
+                    height: 100%;
+                }}
             </style>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+            <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
         </head>
         <body>
             <div id="map"></div>
             <script>
-                // Solución para CORS y User-Agent
-                L.Browser.any3d = false; // Desactivar aceleración hardware
-                L.TileLayer.include({{
-                    createTile: function (coords, done) {{
-                        var tile = document.createElement('img');
-                        tile.onload = L.bind(this._tileOnLoad, this, done, tile);
-                        tile.onerror = L.bind(this._tileOnError, this, done, tile);
-                        tile.src = this.getTileUrl(coords);
-                        tile.setAttribute('referrerpolicy', 'no-referrer');
-                        tile.setAttribute('crossorigin', 'anonymous');
-                        return tile;
-                    }}
+                var backend;
+                new QWebChannel(qt.webChannelTransport, function(channel) {{
+                    backend = channel.objects.qtObject;
                 }});
-                
-                var map = L.map('map', {{
-                    attributionControl: false,
-                    zoomControl: false
-                }}).setView([{lat}, {lon}], 16);
-                
-                // Usar servidores alternativos
+
+                var map = L.map('map').setView([{lat},{lon}], 16);
                 L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
-                    subdomains: 'abc', // Usar subdominios alternativos
-                    noWrap: true,
                     maxZoom: 19,
-                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    attribution: '© OpenStreetMap'
                 }}).addTo(map);
-                
-                // Agregar marcador inicial
-                var marker = L.marker([{lat}, {lon}], {{draggable: true}}).addTo(map);
 
-                // Evento para capturar clics en el mapa
+                var marker = L.marker([{lat},{lon}]).addTo(map)
+                    .bindPopup('Ubicación inmueble')
+                    .openPopup();
+
                 map.on('click', function(e) {{
-                    var coords = e.latlng; // Obtener las coordenadas del clic
-                    marker.setLatLng(coords); // Mover el marcador al nuevo punto
+                    var clickedLat = e.latlng.lat;
+                    var clickedLon = e.latlng.lng;
 
-                    // Enviar las coordenadas al backend
-                    pywebview.api.enviar_coordenadas(coords.lat, coords.lng);
+                    marker.setLatLng(e.latlng)
+                          .bindPopup('Nueva ubicación: ' + clickedLat.toFixed(5) + ', ' + clickedLon.toFixed(5))
+                          .openPopup();
+
+                    backend.update_lat_lon(clickedLat, clickedLon);
                 }});
             </script>
         </body>
         </html>
-        '''
+        """
         
-        """ # Crear la API y exponerla al frontend
-        api = API()
-        self.webview.create_window('Mapa', html=mapa_html, js_api=api)
-        self.webview.start() """
         
+        # Agregar el QWebEngineView al contenedor en la interfaz
+         
         self.web_view.setHtml(mapa_html)
+    
+    def recibir_coordenadas(self, lat, lon):
+        """
+        Método para recibir las coordenadas desde el frontend y actualizar los campos de latitud y longitud.
+        """
+        self.latitud.setText(f"{lat:.5f}")  # Actualizar el campo de latitud
+        self.longitud.setText(f"{lon:.5f}")  # Actualizar el campo de longitud
+        print(f"Coordenadas actualizadas: Latitud={lat}, Longitud={lon}")
         
     def agregar_campo_matricula(self):
         resultado = ""
@@ -481,11 +510,9 @@ class PestanaDatosSolicitud(QWidget):
                 QMessageBox.StandardButton.Ok
             )
     
-    def agregar_matricula_nueva(self):
+    def comparar_cambios_inmuebles(self):
         
-        if self.matricula_actual:
-            
-            inmueble_data = {
+        inmueble_data = {
                 "tipo_inmueble": self.tipo_inmueble.currentText(),
                 "direccion": self.direccion_inmueble.text().strip(),            
                 "barrio": self.barrio_inmueble.text().strip(),
@@ -501,34 +528,36 @@ class PestanaDatosSolicitud(QWidget):
                 "propietario": self.propietario.text().strip(),
                 "id_propietario": self.id_propietario.text().strip()
                 }   
-            print(self.inmuebles[self.matricula_actual])
-            print(inmueble_data)
+        
+        auxiliar_comparar = False
             
-            auxiliar_comparar = False
+        for clave, valor in inmueble_data.items():
+            valor_actual = self.inmuebles[self.matricula_actual].get(clave)
+            print(f"Comparando clave: {clave}, valor actual: {valor_actual}, nuevo valor: {valor}, resultado: {str(valor_actual) != str(valor)}")
+            if str(valor_actual) != str(valor):
+                auxiliar_comparar = True 
+                print("Se detectó un cambio en la clave:", clave)                   
+        print(auxiliar_comparar)
+        if auxiliar_comparar:
+            ## Crear el cuadro de diálogo
+            dialogo = QMessageBox(self)
+            dialogo.setWindowTitle(f"Guardar datos del Inmueble {self.matricula_actual}")
+            dialogo.setText(f"Se han realizado cambios en la matrícula {self.matricula_actual}. ¿Qué desea hacer?")
+            # Personalizar los botones
+            btn_aceptar = dialogo.addButton("Guardar Cambios", QMessageBox.ButtonRole.AcceptRole)
+            btn_descartar = dialogo.addButton("Descartar cambios", QMessageBox.ButtonRole.RejectRole)
+            # Mostrar el cuadro de diálogo y manejar la respuesta
+            dialogo.exec()
+            if dialogo.clickedButton() == btn_aceptar:
+                self.actualizar_inmueble(self.matricula_actual)
+            else:
+                print("Cambios descartados.")
+    
+    def agregar_matricula_nueva(self):
+        
+        if self.matricula_actual:
             
-            for clave, valor in inmueble_data.items():
-                valor_actual = self.inmuebles[self.matricula_actual].get(clave)
-                print(f"Comparando clave: {clave}, valor actual: {valor_actual}, nuevo valor: {valor}, resultado: {str(valor_actual) != str(valor)}")
-                if str(valor_actual) != str(valor):
-                    auxiliar_comparar = True 
-                    print("Se detectó un cambio en la clave:", clave)                   
-            print(auxiliar_comparar)
-            if auxiliar_comparar:
-                ## Crear el cuadro de diálogo
-                dialogo = QMessageBox(self)
-                dialogo.setWindowTitle(f"Guardar datos del Inmueble {self.matricula_actual}")
-                dialogo.setText(f"Se han realizado cambios en la matrícula {self.matricula_actual}. ¿Qué desea hacer?")
-
-                # Personalizar los botones
-                btn_aceptar = dialogo.addButton("Guardar Cambios", QMessageBox.ButtonRole.AcceptRole)
-                btn_descartar = dialogo.addButton("Descartar cambios", QMessageBox.ButtonRole.RejectRole)
-
-                # Mostrar el cuadro de diálogo y manejar la respuesta
-                dialogo.exec()
-                if dialogo.clickedButton() == btn_aceptar:
-                    self.actualizar_inmueble(self.matricula_actual)
-                else:
-                    print("Cambios descartados.")
+            self.comparar_cambios_inmuebles()
         
         # Crear el cuadro de diálogo
         dialogo = QInputDialog(self)    
@@ -690,7 +719,7 @@ class PestanaDatosSolicitud(QWidget):
             print(f"Eliminación de la matrícula '{matricula}' cancelada.")
         
     def actualizar_informacion_inmueble(self, campo):
-        
+
         texto = campo.text()
         
         # Actualizar el título del grupo_inmueble
@@ -713,7 +742,6 @@ class PestanaDatosSolicitud(QWidget):
         
         if self.matricula_actual in self.inmuebles:             
              
-             
             self.btn_guardar_inmueble.setText("Actualizar informacion del Inmueble")
             self.btn_guardar_inmueble.clicked.disconnect()  # Desconectar señales anteriores
             self.btn_guardar_inmueble.clicked.connect(lambda: self.actualizar_inmueble(self.matricula_actual))
@@ -722,6 +750,7 @@ class PestanaDatosSolicitud(QWidget):
             self.btn_guardar_inmueble.setText("Guardar informacion del Inmueble")
             self.btn_guardar_inmueble.clicked.disconnect()  # Desconectar señales anteriores
             self.btn_guardar_inmueble.clicked.connect(lambda: self.guardar_informacion_inmueble(self.matricula_actual))
+        self.actualizar_mapa()
         
     def actualizar_inmueble(self, matricula):
         """
@@ -840,7 +869,8 @@ class PestanaDatosSolicitud(QWidget):
                     "doc_propiedad": registro[13],
                     "propietario": registro[14],
                     "id_propietario": registro[15]
-                }                 
+                }
+                               
                 
                 # Crear el campo de texto para la matrícula
                 campo = QPushButton()
@@ -864,7 +894,7 @@ class PestanaDatosSolicitud(QWidget):
                 layout_container.setContentsMargins(0, 0, 0, 0)    
                 
                 btn_eliminar.clicked.connect(self.crear_eliminar_evento(campo_container))          
-                
+                self.actualizar_mapa()
                 self.matricula_layout.addWidget(campo_container)
             db.cerrar_conexion()
             print(f"Inmuebles cargados correctamente en el diccionario self.inmuebles: {self.inmuebles}")
@@ -876,6 +906,8 @@ class PestanaDatosSolicitud(QWidget):
         Crea un evento para manejar el focusInEvent de un campo.
         """
         def evento_focus_in(texto):
+            if self.matricula_actual and self.matricula_actual in self.inmuebles:
+                self.comparar_cambios_inmuebles()
             self.actualizar_informacion_inmueble(campo)
         return evento_focus_in
     
