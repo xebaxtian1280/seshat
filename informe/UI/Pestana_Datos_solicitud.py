@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWebChannel import QWebChannel
-from PyQt6.QtCore import QDate, QObject, pyqtSlot
+from PyQt6.QtCore import QDate, QObject, pyqtSlot, Qt
 from PyQt6.QtGui import QIcon
 from Estilos import Estilos
 from DB import DB
@@ -53,8 +53,15 @@ class PestanaDatosSolicitud(QWidget):
         self.fecha_informe = QDateEdit(QDate.currentDate())
         self.tipo_avaluo = QComboBox()
         self.tipo_avaluo.addItems(["","Comercial", "Jurídico", "Financiero", "Seguros"])
-        self.municipio_inmueble = QLineEdit()
-        self.departamento_inmueble = QLineEdit()
+        self.municipio_inmueble = QComboBox()
+        self.cargar_municipios()
+        self.municipio_inmueble.currentIndexChanged.connect(self.actualizar_departamento)
+        self.departamento_inmueble = QComboBox()
+        self.cargar_departamentos()
+        self.nombre_perito = QComboBox()
+        self.cargar_peritos() 
+        self.nombre_revisor = QComboBox()
+        self.cargar_revisores()
         
         solicitud_layout.addRow("Cliente:", self.cliente)
         solicitud_layout.addRow("Documento de identificación:", self.doc_identidad)
@@ -64,6 +71,9 @@ class PestanaDatosSolicitud(QWidget):
         solicitud_layout.addRow("Tipo de avalúo solicitado:", self.tipo_avaluo)
         solicitud_layout.addRow("Municipio:", self.municipio_inmueble)
         solicitud_layout.addRow("Departamento:", self.departamento_inmueble)
+        solicitud_layout.addRow("Perito asignado:", self.nombre_perito)
+        solicitud_layout.addRow("Revisor asignado:", self.nombre_revisor)
+        
         
         # Grupo Información Jurídica y Catastral
         grupo_juridico = QGroupBox("Información Jurídica y Catastral")
@@ -140,9 +150,6 @@ class PestanaDatosSolicitud(QWidget):
         self.longitud = QLineEdit()
         self.longitud.setPlaceholderText("-74.0817")
         
-        """ self.latitud.textChanged.connect(self.actualizar_mapa)
-        self.longitud.textChanged.connect(self.actualizar_mapa) """
-        
         self.doc_propiedad = QTextEdit()
         self.doc_propiedad.setPlainText("Copia simple de la Escritura Pública No. 4126 del 26 de Noviembre de 1997, otorgada en la Notaria 2 de Bucaramanga.")
         
@@ -177,9 +184,6 @@ class PestanaDatosSolicitud(QWidget):
         
         # Columna izquierda - Contenedor vertical
         right_column = QVBoxLayout()
-        
-        
-    
         
         main_layout.addLayout(left_column)
         main_layout.addLayout(right_column) 
@@ -219,9 +223,7 @@ class PestanaDatosSolicitud(QWidget):
         scroll_area.setWidgetResizable(True)
         scroll_area.setWidget(self)        
         tab_panel.addTab(scroll_area, "Datos de la Solicitud")
-    
-        # Cargar mapa inicial
-        #self.actualizar_mapa()        
+      
         self.cargar_datos_solicitud(self.id_avaluo)
         
     def cargar_datos_solicitud(self, id_avaluo):
@@ -239,13 +241,30 @@ class PestanaDatosSolicitud(QWidget):
     
             # Consulta SQL para obtener los datos de la solicitud
             consulta = """
-            select a.nombre_cliente , a.id_cliente , a.destinatario, a.fecha_visita ,a.fecha_avaluo , a.tipo_avaluo
-            FROM "Avaluos" a 
-            left join inmuebles i on a."Avaluo_id" = i.avaluo_id 
-            WHERE a."Avaluo_id" = 2
+            SELECT 
+                a.nombre_cliente, 
+                a.id_cliente, 
+                a.destinatario, 
+                a.fecha_visita, 
+                a.fecha_avaluo, 
+                a.tipo_avaluo, 
+                CONCAT(p.nombre, ' ', p.apellido) AS perito_nombre,
+                p.id_peritos, 
+                CONCAT(r.nombre, ' ', r.apellido) AS revisor_nombre,
+                r.id_revisor 
+            FROM 
+                "Avaluos" a
+            LEFT JOIN 
+                inmuebles i ON a."Avaluo_id" = i.avaluo_id
+            LEFT JOIN 
+                peritos p ON a.id_peritos = p.id_peritos
+            LEFT JOIN 
+                revisores r ON a.id_revisor = r.id_revisor
+            WHERE 
+                a."Avaluo_id" = 2;
             """.replace("2", str(id_avaluo))
             resultado = db.consultar(consulta)
-            
+            print(resultado)
             # Verificar si se encontraron datos
             if resultado:
                 
@@ -258,7 +277,17 @@ class PestanaDatosSolicitud(QWidget):
                 index_tipo = self.tipo_avaluo.findText(resultado[0][5])  # Sexto campo: tipo_avaluo
                 if index_tipo != -1:
                     self.tipo_avaluo.setCurrentIndex(index_tipo)
-                    
+                
+                index_perito = self.nombre_perito.findText(resultado[0][6])  # Séptimo campo: perito_nombre
+                
+                if index_perito != -1:
+                    self.nombre_perito.setCurrentIndex(index_perito)
+                
+                index_revisor = self.nombre_revisor.findText(resultado[0][8])  # Noveno campo: revisor_nombre
+                
+                if index_revisor != -1:
+                    self.nombre_revisor.setCurrentIndex(index_revisor)                
+                
                 self.cargar_inmuebles()
             
             else:
@@ -277,6 +306,126 @@ class PestanaDatosSolicitud(QWidget):
         except Exception as e:
             print(f"Error al cargar los datos de la solicitud: {e}")
             
+    def cargar_peritos(self):
+        """
+        Consulta la tabla 'peritos' de la base de datos y agrega los nombres de los peritos a self.filtro_nombre_perito.
+        """
+        try:
+            # Crear una instancia de la clase DB
+            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db.conectar()
+    
+            # Consulta SQL para obtener los nombres de los peritos
+            consulta = """SELECT CONCAT(nombre, ' ', apellido) AS perito_nombre, id_peritos FROM peritos;"""            
+            resultados = db.consultar(consulta)
+    
+            # Limpiar el QComboBox antes de agregar nuevos datos
+            self.nombre_perito.clear()
+    
+            # Agregar los nombres de los peritos al QComboBox
+            self.nombre_perito.addItem("")
+            
+            for resultado in resultados:
+                self.nombre_perito.addItem(resultado[0])  # resultado[0] contiene el nombre del perito
+                indice = self.nombre_perito.count() - 1  # Obtener el índice del último elemento agregado
+                self.nombre_perito.setItemData(indice, resultado[1], role=Qt.ItemDataRole.UserRole)  # resultado[1] es el id_revisor
+            db.cerrar_conex
+            db.cerrar_conexion()
+        except Exception as e:
+            print(f"Error al cargar los peritos: {e}")        
+    
+    def cargar_revisores(self):
+        """
+        Consulta la tabla 'peritos' de la base de datos y agrega los nombres de los peritos a self.filtro_nombre_perito.
+        """
+        try:
+            # Crear una instancia de la clase DB
+            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db.conectar()
+    
+            # Consulta SQL para obtener los nombres de los peritos
+            consulta = "SELECT CONCAT(nombre, ' ', apellido) AS revisor_nombre, id_revisor FROM revisores;"            
+            resultados = db.consultar(consulta)
+    
+            # Limpiar el QComboBox antes de agregar nuevos datos
+            self.nombre_revisor.clear()
+            self.nombre_revisor.addItem("") 
+            # Agregar los nombres de los peritos al QComboBox
+            for resultado in resultados:
+                self.nombre_revisor.addItem(resultado[0])  # resultado[0] contiene el nombre del perito
+                indice = self.nombre_revisor.count() - 1  # Obtener el índice del último elemento agregado
+                self.nombre_revisor.setItemData(indice, resultado[1], role=Qt.ItemDataRole.UserRole)  # resultado[1] es el id_revisor
+            db.cerrar_conexion()
+        except Exception as e:
+            print(f"Error al cargar los peritos: {e}")
+    
+    def cargar_municipios(self):
+        """
+        Carga los municipios desde la base de datos y los agrega al QComboBox.
+        """
+        try:
+            # Consulta para obtener los municipios
+            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db.conectar()
+            query = "SELECT id, nombre, departamento_id FROM municipios ORDER BY nombre"
+            resultados = db.consultar(query)  # Ejecutar la consulta en la base de datos
+            
+            # Limpiar el QComboBox antes de agregar nuevos datos
+            self.municipio_inmueble.clear()
+            self.municipio_inmueble.addItem("")  # Agregar un elemento vacío al inicio
+            
+            # Agregar los municipios al QComboBox
+            for resultado in resultados:
+                self.municipio_inmueble.addItem(resultado[1])  # resultado[1] contiene el nombre del municipio
+                indice = self.municipio_inmueble.count() - 1  # Obtener el índice del último elemento agregado
+                self.municipio_inmueble.setItemData(indice, resultado[0], role=Qt.ItemDataRole.UserRole)  # resultado[0] es el id
+                self.municipio_inmueble.setItemData(indice, resultado[2], role=Qt.ItemDataRole.UserRole + 1)  # resultado[2] es el código departamento
+                
+            db.cerrar_conexion()
+        except Exception as e:
+            print(f"Error al cargar los municipios: {e}")
+ 
+    def cargar_departamentos(self):
+        """
+        Carga los municipios desde la base de datos y los agrega al QComboBox.
+        """
+        try:
+            # Consulta para obtener los municipios
+            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db.conectar()
+            query = "SELECT id, nombre FROM departamentos ORDER BY nombre"
+            resultados = db.consultar(query)  # Ejecutar la consulta en la base de datos
+            
+            # Limpiar el QComboBox antes de agregar nuevos datos
+            self.departamento_inmueble.clear()
+            self.departamento_inmueble.addItem("")  # Agregar un elemento vacío al inicio
+            
+            # Agregar los municipios al QComboBox
+            for resultado in resultados:
+                
+                self.departamento_inmueble.addItem(resultado[1])  # resultado[1] contiene el nombre del municipio
+                indice = self.departamento_inmueble.count() - 1  # Obtener el índice del último elemento agregado
+                self.departamento_inmueble.setItemData(indice, resultado[0], role=Qt.ItemDataRole.UserRole)  # resultado[0] es el id
+                
+            db.cerrar_conexion()
+        except Exception as e:
+            print(f"Error al cargar los municipios: {e}")
+    
+    def actualizar_departamento(self):
+        
+        """
+        Recupera la propiedad asociada al índice 2 del municipio seleccionado
+        y la asigna al QComboBox de departamentos.
+        """
+        # Recuperar la propiedad asociada al índice 2 (por ejemplo, el id del departamento)
+        id_departamento = self.municipio_inmueble.currentData(role=Qt.ItemDataRole.UserRole + 1)
+        indice = self.departamento_inmueble.findData(id_departamento, role=Qt.ItemDataRole.UserRole)
+        print("ID Departamento recuperado:", id_departamento)
+        if indice is not None:
+            # Asignar el valor recuperado al QComboBox de departamentos
+            self.departamento_inmueble.setCurrentIndex(indice)
+        else:
+            print("No se encontró un departamento asociado al municipio seleccionado.")
     
     def radicar_solicitud(self):
         
@@ -289,7 +438,9 @@ class PestanaDatosSolicitud(QWidget):
             "destinatario": self.destinatario.text().strip(),
             "fecha_visita": self.fecha_visita.date().toString("yyyy-MM-dd"),
             "fecha_informe": self.fecha_informe.date().toString("yyyy-MM-dd"),
-            "tipo_avaluo": self.tipo_avaluo.currentText()
+            "tipo_avaluo": self.tipo_avaluo.currentText(),
+            "id_peritos": self.nombre_perito.currentData(role=Qt.ItemDataRole.UserRole),
+            "id_revisor": self.nombre_revisor.currentData(role=Qt.ItemDataRole.UserRole)
         }
         
         # Validar campos requeridos
@@ -301,8 +452,8 @@ class PestanaDatosSolicitud(QWidget):
         db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
         db.conectar()
         id_avaluo = db.insertar(
-           """INSERT INTO "Avaluos" (nombre_cliente, id_cliente, destinatario, fecha_visita, tipo_avaluo, fecha_avaluo) VALUES (%s, %s, %s, %s, %s, %s) returning "Avaluo_id" """
-            , (solicitud_data["cliente"], solicitud_data["doc_identidad"], solicitud_data["destinatario"], solicitud_data["fecha_visita"],solicitud_data["tipo_avaluo"], solicitud_data["fecha_informe"]))
+           """INSERT INTO "Avaluos" (nombre_cliente, id_cliente, destinatario, fecha_visita, tipo_avaluo, fecha_avaluo, id_peritos, id_revisor) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) returning "Avaluo_id" """
+            , (solicitud_data["cliente"], solicitud_data["doc_identidad"], solicitud_data["destinatario"], solicitud_data["fecha_visita"],solicitud_data["tipo_avaluo"], solicitud_data["fecha_informe"], solicitud_data["id_peritos"], solicitud_data["id_revisor"]))
 
         
         # Recorrer los elementos de matricula_layout y obtener los textos de los QLineEdit
@@ -311,10 +462,13 @@ class PestanaDatosSolicitud(QWidget):
         for i in range(self.matricula_layout.count()):
             widget = self.matricula_layout.itemAt(i).widget().findChild(QLineEdit)
             
+            
+            
             if isinstance(widget, QLineEdit):  # Verificar que el widget sea un QLineEdit
                 texto_matricula = widget.text().strip()
                 if texto_matricula:  # Solo agregar si no está vacío
                     matriculas.append(texto_matricula)
+                    
                     db.insertar(
                         """insert into inmuebles (matricula_inmobiliaria, tipo_inmueble, direccion, barrio, municipio, departamento, cedula_catastral, modo_adquicision, limitaciones, longitud, latitud, avaluo_id, doc_propiedad, propietario, id_propietario) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) returning id_inmueble """,(texto_matricula, self.inmuebles[texto_matricula]["tipo_inmueble"], self.inmuebles[texto_matricula]["direccion"], self.inmuebles[texto_matricula]["barrio"], self.inmuebles[texto_matricula]["municipio"], self.inmuebles[texto_matricula]["departamento"], self.inmuebles[texto_matricula]["cedula_catastral"], self.inmuebles[texto_matricula]["modo_adquisicion"], self.inmuebles[texto_matricula]["limitaciones"], self.inmuebles[texto_matricula]["longitud"], self.inmuebles[texto_matricula]["latitud"], id_avaluo, self.inmuebles[texto_matricula]["doc_propiedad"], self.inmuebles[texto_matricula]["propietario"], self.inmuebles[texto_matricula]["id_propietario"]))
                     
@@ -357,14 +511,15 @@ class PestanaDatosSolicitud(QWidget):
                 QMessageBox.StandardButton.Ok
             )
             return "Antes de agregar otra matricula, agrega una matricula nueva que no se encuentre repetida"
+
         
         # Obtener datos del inmueble
         inmueble_data = {
             "tipo_inmueble": self.tipo_inmueble.currentText(),
             "direccion": self.direccion_inmueble.text().strip(),            
             "barrio": self.barrio_inmueble.text().strip(),
-            "municipio": self.municipio_inmueble.text().strip(),
-            "departamento": self.departamento_inmueble.text().strip(),
+            "municipio": self.municipio_inmueble.currentData(role=Qt.ItemDataRole.UserRole),
+            "departamento": self.departamento_inmueble.currentData(role=Qt.ItemDataRole.UserRole),
             "cedula_catastral": self.cedula_catastral.text().strip(),
             "modo_adquisicion": self.modo_adquisicion.currentText(),
             "limitaciones": self.limitaciones.toPlainText().strip(),
@@ -516,8 +671,8 @@ class PestanaDatosSolicitud(QWidget):
                 "tipo_inmueble": self.tipo_inmueble.currentText(),
                 "direccion": self.direccion_inmueble.text().strip(),            
                 "barrio": self.barrio_inmueble.text().strip(),
-                "municipio": self.municipio_inmueble.text().strip(),
-                "departamento": self.departamento_inmueble.text().strip(),
+                "municipio": self.municipio_inmueble.currentData(role=Qt.ItemDataRole.UserRole),
+                "departamento": self.departamento_inmueble.currentData(role=Qt.ItemDataRole.UserRole),
                 "cedula_catastral": self.cedula_catastral.text().strip(),
                 "modo_adquisicion": self.modo_adquisicion.currentText(),
                 "limitaciones": self.limitaciones.toPlainText().strip(),
@@ -607,8 +762,8 @@ class PestanaDatosSolicitud(QWidget):
                 "tipo_inmueble": self.tipo_inmueble.currentText(),
                 "direccion": self.direccion_inmueble.text().strip(),            
                 "barrio": self.barrio_inmueble.text().strip(),
-                "municipio": self.municipio_inmueble.text().strip(),
-                "departamento": self.departamento_inmueble.text().strip(),
+                "municipio": self.municipio_inmueble.currentData(role=Qt.ItemDataRole.UserRole),
+                "departamento": self.departamento_inmueble.currentData(role=Qt.ItemDataRole.UserRole),
                 "cedula_catastral": self.cedula_catastral.text().strip(),
                 "modo_adquisicion": self.modo_adquisicion.currentText(),
                 "limitaciones": self.limitaciones.toPlainText().strip(),
@@ -729,8 +884,21 @@ class PestanaDatosSolicitud(QWidget):
         self.tipo_inmueble.setCurrentText(self.inmuebles[texto]["tipo_inmueble"] if texto in self.inmuebles else "")
         self.direccion_inmueble.setText(self.inmuebles[texto]["direccion"] if texto in self.inmuebles else "")
         self.barrio_inmueble.setText(self.inmuebles[texto]["barrio"] if texto in self.inmuebles else "")
-        self.municipio_inmueble.setText(self.inmuebles[texto]["municipio"] if texto in self.inmuebles else "")
-        self.departamento_inmueble.setText(self.inmuebles[texto]["departamento"] if texto in self.inmuebles else "")
+        
+            # Seleccionar el municipio en el QComboBox        
+        indice = self.municipio_inmueble.findData(self.inmuebles[texto]["municipio"], role=Qt.ItemDataRole.UserRole)
+    
+        if indice != -1:  # Si se encuentra un índice válido
+            self.municipio_inmueble.setCurrentIndex(indice)
+                
+        # Seleccionar el departamento en el QComboBox   
+             
+        indice = self.departamento_inmueble.findData(self.inmuebles[texto]["departamento"], role=Qt.ItemDataRole.UserRole)
+    
+        if indice != -1:  # Si se encuentra un índice válido
+            self.departamento_inmueble.setCurrentIndex(indice)
+
+        
         self.cedula_catastral.setText(self.inmuebles[texto]["cedula_catastral"] if texto in self.inmuebles else "")
         self.modo_adquisicion.setCurrentText(self.inmuebles[texto]["modo_adquisicion"] if texto in self.inmuebles else "")
         self.limitaciones.setPlainText(self.inmuebles[texto]["limitaciones"] if texto in self.inmuebles else "")
@@ -765,8 +933,8 @@ class PestanaDatosSolicitud(QWidget):
                 "tipo_inmueble": self.tipo_inmueble.currentText(),
                 "direccion": self.direccion_inmueble.text().strip(),            
                 "barrio": self.barrio_inmueble.text().strip(),
-                "municipio": self.municipio_inmueble.text().strip(),
-                "departamento": self.departamento_inmueble.text().strip(),
+                "municipio": self.municipio_inmueble.currentData(role=Qt.ItemDataRole.UserRole),
+                "departamento": self.departamento_inmueble.currentData(role=Qt.ItemDataRole.UserRole),
                 "cedula_catastral": self.cedula_catastral.text().strip(),
                 "modo_adquisicion": self.modo_adquisicion.currentText(),
                 "limitaciones": self.limitaciones.toPlainText().strip(),
@@ -949,7 +1117,7 @@ class PestanaDatosSolicitud(QWidget):
             campo.setText(documento[0])
             campo.setProperty("id_documento", documento[1])
             
-        elif self.id_avaluo is None:            
+        elif self.id_avaluo == "":            
             campo.setPlaceholderText("Nombre del documento")
         
         else:

@@ -146,7 +146,7 @@ class PestanaSeguimiento(QWidget):
             self.filtro_nombre_perito.addItem("")
             for resultado in resultados:
                 self.filtro_nombre_perito.addItem(resultado[0])  # resultado[0] contiene el nombre del perito
-    
+            db.cerrar_conexion()
         except Exception as e:
             print(f"Error al cargar los peritos: {e}")
             
@@ -169,7 +169,7 @@ class PestanaSeguimiento(QWidget):
             # Agregar los nombres de los peritos al QComboBox
             for resultado in resultados:
                 self.filtro_nombre_revisor.addItem(resultado[0])  # resultado[0] contiene el nombre del perito
-    
+            db.cerrar_conexion()
         except Exception as e:
             print(f"Error al cargar los peritos: {e}")
     
