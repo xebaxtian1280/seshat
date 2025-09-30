@@ -204,14 +204,14 @@ class PestanaDatosSolicitud(QWidget):
         self.web_view.page().setWebChannel(self.channel)
         
         # Botón para actualizar mapa
-        btn_actualizar = QPushButton("Actualizar Mapa")
+        btn_actualizar = QPushButton("Zoom ubicacion actual")
         btn_actualizar.clicked.connect(self.actualizar_mapa)
         
         mapa_layout.addWidget(self.web_view)
         mapa_layout.addWidget(btn_actualizar)
         
         # Agregar el mapa debajo del grupo del inmueble
-        right_column.addWidget(grupo_mapa)
+        main_layout.addWidget(grupo_mapa)
         
         # Agregar grupos a la columna izquierda
         right_column.addWidget(self.grupo_inmueble)
@@ -225,6 +225,9 @@ class PestanaDatosSolicitud(QWidget):
         tab_panel.addTab(scroll_area, "Datos de la Solicitud")
       
         self.cargar_datos_solicitud(self.id_avaluo)
+        
+        if self.id_avaluo == "":
+            self.actualizar_mapa()
         
     def cargar_datos_solicitud(self, id_avaluo):
         """

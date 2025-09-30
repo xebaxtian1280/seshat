@@ -12,12 +12,15 @@ from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import  Qt
 from Estilos import Estilos
 from Funciones_imagenes import FuncionesImagenes
+from DB import DB
 
 class PestanaCaracteristicasSector(QWidget):
     def __init__(self, tab_panel: QTabWidget, id_avaluo = None):
         super().__init__()
         
         self.id_avaluo = id_avaluo
+        self.pestana_activa = False  # Estado para rastrear si la pestaña está activa
+        
         # Aquí va el contenido de la función crear_pestana_caracteristicas_sector
         self.group_style = Estilos.cargar_estilos(self, "styles.css")
         pestana = QWidget()
@@ -26,6 +29,10 @@ class PestanaCaracteristicasSector(QWidget):
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        
+        # Conectar eventos
+        tab_panel.currentChanged.connect(lambda : self.on_tab_changed(tab_panel, tab_panel.currentIndex()))
+        tab_panel.tabCloseRequested.connect(lambda : self.on_tab_changed(tab_panel, tab_panel.currentIndex()))
         
         # Widget contenedor para el contenido
         
@@ -96,6 +103,7 @@ class PestanaCaracteristicasSector(QWidget):
         
            
         self.amoblamiento_texto = QTextEdit()
+        self.amoblamiento_texto.setFixedHeight(altura_textos)
         layout_amoblamiento.addWidget(self.amoblamiento_texto)
         
         # Nuevo Grupo: Servicios Públicos
@@ -106,8 +114,8 @@ class PestanaCaracteristicasSector(QWidget):
         # Crear widget para dos columnas
         column_widget = QWidget()
         column_layout = QHBoxLayout(column_widget)
-        col1 = QVBoxLayout()
-        col2 = QVBoxLayout()
+        self.col1 = QVBoxLayout()
+        self.col2 = QVBoxLayout()
 
         # Dividir servicios en dos columnas
         servicios = [
@@ -122,12 +130,12 @@ class PestanaCaracteristicasSector(QWidget):
             cb = QCheckBox(servicio)
             #self.checkbox_servicios[servicio] = cb
             if i < mitad:
-                col1.addWidget(cb)
+                self.col1.addWidget(cb)
             else:
-                col2.addWidget(cb)
+                self.col2.addWidget(cb)
 
-        column_layout.addLayout(col1)
-        column_layout.addLayout(col2)
+        column_layout.addLayout(self.col1)
+        column_layout.addLayout(self.col2)
         servicios_layout.addWidget(column_widget)
         
         
@@ -258,6 +266,94 @@ class PestanaCaracteristicasSector(QWidget):
         
         tab_panel.addTab(pestana, "Características del Sector")
     
+    def guardar_datos(self):
+        try:
+            
+            query_caracteristicas = """
+            INSERT INTO caracteristicas_sector (
+                transporte, amoblamiento_urbano, agua, gas, telefonia, recoleccion_basuras,
+                alcantarillado, energia, contador_agua, contador_energia, contador_gas,
+                descripcion_tratamiento, descripcion_usos, delimitacion_norte, delimitacion_sur,
+                delimitacion_oriente, delimitacion_occidente, via_principal, via_secundaria
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            RETURNING id;
+            """
+            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db.conectar()
+            
+            valores_checkbox = {cb.text(): cb.isChecked() for cb in self.col1.parentWidget().findChildren(QCheckBox) + self.col2.parentWidget().findChildren(QCheckBox)}
+            
+            print(valores_checkbox)
+            
+            id_caracteristicas = db.insertar(query_caracteristicas, (
+                self.transporte_texto.toPlainText(), self.amoblamiento_texto.toPlainText(), valores_checkbox["Acueducto"], valores_checkbox["Gas Natural"], valores_checkbox["Telefonía Fija"],
+                valores_checkbox["Recolección de Basuras"], valores_checkbox["Alcantarillado"], valores_checkbox["Energía Eléctrica"], valores_checkbox["Contador de Agua"],
+                valores_checkbox["Contador de Energia"], valores_checkbox["Contador de Gas"], self.descripcion_tratamientos.toPlainText(),
+                self.descripcion_usos.toPlainText(), self.norte.text(), self.sur.text(),
+                self.oriente.text(), self.occidente.text(), self.vias_principales_texto.toPlainText(),
+                self.vias_secundarias_texto.toPlainText()
+            ))
+            
+            # Insertar en usos_sector
+                        
+            for i in range(self.imagenes_usos_layout.count()):
+                # Obtener el contenedor en la posición actual
+                contenedor = self.imagenes_usos_layout.itemAt(i).widget()
+                
+                if contenedor:
+                    # Obtener el QLabel y el QLineEdit dentro del contenedor
+                    label = contenedor.findChild(QLabel)
+                    line_edit = contenedor.findChild(QLineEdit)
+                    
+                    # Obtener el texto del QLineEdit
+                    texto_descripcion = line_edit.text() if line_edit else "Sin descripción"
+                    
+                    # Obtener el path de la propiedad del label
+                    path_imagen = label.property("path_imagen") if label else "Sin imagen"
+                    
+                                     
+                    query_usos = """
+                    INSERT INTO usos_sector (caracteristicas_sector_id, uso, path_imagen)
+                    VALUES (%s, %s, %s) RETURNING id;
+                    """
+                    print(query_usos)
+                    
+                    db.insertar(query_usos, (id_caracteristicas, texto_descripcion, path_imagen))
+            
+            # Insertar en tratamientos_sector
+                        
+            for i in range(self.imagenes_tratamientos_layout.count()):
+                # Obtener el contenedor en la posición actual
+                contenedor = self.imagenes_tratamientos_layout.itemAt(i).widget()
+                
+                if contenedor:
+                    # Obtener el QLabel y el QLineEdit dentro del contenedor
+                    label = contenedor.findChild(QLabel)
+                    line_edit = contenedor.findChild(QLineEdit)
+                    
+                    # Obtener el texto del QLineEdit
+                    texto_descripcion = line_edit.text() if line_edit else ""
+                    
+                    # Obtener el path de la propiedad del label
+                    path_imagen = label.property("path_imagen") if label else ""
+                    
+                    query_tratamiento = """
+                    INSERT INTO tratamientos_sector (caracteristicas_sector_id, tratamiento, path_imagen)
+                    VALUES (%s, %s, %s) RETURNING id;
+                    """
+                    print(query_tratamiento)
+                    
+                    db.insertar(query_tratamiento, (id_caracteristicas, texto_descripcion, path_imagen))
+            # Confirmar los cambios
+            db.cerrar_conexion()
+            print("Datos guardados correctamente.")
+            
+            db.cerrar_conexion()
+        except Exception as e:
+            db.rollback()
+            db.cerrar_conexion()
+            print(f"Error al guardar los datos: {e}")
+    
     def crear_lista_usos(self, nombre):
         widget = QWidget()
         layout = QHBoxLayout(widget)
@@ -295,6 +391,7 @@ class PestanaCaracteristicasSector(QWidget):
         file_name, _ = QFileDialog.getOpenFileName(
             self, "Seleccionar imagen", "", "Imágenes (*.png *.jpg *.jpeg)"
         )
+        
         if file_name:
             self.mostrar_imagen(file_name, self.imagenes_usos_layout)
 
@@ -325,3 +422,23 @@ class PestanaCaracteristicasSector(QWidget):
 
     def eliminar_imagen(self, widget):
         widget.deleteLater()
+     
+    def on_tab_changed(self, tab_panel, index):
+        
+        print(f"Cambio de pestaña detectado. {tab_panel.tabText(index)}")
+        # Verificar si la pestaña activa es la de "Características del Sector"
+        if tab_panel.tabText(index) == "Características del Sector":
+            self.pestana_activa = True  # Marcar la pestaña como activa
+            print("Pestaña 'Características del Sector' está activa.")
+        elif self.pestana_activa:
+            print("Pestaña 'Características del Sector' dejó de estar activa. Guardando datos...")
+            # Si la pestaña estuvo activa y se cambió a otra pestaña, guardar los datos
+            
+            try:
+                if self.amoblamiento_texto.toPlainText().strip() != "":                    
+                    self.guardar_datos()
+                    
+            except Exception as e:
+                print(f"Error al guardar datos: {e}")
+            
+            self.pestana_activa = False  # Resetear el estado

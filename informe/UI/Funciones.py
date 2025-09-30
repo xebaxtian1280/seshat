@@ -45,13 +45,12 @@ class Funciones:
             for index in range(tab_panel.count()):
                 
                 widget = tab_panel.widget(index)
-                validacion=(tab_panel.tabText(index) == "PestanaDatosSolicitud")
-                
+                               
                 if tab_panel.tabText(index) == "Datos de la Solicitud":
                     # Si la pestaña ya existe, mover a esa pestaña y actualizar el id_avaluo
                     tab_panel.setCurrentIndex(index)
                     widget.cargar_datos_solicitud(id_avaluo)  # Método para actualizar los datos con el nuevo id_avaluo
-                    print(f"Movido a la pestaña existente 'PestanaDatosSolicitud' con id_avaluo: {id_avaluo}")
+                    
                     seguimiento_index = tab_panel.indexOf(self)
                     if seguimiento_index != -1:
                         tab_panel.removeTab(seguimiento_index)
@@ -60,7 +59,11 @@ class Funciones:
                 
             # Agregar las pestañas al QTabWidget
             PestanaDatosSolicitud(tab_panel, id_avaluo)   
-            PestanaCaracteristicasSector(tab_panel, id_avaluo)
+            
+            if id_avaluo != "":
+            
+                PestanaCaracteristicasSector(tab_panel, id_avaluo)
+                
             print(f"Movido a la pestaña existente 'PestanaDatosSolicitud' con id_avaluo: {id_avaluo}")
             """ PestanaCaracteristicasSector(self.tab_panel)
             PestanaCaracteristicasConstruccion(self.tab_panel)

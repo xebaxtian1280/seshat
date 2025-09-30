@@ -118,3 +118,14 @@ class DB:
         except psycopg2.Error as e:
             print(f"Error al consultar los registros: {e}")
             return None
+        
+    def rollback(self):
+        """
+        Deshace cualquier transacción pendiente en la base de datos.
+        """
+        try:
+            if self.connection:  # Verificar si la conexión está activa
+                self.connection.rollback()
+                print("Transacción revertida correctamente.")
+        except Exception as e:
+            print(f"Error al intentar revertir la transacción: {e}")
