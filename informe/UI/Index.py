@@ -193,10 +193,7 @@ class ReportApp(QMainWindow):
         
         # Conectar a la base de datos
         db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
-        db.conectar()
-        
-        
-            
+        db.conectar()           
         
         
         # Recolectar datos de todas las pestañas

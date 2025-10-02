@@ -94,7 +94,7 @@ class PestanaDatosSolicitud(QWidget):
         # Botón para agregar matrículas
         btn_agregar_matricula = QPushButton("Agregar Matrícula")
         if id_avaluo == "":
-            btn_agregar_matricula.clicked.connect(self.agregar_campo_matricula)
+            btn_agregar_matricula.clicked.connect(lambda _: self.agregar_campo_matricula())
         else:
             btn_agregar_matricula.clicked.connect(self.agregar_matricula_nueva)
         btn_agregar_matricula.setStyleSheet(self.group_style)
@@ -470,7 +470,7 @@ class PestanaDatosSolicitud(QWidget):
             if isinstance(widget, QLineEdit):  # Verificar que el widget sea un QLineEdit
                 texto_matricula = widget.text().strip()
                 if texto_matricula:  # Solo agregar si no está vacío
-                    matriculas.append(texto_matricula)
+                    matriculas.append(texto_matricula) 
                     
                     db.insertar(
                         """insert into inmuebles (matricula_inmobiliaria, tipo_inmueble, direccion, barrio, municipio, departamento, cedula_catastral, modo_adquicision, limitaciones, longitud, latitud, avaluo_id, doc_propiedad, propietario, id_propietario) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) returning id_inmueble """,(texto_matricula, self.inmuebles[texto_matricula]["tipo_inmueble"], self.inmuebles[texto_matricula]["direccion"], self.inmuebles[texto_matricula]["barrio"], self.inmuebles[texto_matricula]["municipio"], self.inmuebles[texto_matricula]["departamento"], self.inmuebles[texto_matricula]["cedula_catastral"], self.inmuebles[texto_matricula]["modo_adquisicion"], self.inmuebles[texto_matricula]["limitaciones"], self.inmuebles[texto_matricula]["longitud"], self.inmuebles[texto_matricula]["latitud"], id_avaluo, self.inmuebles[texto_matricula]["doc_propiedad"], self.inmuebles[texto_matricula]["propietario"], self.inmuebles[texto_matricula]["id_propietario"]))
