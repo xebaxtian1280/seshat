@@ -149,6 +149,7 @@ class ReportApp(QMainWindow):
     def crea_proyecto(self):
         directory = QFileDialog.getExistingDirectory(
             self,
+            
             "Seleccionar ubicación de guardado",
             self.default_save_path
         )
