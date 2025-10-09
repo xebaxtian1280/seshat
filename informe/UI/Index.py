@@ -6,7 +6,8 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QMessageBox, QProgressBar,
                              QFileDialog, QMenuBar, QMenu, QTabWidget)
 from PyQt6.QtCore import Qt, QTimer
-
+from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtWidgets import QSystemTrayIcon
 # Importar las pestañas
 
 from Pestana_Imagenes import agregar_pestana_imagenes
@@ -16,6 +17,7 @@ from Pestana_caracteristicas_construccion import PestanaCaracteristicasConstrucc
 from Pestana_condiciones_valuacion import PestanaCondicionesValuacion
 from Pestana_seguimiento import PestanaSeguimiento
 from DB import DB
+
 from Funciones import Funciones
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
@@ -27,7 +29,9 @@ class ReportApp(QMainWindow):
         super().__init__()
         
         self.setWindowTitle("Sistema de Gestión de Informes")
+        self.create_tray_icon_with_file() # Asegúrate de tener un icono en la ruta especificada
         #self.setMinimumSize(1000, 700)
+
         self.showMaximized()
         self.default_save_path = ""
         self.file_path = None
@@ -97,6 +101,17 @@ class ReportApp(QMainWindow):
         self.progress_bar = QProgressBar()
         self.progress_bar.hide()
         main_layout.addWidget(self.progress_bar)
+
+    def create_tray_icon_with_file(self):
+        self.tray_icon = QSystemTrayIcon()
+        try:
+            icon = QIcon("./Logo.png")  # Usa la ruta correcta
+            self.tray_icon.setIcon(icon)
+        except Exception:
+            pixmap = QPixmap(24, 24)
+            pixmap.fill(Qt.GlobalColor.red)
+            self.tray_icon.setIcon(QIcon(pixmap))
+        self.tray_icon.show()
         
     def volver_a_seguimiento(self):
         

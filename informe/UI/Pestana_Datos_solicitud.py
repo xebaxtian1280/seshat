@@ -8,6 +8,7 @@ from PyQt6.QtCore import QDate, QObject, pyqtSlot, Qt
 from PyQt6.QtGui import QIcon
 from Estilos import Estilos
 from DB import DB
+
 import webview
 
 class Backend(QObject):
@@ -27,6 +28,7 @@ class Backend(QObject):
 class PestanaDatosSolicitud(QWidget):
     def __init__(self,  tab_panel: QTabWidget, id_avaluo=None):
         super().__init__()
+        self.tab_panel = tab_panel
         self.id_avaluo = id_avaluo
         self.group_style = Estilos.cargar_estilos(self, "styles.css")
         
@@ -222,12 +224,14 @@ class PestanaDatosSolicitud(QWidget):
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
         scroll_area.setWidget(self)        
-        tab_panel.addTab(scroll_area, "Datos de la Solicitud")
+        self.tab_panel.addTab(scroll_area, "Datos de la Solicitud")
       
-        self.cargar_datos_solicitud(self.id_avaluo)
         
         if self.id_avaluo == "":
             self.actualizar_mapa()
+        else:
+            self.cargar_datos_solicitud(self.id_avaluo)
+
         
     def cargar_datos_solicitud(self, id_avaluo):
         """
@@ -332,7 +336,7 @@ class PestanaDatosSolicitud(QWidget):
                 self.nombre_perito.addItem(resultado[0])  # resultado[0] contiene el nombre del perito
                 indice = self.nombre_perito.count() - 1  # Obtener el índice del último elemento agregado
                 self.nombre_perito.setItemData(indice, resultado[1], role=Qt.ItemDataRole.UserRole)  # resultado[1] es el id_revisor
-            db.cerrar_conex
+            
             db.cerrar_conexion()
         except Exception as e:
             print(f"Error al cargar los peritos: {e}")        
@@ -432,6 +436,8 @@ class PestanaDatosSolicitud(QWidget):
     
     def radicar_solicitud(self):
         
+        from Pestana_seguimiento import PestanaSeguimiento
+
         if self.matricula_actual not in self.inmuebles:
             self.guardar_informacion_inmueble(self.matricula_actual)
         # Obtener datos de la solicitud
@@ -498,7 +504,24 @@ class PestanaDatosSolicitud(QWidget):
                         print(f"Error al insertar el documento '{texto_documento}': {e}")
         
         print(f"Números de matrícula obtenidos: {matriculas}")
-
+        try:
+            # Crear las pestañas con el id_avaluo            
+            
+            for index in range(self.tab_panel.count()):
+                
+                """ widget = self.tab_panel.widget(index)
+                validacion=(self.tab_panel.tabText(index) == "PestanaDatosSolicitud") """
+                print(f"Cerrando pestaña: {self.tab_panel.tabText(index)} con idex {index}")
+                
+                self.tab_panel.removeTab(0)
+                
+            
+            # Crear las pestaña seguimiento
+            self.pestana_seguimiento = PestanaSeguimiento(self.tab_panel)
+                   
+    
+        except Exception as e:
+            print(f"Error al agregar las pestañas: {e}")
         
         db.cerrar_conexion()  
         
@@ -770,7 +793,7 @@ class PestanaDatosSolicitud(QWidget):
                 btn_eliminar = QPushButton("×")
                 btn_eliminar.setObjectName("botonEliminar")
                 btn_eliminar.setStyleSheet(self.group_style)
-                self.actualizar_informacion_inmueble(campo)
+                #self.actualizar_informacion_inmueble(campo)
                 
                 # Contenedor para el campo y el botón
                 campo_container = QWidget()
@@ -805,6 +828,8 @@ class PestanaDatosSolicitud(QWidget):
                 "propietario": self.propietario.text().strip(),
                 "id_propietario": self.id_propietario.text().strip()
                 }   
+
+                self.guardar_informacion_inmueble(self.matricula_actual)
                 
                 db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
                 db.conectar()
@@ -860,7 +885,7 @@ class PestanaDatosSolicitud(QWidget):
         respuesta = QMessageBox.question(
             self,
             "Confirmar eliminación",
-            f"¿Está seguro de que desea eliminar la matrícula '{matricula}' de la base de datos?",
+            f"¿Está seguro de que desea eliminar la matrícula '{matricula}'?",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         
@@ -869,16 +894,19 @@ class PestanaDatosSolicitud(QWidget):
                 # Eliminar la matrícula del diccionario
                 if matricula in self.inmuebles:
                     del self.inmuebles[matricula]
-                    print(f"Matrícula '{matricula}' eliminada del diccionario.")
 
                 # Consulta SQL para eliminar la matrícula de la base de datos
                 
-                db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
-                db.conectar()
-                
-                query = "DELETE FROM inmuebles WHERE matricula_inmobiliaria = %s AND avaluo_id = %s"
-                db.eliminar(query, (matricula, self.id_avaluo))
-                print(f"Matrícula '{matricula}' eliminada de la base de datos.")
+                if self.id_avaluo != "":
+                    
+                    # Crear una instancia de la clase DB
+                    db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+                    db.conectar()
+                    
+                    query = "DELETE FROM inmuebles WHERE matricula_inmobiliaria = %s AND avaluo_id = %s"
+                    db.eliminar(query, (matricula, self.id_avaluo))
+                    print(f"Matrícula '{matricula}' eliminada de la base de datos.")
+                    db.cerrar_conexion()                
 
                 # Remover el widget contenedor del layout
         
@@ -893,7 +921,7 @@ class PestanaDatosSolicitud(QWidget):
                     f"La matrícula '{matricula}' ha sido eliminada correctamente.",
                     QMessageBox.StandardButton.Ok
                 )
-                db.cerrar_conexion()
+                
             except Exception as e:
                 QMessageBox.critical(
                     self,
@@ -1123,6 +1151,9 @@ class PestanaDatosSolicitud(QWidget):
                 btn_eliminar.clicked.connect(self.crear_eliminar_evento(campo_container))          
                 self.actualizar_mapa()
                 self.matricula_layout.addWidget(campo_container)
+
+            if not self.matricula_layout.count():
+                self.actualizar_mapa()
             db.cerrar_conexion()
             print(f"Inmuebles cargados correctamente en el diccionario self.inmuebles: {self.inmuebles}")
         except Exception as e:
@@ -1229,40 +1260,60 @@ class PestanaDatosSolicitud(QWidget):
             # Obtener el campo QLineEdit dentro del contenedor
             campo = contenedor.findChild(QLineEdit)
             # Confirmar eliminación
-            respuesta = QMessageBox.question(
-                self,
-                "Confirmar eliminación",
-                f"¿Está seguro de que desea eliminar la el documento '{campo.text()}' de la base de datos?",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-            )
-            
-            if respuesta == QMessageBox.StandardButton.Yes:
+
+            if self.id_avaluo == "":
+                respuesta = QMessageBox.question(
+                    self,
+                    "Confirmar eliminación",
+                    f"¿Está seguro de que desea eliminar la el documento '{campo.text()}' de la radicación?",
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                )
+                if respuesta == QMessageBox.StandardButton.Yes:
+                    # Eliminar el contenedor del layout
+                    layout = self.documentacion_layout
+                    for i in range(layout.count()):
+                        item = layout.itemAt(i)
+                        if item and item.widget() == contenedor:
+                            layout.takeAt(i)
+                            contenedor.deleteLater()
+                            print("Contenedor eliminado de la interfaz.")
+                            break
+
+            else:
+                respuesta = QMessageBox.question(
+                    self,
+                    "Confirmar eliminación",
+                    f"¿Está seguro de que desea eliminar la el documento '{campo.text()}' de la base de datos?",
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                )
                 
-                db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
-                db.conectar()
-                
-                if campo:
-                    # Obtener el id_documento de la propiedad del campo
-                    id_documento = campo.property("id_documento")
+                if respuesta == QMessageBox.StandardButton.Yes:
                     
-                    print(f"Eliminando documento con id_documento: {id_documento}")
-                    if id_documento:
-                        # Conectar a la base de datos y eliminar el registro
-                        db.eliminar("DELETE FROM documentacion_aportada WHERE id_documentacin = %s", (id_documento,))
+                    db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+                    db.conectar()
+                    
+                    if campo:
+                        # Obtener el id_documento de la propiedad del campo
+                        id_documento = campo.property("id_documento")
                         
-                        print(f"Documento con id_documento {id_documento} eliminado de la base de datos.")
-                    else:
-                        print("Advertencia: No se encontró un id_documento asociado al campo.")
-                
-                # Eliminar el contenedor del layout
-                layout = self.documentacion_layout
-                for i in range(layout.count()):
-                    item = layout.itemAt(i)
-                    if item and item.widget() == contenedor:
-                        layout.takeAt(i)
-                        contenedor.deleteLater()
-                        print("Contenedor eliminado de la interfaz.")
-                        break
-                db.cerrar_conexion()
+                        print(f"Eliminando documento con id_documento: {id_documento}")
+                        if id_documento:
+                            # Conectar a la base de datos y eliminar el registro
+                            db.eliminar("DELETE FROM documentacion_aportada WHERE id_documentacin = %s", (id_documento,))
+                            
+                            print(f"Documento con id_documento {id_documento} eliminado de la base de datos.")
+                        else:
+                            print("Advertencia: No se encontró un id_documento asociado al campo.")
+                    
+                    # Eliminar el contenedor del layout
+                    layout = self.documentacion_layout
+                    for i in range(layout.count()):
+                        item = layout.itemAt(i)
+                        if item and item.widget() == contenedor:
+                            layout.takeAt(i)
+                            contenedor.deleteLater()
+                            print("Contenedor eliminado de la interfaz.")
+                            break
+                    db.cerrar_conexion()
         except Exception as e:
             print(f"Error al eliminar el contenedor o el registro de la base de datos: {e}")

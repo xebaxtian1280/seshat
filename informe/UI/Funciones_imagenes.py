@@ -21,15 +21,18 @@ import os
 
 class FuncionesImagenes:
     
-    def agregar_imagen(self,layout_destino=None):
+    def agregar_imagen(self,layout_destino=None, path_imagen=None, leyenda=""):
         # Abrir un cuadro de diálogo para seleccionar una imagen
-        ruta_imagen, _ = QFileDialog.getOpenFileName(
-            self, 
-            "Seleccionar imagen", 
-            "./Resultados/Imagenes",  # Carpeta actual
-            "Imágenes (*.png *.jpg *.jpeg *.bmp *.gif)"
-        )
-        
+
+        if path_imagen is None:
+            ruta_imagen, _ = QFileDialog.getOpenFileName(
+                self, 
+                "Seleccionar imagen", 
+                "./Resultados/Imagenes",  # Carpeta actual
+                "Imágenes (*.png *.jpg *.jpeg *.bmp *.gif)"
+            )
+        else:
+            ruta_imagen = path_imagen
         if ruta_imagen:  # Si se seleccionó una imagen
             
             contenedor = QWidget()
@@ -44,7 +47,10 @@ class FuncionesImagenes:
             
             # Campo de descripción
             descripcion = QLineEdit()
-            descripcion.setPlaceholderText("Descripción de la imagen")
+            if leyenda:
+                descripcion.setText(leyenda)
+            else:
+                descripcion.setPlaceholderText("Descripción de la imagen")
             
             # Botón para eliminar
             btn_eliminar = QPushButton("x")

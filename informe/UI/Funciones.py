@@ -21,7 +21,8 @@ import subprocess
 import os
 
 class Funciones:
-       
+
+  
         
     def agregar_pestanas_avaluo(self, id_avaluo, tab_panel):
         

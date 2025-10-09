@@ -265,17 +265,21 @@ class PestanaCaracteristicasSector(QWidget):
         pestana_layout.setContentsMargins(0, 0, 0, 0)
         
         tab_panel.addTab(pestana, "Características del Sector")
+
+        self.cargar_datos_sector(self.id_avaluo)
     
+
+
     def guardar_datos(self):
         try:
             
             query_caracteristicas = """
             INSERT INTO caracteristicas_sector (
-                transporte, amoblamiento_urbano, agua, gas, telefonia, recoleccion_basuras,
+                id_avaluo, transporte, amoblamiento_urbano, agua, gas, telefonia, recoleccion_basuras,
                 alcantarillado, energia, contador_agua, contador_energia, contador_gas,
                 descripcion_tratamiento, descripcion_usos, delimitacion_norte, delimitacion_sur,
                 delimitacion_oriente, delimitacion_occidente, via_principal, via_secundaria
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id;
             """
             db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
@@ -286,12 +290,7 @@ class PestanaCaracteristicasSector(QWidget):
             print(valores_checkbox)
             
             id_caracteristicas = db.insertar(query_caracteristicas, (
-                self.transporte_texto.toPlainText(), self.amoblamiento_texto.toPlainText(), valores_checkbox["Acueducto"], valores_checkbox["Gas Natural"], valores_checkbox["Telefonía Fija"],
-                valores_checkbox["Recolección de Basuras"], valores_checkbox["Alcantarillado"], valores_checkbox["Energía Eléctrica"], valores_checkbox["Contador de Agua"],
-                valores_checkbox["Contador de Energia"], valores_checkbox["Contador de Gas"], self.descripcion_tratamientos.toPlainText(),
-                self.descripcion_usos.toPlainText(), self.norte.text(), self.sur.text(),
-                self.oriente.text(), self.occidente.text(), self.vias_principales_texto.toPlainText(),
-                self.vias_secundarias_texto.toPlainText()
+                self.id_avaluo, self.transporte_texto.toPlainText(), self.amoblamiento_texto.toPlainText(), valores_checkbox["Acueducto"], valores_checkbox["Gas Natural"], valores_checkbox["Telefonía Fija"], valores_checkbox["Recolección de Basuras"], valores_checkbox["Alcantarillado"], valores_checkbox["Energía Eléctrica"], valores_checkbox["Contador de Agua"], valores_checkbox["Contador de Energia"], valores_checkbox["Contador de Gas"], self.descripcion_tratamientos.toPlainText(), self.descripcion_usos.toPlainText(), self.norte.text(), self.sur.text(), self.oriente.text(), self.occidente.text(), self.vias_principales_texto.toPlainText(), self.vias_secundarias_texto.toPlainText()
             ))
             
             # Insertar en usos_sector
@@ -386,21 +385,7 @@ class PestanaCaracteristicasSector(QWidget):
         
         item = QListWidgetItem(combo.currentText())
         lista.addItem(item)
-        
-    def agregar_imagen_usos(self):
-        file_name, _ = QFileDialog.getOpenFileName(
-            self, "Seleccionar imagen", "", "Imágenes (*.png *.jpg *.jpeg)"
-        )
-        
-        if file_name:
-            self.mostrar_imagen(file_name, self.imagenes_usos_layout)
 
-    def agregar_imagen_tratamientos(self):
-        file_name, _ = QFileDialog.getOpenFileName(
-            self, "Seleccionar imagen", "", "Imágenes (*.png *.jpg *.jpeg)"
-        )
-        if file_name:
-            self.mostrar_imagen(file_name, self.imagenes_tratamientos_layout)
 
     def mostrar_imagen(self, file_path, layout):
         contenedor = QWidget()
@@ -442,3 +427,90 @@ class PestanaCaracteristicasSector(QWidget):
                 print(f"Error al guardar datos: {e}")
             
             self.pestana_activa = False  # Resetear el estado
+
+    def cargar_datos_sector(self, id_avaluo):
+        db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+        db.conectar()
+        try:
+            # Consulta principal
+            query = """
+            SELECT transporte, amoblamiento_urbano, agua, gas, telefonia, recoleccion_basuras,
+                   alcantarillado, energia, contador_agua, contador_energia, contador_gas,
+                   descripcion_tratamiento, descripcion_usos, delimitacion_norte, delimitacion_sur,
+                   delimitacion_oriente, delimitacion_occidente, via_principal, via_secundaria, id
+            FROM caracteristicas_sector
+            WHERE id_avaluo = %s
+            """
+            resultado = db.consultar(query, (id_avaluo,))
+            if resultado:
+                datos = resultado[0]
+                self.transporte_texto.setPlainText(datos[0])
+                self.amoblamiento_texto.setPlainText(datos[1])
+                # Checkboxes
+                servicios = [
+                    "Acueducto", "Gas Natural", "Telefonía Fija", "Recolección de Basuras",
+                    "Alcantarillado", "Energía Eléctrica", "Contador de Agua",
+                    "Contador de Energia", "Contador de Gas"
+                ]
+                valores_servicios = datos[2:11]
+                for i, servicio in enumerate(servicios):
+                    for cb in self.col1.parentWidget().findChildren(QCheckBox) + self.col2.parentWidget().findChildren(QCheckBox):
+                        if cb.text() == servicio:
+                            cb.setChecked(valores_servicios[i])
+                self.descripcion_tratamientos.setPlainText(datos[11])
+                self.descripcion_usos.setPlainText(datos[12])
+                self.norte.setText(datos[13])
+                self.sur.setText(datos[14])
+                self.oriente.setText(datos[15])
+                self.occidente.setText(datos[16])
+                self.vias_principales_texto.setPlainText(datos[17])
+                self.vias_secundarias_texto.setPlainText(datos[18])
+
+            # Cargar usos y tratamientos del sector
+            if resultado:
+                self.cargar_usos_sector(datos[19])
+                self.cargar_tratamientos_sector(datos[19])
+            else:
+                print("No se encontraron datos para el avalúo.")
+        except Exception as e:
+            print(f"Error al cargar los datos del sector: {e}")
+        finally:
+            db.cerrar_conexion()
+    
+    def cargar_tratamientos_sector(self, caracteristicas_sector_id):
+        db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+        db.conectar()
+        try:
+            query = """
+            SELECT tratamiento, path_imagen
+            FROM tratamientos_sector
+            WHERE caracteristicas_sector_id = %s
+            """
+            resultados = db.consultar(query, (caracteristicas_sector_id,))
+            for tratamiento, path_imagen in resultados:
+                # Aquí puedes crear el widget para mostrar el tratamiento y la imagen
+                FuncionesImagenes.agregar_imagen(self, self.imagenes_tratamientos_layout, path_imagen, tratamiento)
+                
+        except Exception as e:
+            print(f"Error al cargar tratamientos: {e}")
+        finally:
+            db.cerrar_conexion()
+    
+    def cargar_usos_sector(self, caracteristicas_sector_id):
+        db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+        db.conectar()
+        try:
+            query = """
+            SELECT uso, path_imagen
+            FROM usos_sector
+            WHERE caracteristicas_sector_id = %s
+            """
+            resultados = db.consultar(query, (caracteristicas_sector_id,))
+            for uso, path_imagen in resultados:
+                # Aquí puedes crear el widget para mostrar el uso y la imagen
+                FuncionesImagenes.agregar_imagen(self, self.imagenes_usos_layout, path_imagen, uso)
+                
+        except Exception as e:
+            print(f"Error al cargar usos: {e}")
+        finally:
+            db.cerrar_conexion()

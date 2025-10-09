@@ -1,3 +1,4 @@
+
 -- Tabla de Avalúos
 CREATE TABLE "Avaluos" (
     "Avaluo_id" SERIAL PRIMARY KEY,
@@ -8,7 +9,8 @@ CREATE TABLE "Avaluos" (
     tipo_avaluo VARCHAR(50),
     fecha_avaluo DATE,
     id_peritos INTEGER,
-    id_revisor INTEGER
+    id_revisor INTEGER,
+	estado VARCHAR(20)
 );
 
 -- Tabla de Inmuebles

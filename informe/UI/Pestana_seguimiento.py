@@ -6,7 +6,7 @@ from PyQt6.QtCore import Qt, pyqtSignal, QObject
 from DB import DB 
 
 from Pestana_Imagenes import agregar_pestana_imagenes
-from Pestana_Datos_solicitud import PestanaDatosSolicitud
+#`from Pestana_Datos_solicitud import PestanaDatosSolicitud
 from Pestana_caracteristicas_sector import PestanaCaracteristicasSector
 from Pestana_caracteristicas_construccion import PestanaCaracteristicasConstruccion
 from Pestana_condiciones_valuacion import PestanaCondicionesValuacion
@@ -243,61 +243,6 @@ class PestanaSeguimiento(QWidget):
         self.id_avaluo_seleccionado.emit(id_avaluo)  # Emitir la señal con el id_avaluo
         Funciones.agregar_pestanas_avaluo(self, id_avaluo, self.tab_panel)
         #self.agregar_pestanas_avaluo(id_avaluo, self.tab_panel)
-    
-    def agregar_pestanas_avaluo(self, id_avaluo, tab_panel):
-        
-        """
-        Agrega las pestañas relacionadas con el avalúo al accionar el botón 'boton_accion'.
-        Pasa el id_avaluo a cada pestaña para cargar la información correspondiente.
-        
-        :param id_avaluo: ID del avalúo seleccionado.
-        """
-        
-        try:
-            # Crear las pestañas con el id_avaluo
-            
-            """ pestana_solicitud = PestanaDatosSolicitud(id_avaluo)
-            pestana_sector = PestanaCaracteristicasSector(id_avaluo)
-            pestana_construccion = PestanaCaracteristicasConstruccion(id_avaluo)
-            pestana_valuacion = PestanaCondicionesValuacion(id_avaluo)
-            pestana_imagenes = agregar_pestana_imagenes(id_avaluo) """
-            
-            
-            for index in range(tab_panel.count()):
-                
-                widget = tab_panel.widget(index)
-                validacion=(tab_panel.tabText(index) == "PestanaDatosSolicitud")
-                
-                if tab_panel.tabText(index) == "Datos de la Solicitud":
-                    # Si la pestaña ya existe, mover a esa pestaña y actualizar el id_avaluo
-                    tab_panel.setCurrentIndex(index)
-                    widget.cargar_datos_solicitud(id_avaluo)  # Método para actualizar los datos con el nuevo id_avaluo
-                    print(f"Movido a la pestaña existente 'PestanaDatosSolicitud' con id_avaluo: {id_avaluo}")
-                    seguimiento_index = tab_panel.indexOf(self)
-                    if seguimiento_index != -1:
-                        tab_panel.removeTab(seguimiento_index)
-                        print("Pestaña de seguimiento cerrada.")
-                    return  # Salir de la función para evitar agregar pestañas duplicadas
-                
-            # Agregar las pestañas al QTabWidget
-            PestanaDatosSolicitud(tab_panel, id_avaluo)   
-            PestanaCaracteristicasSector(tab_panel, id_avaluo)
-            print(f"Movido a la pestaña existente 'PestanaDatosSolicitud' con id_avaluo: {id_avaluo}")
-            """ PestanaCaracteristicasSector(self.tab_panel)
-            PestanaCaracteristicasConstruccion(self.tab_panel)
-            PestanaCondicionesValuacion(self.tab_panel)
-            agregar_pestana_imagenes(self.tab_panel)  """
-            print("Cantidad de pesta;as : ",(seguimiento_index))
-            if tab_panel.count()>1:
-                tab_panel.removeTab(index)
-                print("Pestaña de seguimiento cerrada.")
-    
-            print(f"Pestañas agregadas para el avalúo con ID: {id_avaluo}")
-                
-            
-    
-        except Exception as e:
-            print(f"Error al agregar las pestañas: {e}") 
     
     def buscar_seguimiento(self):
         # Construir la consulta SQL dinámica
