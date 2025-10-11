@@ -20,6 +20,7 @@ class PestanaCaracteristicasSector(QWidget):
         
         self.id_avaluo = id_avaluo
         self.pestana_activa = False  # Estado para rastrear si la pestaña está activa
+        self.caracteristicas_sector_id = None  # ID del registro en la tabla caracteristicas_sector
         
         # Aquí va el contenido de la función crear_pestana_caracteristicas_sector
         self.group_style = Estilos.cargar_estilos(self, "styles.css")
@@ -30,9 +31,9 @@ class PestanaCaracteristicasSector(QWidget):
         scroll_area.setWidgetResizable(True)
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         
-        # Conectar eventos
+        """ # Conectar eventos
         tab_panel.currentChanged.connect(lambda : self.on_tab_changed(tab_panel, tab_panel.currentIndex()))
-        tab_panel.tabCloseRequested.connect(lambda : self.on_tab_changed(tab_panel, tab_panel.currentIndex()))
+        tab_panel.tabCloseRequested.connect(lambda : self.on_tab_changed(tab_panel, tab_panel.currentIndex())) """
         
         # Widget contenedor para el contenido
         
@@ -185,7 +186,7 @@ class PestanaCaracteristicasSector(QWidget):
         form_usos.addRow(btn_agregar_imagen)
         form_usos.addRow(self.imagenes_usos_layout)
         
-        # Listas dinámicas de usos
+        """ # Listas dinámicas de usos
         categorias_usos = [
             ("Principales", self.crear_lista_usos),
             ("Complementarios", self.crear_lista_usos),
@@ -196,7 +197,7 @@ class PestanaCaracteristicasSector(QWidget):
         
         for nombre, funcion in categorias_usos:
             form_usos.addRow(funcion(nombre))
-            
+             """
         scroll_usos.setWidget(contenido_usos)
     
         # Layout para el grupo de usos
@@ -263,6 +264,7 @@ class PestanaCaracteristicasSector(QWidget):
         pestana_layout = QVBoxLayout(pestana)
         pestana_layout.addWidget(scroll_area)
         pestana_layout.setContentsMargins(0, 0, 0, 0)
+        pestana.mi_pestana = self
         
         tab_panel.addTab(pestana, "Características del Sector")
 
@@ -273,32 +275,64 @@ class PestanaCaracteristicasSector(QWidget):
     def guardar_datos(self):
         try:
             
-            query_caracteristicas = """
-            INSERT INTO caracteristicas_sector (
+            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db.conectar()
+
+            valores_checkbox = {cb.text(): cb.isChecked() for cb in self.col1.parentWidget().findChildren(QCheckBox) + self.col2.parentWidget().findChildren(QCheckBox)}
+
+            if self.caracteristicas_sector_id:
+                
+                query_caracteristicas = """UPDATE caracteristicas_sector
+                SET
+                    transporte = %s,
+                    amoblamiento_urbano = %s,
+                    agua = %s,
+                    gas = %s,
+                    telefonia = %s,
+                    recoleccion_basuras = %s,
+                    alcantarillado = %s,
+                    energia = %s,
+                    contador_agua = %s,
+                    contador_energia = %s,
+                    contador_gas = %s,
+                    descripcion_tratamiento = %s,
+                    descripcion_usos = %s,
+                    delimitacion_norte = %s,
+                    delimitacion_sur = %s,
+                    delimitacion_oriente = %s,
+                    delimitacion_occidente = %s,
+                    via_principal = %s,
+                    via_secundaria = %s
+                WHERE id_avaluo = %s;"""
+
+                id_caracteristicas = db.actualizar(query_caracteristicas, (
+                    self.transporte_texto.toPlainText(), self.amoblamiento_texto.toPlainText(), valores_checkbox["Acueducto"], valores_checkbox["Gas Natural"], valores_checkbox["Telefonía Fija"], valores_checkbox["Recolección de Basuras"], valores_checkbox["Alcantarillado"], valores_checkbox["Energía Eléctrica"], valores_checkbox["Contador de Agua"], valores_checkbox["Contador de Energia"], valores_checkbox["Contador de Gas"], self.descripcion_tratamientos.toPlainText(), self.descripcion_usos.toPlainText(), self.norte.text(), self.sur.text(), self.oriente.text(), self.occidente.text(), self.vias_principales_texto.toPlainText(), self.vias_secundarias_texto.toPlainText(), self.id_avaluo
+                ))
+
+            else:
+                
+                query_caracteristicas = """
+                INSERT INTO caracteristicas_sector (
                 id_avaluo, transporte, amoblamiento_urbano, agua, gas, telefonia, recoleccion_basuras,
                 alcantarillado, energia, contador_agua, contador_energia, contador_gas,
                 descripcion_tratamiento, descripcion_usos, delimitacion_norte, delimitacion_sur,
                 delimitacion_oriente, delimitacion_occidente, via_principal, via_secundaria
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            RETURNING id;
-            """
-            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
-            db.conectar()
-            
-            valores_checkbox = {cb.text(): cb.isChecked() for cb in self.col1.parentWidget().findChildren(QCheckBox) + self.col2.parentWidget().findChildren(QCheckBox)}
-            
-            print(valores_checkbox)
-            
-            id_caracteristicas = db.insertar(query_caracteristicas, (
-                self.id_avaluo, self.transporte_texto.toPlainText(), self.amoblamiento_texto.toPlainText(), valores_checkbox["Acueducto"], valores_checkbox["Gas Natural"], valores_checkbox["Telefonía Fija"], valores_checkbox["Recolección de Basuras"], valores_checkbox["Alcantarillado"], valores_checkbox["Energía Eléctrica"], valores_checkbox["Contador de Agua"], valores_checkbox["Contador de Energia"], valores_checkbox["Contador de Gas"], self.descripcion_tratamientos.toPlainText(), self.descripcion_usos.toPlainText(), self.norte.text(), self.sur.text(), self.oriente.text(), self.occidente.text(), self.vias_principales_texto.toPlainText(), self.vias_secundarias_texto.toPlainText()
-            ))
-            
-            # Insertar en usos_sector
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id;
+                """
                         
+                id_caracteristicas = db.insertar(query_caracteristicas, (
+                    self.id_avaluo, self.transporte_texto.toPlainText(), self.amoblamiento_texto.toPlainText(), valores_checkbox["Acueducto"], valores_checkbox["Gas Natural"], valores_checkbox["Telefonía Fija"], valores_checkbox["Recolección de Basuras"], valores_checkbox["Alcantarillado"], valores_checkbox["Energía Eléctrica"], valores_checkbox["Contador de Agua"], valores_checkbox["Contador de Energia"], valores_checkbox["Contador de Gas"], self.descripcion_tratamientos.toPlainText(), self.descripcion_usos.toPlainText(), self.norte.text(), self.sur.text(), self.oriente.text(), self.occidente.text(), self.vias_principales_texto.toPlainText(), self.vias_secundarias_texto.toPlainText()
+                ))
+                
+            # Insertar en usos_sector
+              
             for i in range(self.imagenes_usos_layout.count()):
                 # Obtener el contenedor en la posición actual
                 contenedor = self.imagenes_usos_layout.itemAt(i).widget()
+                id_imagen = contenedor.property("id_imagen") if contenedor else None
                 
+
                 if contenedor:
                     # Obtener el QLabel y el QLineEdit dentro del contenedor
                     label = contenedor.findChild(QLabel)
@@ -308,23 +342,41 @@ class PestanaCaracteristicasSector(QWidget):
                     texto_descripcion = line_edit.text() if line_edit else "Sin descripción"
                     
                     # Obtener el path de la propiedad del label
-                    path_imagen = label.property("path_imagen") if label else "Sin imagen"
+                    path_imagen = contenedor.property("path_imagen") if contenedor else "Sin imagen"
                     
-                                     
-                    query_usos = """
-                    INSERT INTO usos_sector (caracteristicas_sector_id, uso, path_imagen)
-                    VALUES (%s, %s, %s) RETURNING id;
-                    """
-                    print(query_usos)
-                    
-                    db.insertar(query_usos, (id_caracteristicas, texto_descripcion, path_imagen))
+                    existe_imagen = db.consultar("SELECT id FROM usos_sector WHERE id = %s", (id_imagen,))
+                    print(f"Existe imagen: {len(existe_imagen)}, ID: {id_imagen}")
+                    if len(existe_imagen)>0:
+
+                        query_usos = """
+                        UPDATE usos_sector
+                        SET uso = %s, path_imagen = %s
+                        WHERE id = %s
+                        """
+                        print(query_usos)
+                        print(f"Actualizando uso con ID {id_imagen}")
+                        
+                        db.actualizar(query_usos, (texto_descripcion, path_imagen,id_imagen))
+
+
+                    else:
+                        query_usos = """
+                        INSERT INTO usos_sector (caracteristicas_sector_id, uso, path_imagen)
+                        VALUES (%s, %s, %s) RETURNING id;
+                        """
+                        print(query_usos)
+                        
+                        id_imagen = db.insertar(query_usos, (self.caracteristicas_sector_id, texto_descripcion, path_imagen))
+
+                        contenedor.setProperty("id_imagen", id_imagen)
             
             # Insertar en tratamientos_sector
                         
             for i in range(self.imagenes_tratamientos_layout.count()):
                 # Obtener el contenedor en la posición actual
                 contenedor = self.imagenes_tratamientos_layout.itemAt(i).widget()
-                
+                id_imagen = contenedor.property("id_imagen") if contenedor else None
+
                 if contenedor:
                     # Obtener el QLabel y el QLineEdit dentro del contenedor
                     label = contenedor.findChild(QLabel)
@@ -334,20 +386,36 @@ class PestanaCaracteristicasSector(QWidget):
                     texto_descripcion = line_edit.text() if line_edit else ""
                     
                     # Obtener el path de la propiedad del label
-                    path_imagen = label.property("path_imagen") if label else ""
+                    path_imagen = contenedor.property("path_imagen") if contenedor else ""
                     
-                    query_tratamiento = """
-                    INSERT INTO tratamientos_sector (caracteristicas_sector_id, tratamiento, path_imagen)
-                    VALUES (%s, %s, %s) RETURNING id;
-                    """
-                    print(query_tratamiento)
+                    existe_imagen = db.consultar("SELECT id FROM tratamientos_sector WHERE id = %s", (id_imagen,))
                     
-                    db.insertar(query_tratamiento, (id_caracteristicas, texto_descripcion, path_imagen))
+                    if len(existe_imagen)>0:
+                    
+                        query_tratamiento = """ UPDATE tratamientos_sector
+                        SET tratamiento = %s, path_imagen = %s
+                        WHERE id = %s"""
+                        print(query_tratamiento)
+                        
+                        db.actualizar(query_tratamiento, (texto_descripcion, path_imagen, id_imagen))
+
+
+                    else:
+                        query_tratamiento = """
+                        INSERT INTO tratamientos_sector (caracteristicas_sector_id, tratamiento, path_imagen)
+                        VALUES (%s, %s, %s) RETURNING id;
+                        """
+                        print(query_tratamiento)
+                        
+                        id_imagen = db.insertar(query_tratamiento, (self.caracteristicas_sector_id, texto_descripcion, path_imagen))
+                        
+                        contenedor.setProperty("id_imagen", id_imagen)
+
+
             # Confirmar los cambios
             db.cerrar_conexion()
             print("Datos guardados correctamente.")
             
-            db.cerrar_conexion()
         except Exception as e:
             db.rollback()
             db.cerrar_conexion()
@@ -413,9 +481,9 @@ class PestanaCaracteristicasSector(QWidget):
         print(f"Cambio de pestaña detectado. {tab_panel.tabText(index)}")
         # Verificar si la pestaña activa es la de "Características del Sector"
         if tab_panel.tabText(index) == "Características del Sector":
-            self.pestana_activa = True  # Marcar la pestaña como activa
-            print("Pestaña 'Características del Sector' está activa.")
-        elif self.pestana_activa:
+            """     self.pestana_activa = True  # Marcar la pestaña como activa
+                print("Pestaña 'Características del Sector' está activa.")
+            elif self.pestana_activa: """
             print("Pestaña 'Características del Sector' dejó de estar activa. Guardando datos...")
             # Si la pestaña estuvo activa y se cambió a otra pestaña, guardar los datos
             
@@ -465,6 +533,11 @@ class PestanaCaracteristicasSector(QWidget):
                 self.occidente.setText(datos[16])
                 self.vias_principales_texto.setPlainText(datos[17])
                 self.vias_secundarias_texto.setPlainText(datos[18])
+                self.caracteristicas_sector_id = datos[19]  # Guardar el ID para usos y tratamientos
+
+            else:
+                print("No se encontraron datos para el avalúo.")
+                return  # Salir si no hay datos
 
             # Cargar usos y tratamientos del sector
             if resultado:
@@ -478,18 +551,21 @@ class PestanaCaracteristicasSector(QWidget):
             db.cerrar_conexion()
     
     def cargar_tratamientos_sector(self, caracteristicas_sector_id):
+
         db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
         db.conectar()
+
         try:
             query = """
-            SELECT tratamiento, path_imagen
+            SELECT tratamiento, path_imagen, id
             FROM tratamientos_sector
             WHERE caracteristicas_sector_id = %s
             """
             resultados = db.consultar(query, (caracteristicas_sector_id,))
-            for tratamiento, path_imagen in resultados:
+            for tratamiento, path_imagen, id_imagen in resultados:
                 # Aquí puedes crear el widget para mostrar el tratamiento y la imagen
-                FuncionesImagenes.agregar_imagen(self, self.imagenes_tratamientos_layout, path_imagen, tratamiento)
+                FuncionesImagenes.agregar_imagen(self, self.imagenes_tratamientos_layout, path_imagen, tratamiento, id_imagen,'tratamientos_sector')
+
                 
         except Exception as e:
             print(f"Error al cargar tratamientos: {e}")
@@ -497,18 +573,21 @@ class PestanaCaracteristicasSector(QWidget):
             db.cerrar_conexion()
     
     def cargar_usos_sector(self, caracteristicas_sector_id):
+
         db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
         db.conectar()
+
         try:
             query = """
-            SELECT uso, path_imagen
+            SELECT uso, path_imagen, id
             FROM usos_sector
             WHERE caracteristicas_sector_id = %s
             """
             resultados = db.consultar(query, (caracteristicas_sector_id,))
-            for uso, path_imagen in resultados:
-                # Aquí puedes crear el widget para mostrar el uso y la imagen
-                FuncionesImagenes.agregar_imagen(self, self.imagenes_usos_layout, path_imagen, uso)
+            for uso, path_imagen, id_imagen in resultados:
+                print(f"Cargando uso: {uso}, imagen: {path_imagen}, id: {id_imagen}")
+                FuncionesImagenes.agregar_imagen(self, self.imagenes_usos_layout, path_imagen, uso, id_imagen, 'usos_sector')
+
                 
         except Exception as e:
             print(f"Error al cargar usos: {e}")

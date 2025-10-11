@@ -13,7 +13,7 @@ from PyQt6.QtCore import QUrl, QFileInfo, Qt
 from PyQt6.QtGui import QPixmap
 from num2words import num2words
 from Estilos import Estilos
-
+from DB import DB
 
 
 import subprocess
@@ -21,7 +21,7 @@ import os
 
 class FuncionesImagenes:
     
-    def agregar_imagen(self,layout_destino=None, path_imagen=None, leyenda=""):
+    def agregar_imagen(self,layout_destino=None, path_imagen=None, leyenda="", id_imagen=None, tabla=None):
         # Abrir un cuadro de diálogo para seleccionar una imagen
 
         if path_imagen is None:
@@ -36,13 +36,17 @@ class FuncionesImagenes:
         if ruta_imagen:  # Si se seleccionó una imagen
             
             contenedor = QWidget()
+
+            if id_imagen:
+                contenedor.setProperty("id_imagen", id_imagen)
+
             layout = QVBoxLayout(contenedor)
             
             # Mostrar imagen reducida
             
             label = QLabel()
             pixmap = QPixmap(ruta_imagen)
-            label.setProperty("path_imagen", ruta_imagen)
+            contenedor.setProperty("path_imagen", ruta_imagen)
             label.setPixmap(pixmap.scaled(label.width(), label.height(), Qt.AspectRatioMode.KeepAspectRatio))            
             
             # Campo de descripción
@@ -58,10 +62,15 @@ class FuncionesImagenes:
             
             btn_eliminar.setStyleSheet(Estilos.cargar_estilos(self, "styles.css"))
             btn_eliminar.clicked.connect(lambda: eliminar_imagen(self,contenedor))
+            # Botón para eliminar
+            btn_actualizar_imagen = QPushButton("Actualizar imagen")
+            btn_actualizar_imagen.setStyleSheet(Estilos.cargar_estilos(self, "styles.css"))
+            btn_actualizar_imagen.clicked.connect(lambda: actualizar_imagen(self,contenedor))
             
             layout.addWidget(label, alignment=Qt.AlignmentFlag.AlignCenter)
             layout.addWidget(descripcion)
             layout.addWidget(btn_eliminar, alignment=Qt.AlignmentFlag.AlignCenter)
+            layout.addWidget(btn_actualizar_imagen, alignment=Qt.AlignmentFlag.AlignCenter)
             
             #self.lista_imagenes.addWidget(contenedor)
             # Agregar el contenedor al layout proporcionado
@@ -69,6 +78,31 @@ class FuncionesImagenes:
             
             layout_destino.addWidget(contenedor)
 
+        def actualizar_imagen(self, contenedor):
+
+            ruta_imagen, _ = QFileDialog.getOpenFileName(
+                self, 
+                "Seleccionar imagen", 
+                "./Resultados/Imagenes",  # Carpeta actual
+                "Imágenes (*.png *.jpg *.jpeg *.bmp *.gif)"
+            )
+            if ruta_imagen:  # Si se seleccionó una imagen
+                
+                label = contenedor.findChild(QLabel)
+                pixmap = QPixmap(ruta_imagen)
+                contenedor.setProperty("path_imagen", ruta_imagen)
+                label.setPixmap(pixmap.scaled(label.width(), label.height(), Qt.AspectRatioMode.KeepAspectRatio))            
+                
+                id_imagen = contenedor.property("id_imagen")
+               
+
         def eliminar_imagen(self, widget):
             #self.lista_imagenes.removeWidget(widget)
+            if id_imagen:
+                db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+                db.conectar()
+                db.eliminar(f"DELETE FROM {tabla} WHERE id = %s", (id_imagen,))
+                print(f"Imagen con ID {id_imagen} eliminada de la base de datos.")
+                db.cerrar_conexion()
+            
             widget.deleteLater()

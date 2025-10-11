@@ -4,7 +4,7 @@ import time
 from pathlib import Path
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                              QMessageBox, QProgressBar,
-                             QFileDialog, QMenuBar, QMenu, QTabWidget)
+                             QFileDialog, QMenuBar, QMenu, QTabWidget, QScrollArea)
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import QSystemTrayIcon
@@ -35,6 +35,7 @@ class ReportApp(QMainWindow):
         self.showMaximized()
         self.default_save_path = ""
         self.file_path = None
+        self.pestana_anterior = None
         self.init_ui()
 
     def init_ui(self):
@@ -77,6 +78,9 @@ class ReportApp(QMainWindow):
         
         # Panel de pestañas
         self.tab_panel = QTabWidget()
+
+        self.tab_panel.currentChanged.connect(lambda: self.on_tab_changed(self.tab_panel, self.tab_panel.currentIndex()))
+        self.tab_panel.tabCloseRequested.connect(lambda: self.on_tab_changed(self.tab_panel, self.tab_panel.currentIndex()))
         
         # Crear las pestañas
         self.pestana_seguimiento = PestanaSeguimiento(self.tab_panel)
@@ -101,6 +105,22 @@ class ReportApp(QMainWindow):
         self.progress_bar = QProgressBar()
         self.progress_bar.hide()
         main_layout.addWidget(self.progress_bar)
+
+    def on_tab_changed(self, tab_panel, index):
+        
+        
+        if self.pestana_anterior == None:
+            self.pestana_anterior = index
+        else:
+            # Obtén el widget actual de la pestaña
+            pestana_actual = tab_panel.widget(self.pestana_anterior)
+            # Verifica si tiene el atributo mi_pestana
+            if hasattr(pestana_actual, "mi_pestana"):
+                instancia_real = pestana_actual.mi_pestana
+                print(f"la pestaña anterior es: {instancia_real} con index {self.pestana_anterior}")
+                if hasattr(instancia_real, "on_tab_changed"):
+                    instancia_real.on_tab_changed(tab_panel, self.pestana_anterior)
+            self.pestana_anterior = index
 
     def create_tray_icon_with_file(self):
         self.tray_icon = QSystemTrayIcon()
