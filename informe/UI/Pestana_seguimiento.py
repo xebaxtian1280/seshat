@@ -16,12 +16,15 @@ class PestanaSeguimiento(QWidget):
     
     # Señal personalizada para enviar el id_avaluo
     id_avaluo_seleccionado = pyqtSignal(str)
+
+    
     
     def __init__(self, tab_panel: QTabWidget):
         super().__init__()
         
         self.tab_panel = tab_panel
         # Layout principal
+        self.basededatos = 'seshat'
         self.layout_principal = QVBoxLayout(self)
         
         # Crear un área de desplazamiento
@@ -111,6 +114,8 @@ class PestanaSeguimiento(QWidget):
         
         tab_panel.addTab(self.scroll_area, "Seguimiento")       
     
+
+
     def limpiar_filtros(self):
         """
         Limpia todos los filtros y actualiza la información de la tabla.
@@ -132,7 +137,7 @@ class PestanaSeguimiento(QWidget):
         """
         try:
             # Crear una instancia de la clase DB
-            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
             db.conectar()
     
             # Consulta SQL para obtener los nombres de los peritos
@@ -156,7 +161,7 @@ class PestanaSeguimiento(QWidget):
         """
         try:
             # Crear una instancia de la clase DB
-            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
             db.conectar()
     
             # Consulta SQL para obtener los nombres de los peritos
@@ -179,7 +184,7 @@ class PestanaSeguimiento(QWidget):
         """
         try:
             # Crear una instancia de la clase DB
-            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
             db.conectar()
             # Consulta SQL para obtener los datos de la tabla 'Avaluos'
             consulta = """
@@ -283,7 +288,7 @@ class PestanaSeguimiento(QWidget):
             
         print("Consulta SQL:", query)
         # Ejecutar la consulta
-        db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
         db.conectar()
         resultados = db.consultar(query, parametros)
         

@@ -4,10 +4,14 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWebChannel import QWebChannel
-from PyQt6.QtCore import QDate, QObject, pyqtSlot, Qt
+from PyQt6.QtCore import QDate, QObject, pyqtSlot, Qt, QTimer
 from PyQt6.QtGui import QIcon
 from Estilos import Estilos
 from DB import DB
+
+
+import enchant
+from PyQt6.QtGui import QTextCharFormat, QColor
 
 import webview
 
@@ -28,10 +32,12 @@ class Backend(QObject):
 class PestanaDatosSolicitud(QWidget):
     def __init__(self,  tab_panel: QTabWidget, id_avaluo=None):
         super().__init__()
+
+        
         self.tab_panel = tab_panel
         self.id_avaluo = id_avaluo
         self.group_style = Estilos.cargar_estilos(self, "styles.css")
-        
+        self.basededatos = "seshat"
         self.inmuebles = {}  # Lista para almacenar los inmuebles asociados a la matricula
         self.matricula_actual = ""  # Variable para almacenar la matrícula actual
 
@@ -59,6 +65,8 @@ class PestanaDatosSolicitud(QWidget):
         self.cargar_municipios()
         self.municipio_inmueble.currentIndexChanged.connect(self.actualizar_departamento)
         self.departamento_inmueble = QComboBox()
+        self.zona = QComboBox()
+        self.zona.addItems(["","Urbano", "Rural", "Expancion Urbana"])
         self.cargar_departamentos()
         self.nombre_perito = QComboBox()
         self.cargar_peritos() 
@@ -73,6 +81,7 @@ class PestanaDatosSolicitud(QWidget):
         solicitud_layout.addRow("Tipo de avalúo solicitado:", self.tipo_avaluo)
         solicitud_layout.addRow("Municipio:", self.municipio_inmueble)
         solicitud_layout.addRow("Departamento:", self.departamento_inmueble)
+        solicitud_layout.addRow("Zona:", self.zona)
         solicitud_layout.addRow("Perito asignado:", self.nombre_perito)
         solicitud_layout.addRow("Revisor asignado:", self.nombre_revisor)
         
@@ -133,6 +142,8 @@ class PestanaDatosSolicitud(QWidget):
         
         self.cedula_catastral = QLineEdit()
         self.limitaciones = QTextEdit()
+        
+        #self.limitaciones.textChanged.connect(lambda : self.resaltar_errores(self.limitaciones))
         
         self.modo_adquisicion = QComboBox()
         self.modo_adquisicion.addItems([
@@ -223,7 +234,8 @@ class PestanaDatosSolicitud(QWidget):
         
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
-        scroll_area.setWidget(self)        
+        scroll_area.setWidget(self)
+        scroll_area.mi_pestana = self
         self.tab_panel.addTab(scroll_area, "Datos de la Solicitud")
       
         
@@ -232,16 +244,92 @@ class PestanaDatosSolicitud(QWidget):
         else:
             self.cargar_datos_solicitud(self.id_avaluo)
 
-        
+    def on_tab_changed(self, tab_panel, index):
+            """
+            Maneja el evento de cambio de pestaña en el QTabWidget.
+            Si la pestaña activa es "Datos de la Solicitud", recarga los datos de la solicitud.
+
+            :param tab_panel: El QTabWidget que contiene las pestañas.
+            :param index: El índice de la pestaña actualmente activa.
+            """
+            print(f"Pestaña cambiada a índice: {index}, Título: {tab_panel.tabText(index)}")
+            if tab_panel.tabText(index) == "Datos de la Solicitud":
+
+                if self.id_avaluo != "":
+                    self.actualizar_solicitud()
+                    
+    def actualizar_solicitud(self):
+        # Obtener datos actualizados de la solicitud
+        solicitud_data = {
+            "cliente": self.cliente.text().strip(),
+            "doc_identidad": self.doc_identidad.text().strip(),
+            "destinatario": self.destinatario.text().strip(),
+            "fecha_visita": self.fecha_visita.date().toString("yyyy-MM-dd"),
+            "fecha_informe": self.fecha_informe.date().toString("yyyy-MM-dd"),
+            "tipo_avaluo": self.tipo_avaluo.currentText(),
+            "id_peritos": self.nombre_perito.currentData(role=Qt.ItemDataRole.UserRole),
+            "id_revisor": self.nombre_revisor.currentData(role=Qt.ItemDataRole.UserRole),
+            "zona": self.zona.currentText()
+        }
+
+        # Validar campos requeridos
+        if not solicitud_data["cliente"] or not solicitud_data["doc_identidad"] or not solicitud_data["tipo_avaluo"]:
+            QMessageBox.warning(self, "Campos incompletos", "Por favor complete todos los campos requeridos.")
+            return
+
+        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+        db.conectar()
+
+        # Actualizar la solicitud en la base de datos
+        db.actualizar(
+            """UPDATE "Avaluos" SET nombre_cliente=%s, id_cliente=%s, destinatario=%s, fecha_visita=%s, tipo_avaluo=%s, fecha_avaluo=%s, id_peritos=%s, id_revisor=%s, zona=%s WHERE "Avaluo_id"=%s""",
+            (solicitud_data["cliente"], solicitud_data["doc_identidad"], solicitud_data["destinatario"], solicitud_data["fecha_visita"], solicitud_data["tipo_avaluo"], solicitud_data["fecha_informe"], solicitud_data["id_peritos"], solicitud_data["id_revisor"], solicitud_data["zona"], self.id_avaluo)
+        )
+
+        # Actualizar inmuebles asociados
+        for i in range(self.matricula_layout.count()):
+            widget = self.matricula_layout.itemAt(i).widget().findChild(QPushButton)
+            if isinstance(widget, QPushButton):
+                texto_matricula = widget.text().strip()
+                id_matricula = widget.property("id_matricula")
+                if id_matricula:
+                    db.actualizar(
+                        """UPDATE inmuebles SET tipo_inmueble=%s, direccion=%s, barrio=%s, municipio=%s, departamento=%s, cedula_catastral=%s, modo_adquicision=%s, limitaciones=%s, longitud=%s, latitud=%s, doc_propiedad=%s, propietario=%s, id_propietario=%s WHERE id_inmueble=%s """,
+                        (self.inmuebles[texto_matricula]["tipo_inmueble"], self.inmuebles[texto_matricula]["direccion"], self.inmuebles[texto_matricula]["barrio"], self.inmuebles[texto_matricula]["municipio"], self.inmuebles[texto_matricula]["departamento"], self.inmuebles[texto_matricula]["cedula_catastral"], self.inmuebles[texto_matricula]["modo_adquisicion"], self.inmuebles[texto_matricula]["limitaciones"], self.inmuebles[texto_matricula]["longitud"], self.inmuebles[texto_matricula]["latitud"], self.inmuebles[texto_matricula]["doc_propiedad"], self.inmuebles[texto_matricula]["propietario"], self.inmuebles[texto_matricula]["id_propietario"], id_matricula)
+                    )
+
+        # Actualizar documentación aportada
+        for i in range(self.documentacion_layout.count()):
+            widget = self.documentacion_layout.itemAt(i).widget().findChild(QLineEdit)
+            if isinstance(widget, QLineEdit):
+                texto_documento = widget.text().strip()
+                if texto_documento:
+                    db.actualizar(
+                        """UPDATE documentacion_aportada SET documento=%s WHERE \"Avaluo_id\"=%s AND documento=%s""",
+                        (texto_documento, self.id_avaluo, texto_documento)
+                    )
+
+        db.cerrar_conexion()
+        #QMessageBox.information(self, "Actualización", "La información ha sido actualizada correctamente.")
+        self.mostrar_mensaje_temporal("¡Actualización exitosa!", 5000)
+
+    def mostrar_mensaje_temporal(self,texto, milisegundos=5000):
+        mensaje = QLabel(texto)
+        mensaje.setStyleSheet("background: #e0ffe0; color: #333; border: 1px solid #8f8; padding: 8px;")
+        mensaje.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        mensaje.setGeometry(50, 50, 300, 40)  # Ajusta posición y tamaño según tu ventana
+        mensaje.show()
+
+        QTimer.singleShot(milisegundos, mensaje.deleteLater)
+
     def cargar_datos_solicitud(self, id_avaluo):
         """
         Carga los datos de la solicitud desde la base de datos utilizando el id_avaluo.
-        
-        :param id_avaluo: ID del avalúo para buscar los datos en la base de datos.
+
         """
         try:
             # Crear una instancia de la clase DB
-            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
             db.conectar()
             
             print(f"Cargando datos para el avalúo con ID: {self.id_avaluo}")
@@ -258,7 +346,8 @@ class PestanaDatosSolicitud(QWidget):
                 CONCAT(p.nombre, ' ', p.apellido) AS perito_nombre,
                 p.id_peritos, 
                 CONCAT(r.nombre, ' ', r.apellido) AS revisor_nombre,
-                r.id_revisor 
+                r.id_revisor,
+                a.zona 
             FROM 
                 "Avaluos" a
             LEFT JOIN 
@@ -280,6 +369,10 @@ class PestanaDatosSolicitud(QWidget):
                 self.destinatario.setText(resultado[0][2])  # Tercer campo: destinatario
                 self.fecha_visita.setDate(resultado[0][3])  # Cuarto campo: fecha_visita  
                 self.fecha_informe.setDate(resultado[0][4])  # Quinto campo: fecha_informe
+
+                index_zona = self.zona.findText(resultado[0][10])  # Undécimo campo: zona
+                if index_zona != -1:
+                    self.zona.setCurrentIndex(index_zona)
                 
                 index_tipo = self.tipo_avaluo.findText(resultado[0][5])  # Sexto campo: tipo_avaluo
                 if index_tipo != -1:
@@ -305,9 +398,9 @@ class PestanaDatosSolicitud(QWidget):
             resultado_documentacion = db.consultar(consulta_documentacion)
             print(resultado_documentacion)
             if resultado_documentacion:
-                for doc in resultado_documentacion:
-                    self.agregar_campo_documento(doc)
-            
+                for doc, id_documentacion in resultado_documentacion:
+                    self.agregar_campo_documento(doc, id_documentacion)
+
             db.cerrar_conexion()
             
         except Exception as e:
@@ -319,7 +412,7 @@ class PestanaDatosSolicitud(QWidget):
         """
         try:
             # Crear una instancia de la clase DB
-            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
             db.conectar()
     
             # Consulta SQL para obtener los nombres de los peritos
@@ -347,7 +440,7 @@ class PestanaDatosSolicitud(QWidget):
         """
         try:
             # Crear una instancia de la clase DB
-            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
             db.conectar()
     
             # Consulta SQL para obtener los nombres de los peritos
@@ -372,7 +465,7 @@ class PestanaDatosSolicitud(QWidget):
         """
         try:
             # Consulta para obtener los municipios
-            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
             db.conectar()
             query = "SELECT id, nombre, departamento_id FROM municipios ORDER BY nombre"
             resultados = db.consultar(query)  # Ejecutar la consulta en la base de datos
@@ -398,7 +491,7 @@ class PestanaDatosSolicitud(QWidget):
         """
         try:
             # Consulta para obtener los municipios
-            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
             db.conectar()
             query = "SELECT id, nombre FROM departamentos ORDER BY nombre"
             resultados = db.consultar(query)  # Ejecutar la consulta en la base de datos
@@ -449,20 +542,22 @@ class PestanaDatosSolicitud(QWidget):
             "fecha_informe": self.fecha_informe.date().toString("yyyy-MM-dd"),
             "tipo_avaluo": self.tipo_avaluo.currentText(),
             "id_peritos": self.nombre_perito.currentData(role=Qt.ItemDataRole.UserRole),
-            "id_revisor": self.nombre_revisor.currentData(role=Qt.ItemDataRole.UserRole)
+            "id_revisor": self.nombre_revisor.currentData(role=Qt.ItemDataRole.UserRole),
+            "zona": self.zona.currentText()
         }
         
         # Validar campos requeridos
         if not solicitud_data["cliente"] or not solicitud_data["doc_identidad"] or not solicitud_data["tipo_avaluo"]:
-            print("Por favor complete todos los campos requeridos.")
+            
+            QMessageBox.warning(self, "Campos incompletos", "Por favor complete todos los campos requeridos.")
             return
         
         # Guardar los datos en una base de datos o archivo
-        db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
         db.conectar()
         id_avaluo = db.insertar(
-           """INSERT INTO "Avaluos" (nombre_cliente, id_cliente, destinatario, fecha_visita, tipo_avaluo, fecha_avaluo, id_peritos, id_revisor) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) returning "Avaluo_id" """
-            , (solicitud_data["cliente"], solicitud_data["doc_identidad"], solicitud_data["destinatario"], solicitud_data["fecha_visita"],solicitud_data["tipo_avaluo"], solicitud_data["fecha_informe"], solicitud_data["id_peritos"], solicitud_data["id_revisor"]))
+           """INSERT INTO "Avaluos" (nombre_cliente, id_cliente, destinatario, fecha_visita, tipo_avaluo, fecha_avaluo, id_peritos, id_revisor, zona) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) returning "Avaluo_id" """
+            , (solicitud_data["cliente"], solicitud_data["doc_identidad"], solicitud_data["destinatario"], solicitud_data["fecha_visita"],solicitud_data["tipo_avaluo"], solicitud_data["fecha_informe"], solicitud_data["id_peritos"], solicitud_data["id_revisor"], solicitud_data["zona"]))
 
         
         # Recorrer los elementos de matricula_layout y obtener los textos de los QLineEdit
@@ -558,6 +653,7 @@ class PestanaDatosSolicitud(QWidget):
             "barrio": self.barrio_inmueble.text().strip(),
             "municipio": self.municipio_inmueble.currentData(role=Qt.ItemDataRole.UserRole),
             "departamento": self.departamento_inmueble.currentData(role=Qt.ItemDataRole.UserRole),
+            "zona": self.zona.currentData(role=Qt.ItemDataRole.UserRole),
             "cedula_catastral": self.cedula_catastral.text().strip(),
             "modo_adquisicion": self.modo_adquisicion.currentText(),
             "limitaciones": self.limitaciones.toPlainText().strip(),
@@ -655,7 +751,7 @@ class PestanaDatosSolicitud(QWidget):
 
         """ Agrega un campo de matricula, sin modificar la base de datos, para generar la radicacion inicial."""
 
-        resultado = ""
+        resultado = self.id_propietario.text().strip()
 
         if self.matricula_actual:
             
@@ -681,8 +777,9 @@ class PestanaDatosSolicitud(QWidget):
                     QMessageBox.StandardButton.Ok
                 )
                 return
-                
-            if resultado == "" and self.matricula_actual:
+            print("resultado:", resultado!='')
+            print("matricula actual:", self.matricula_actual)
+            if resultado != '' and self.matricula_actual:
                 campo = QPushButton()
                 campo.setText(self.matricula_actual)
                 campo.clicked.connect(lambda : self.actualizar_informacion_inmueble(campo))
@@ -708,15 +805,17 @@ class PestanaDatosSolicitud(QWidget):
                 self.btn_guardar_inmueble.setText("Actualizar informacion del Inmueble")
                 self.btn_guardar_inmueble.clicked.disconnect()  # Desconectar señales anteriores
                 self.btn_guardar_inmueble.clicked.connect(lambda: self.actualizar_inmueble(self.matricula_actual))
+                
                 self.guardar_informacion_inmueble(self.matricula_actual)
             
             else:
                 QMessageBox.warning(
                     self, 
                     "Advertencia", 
-                    resultado, 
+                    "Primero ingrese los datos del inmueble para agregar una nueva matrícula.", 
                     QMessageBox.StandardButton.Ok
                 )
+                self.matricula_actual = ""
     
     def comparar_cambios_inmuebles(self):
         
@@ -818,6 +917,7 @@ class PestanaDatosSolicitud(QWidget):
                 "barrio": self.barrio_inmueble.text().strip(),
                 "municipio": self.municipio_inmueble.currentData(role=Qt.ItemDataRole.UserRole),
                 "departamento": self.departamento_inmueble.currentData(role=Qt.ItemDataRole.UserRole),
+                "zona": self.zona.currentData(role=Qt.ItemDataRole.UserRole),
                 "cedula_catastral": self.cedula_catastral.text().strip(),
                 "modo_adquisicion": self.modo_adquisicion.currentText(),
                 "limitaciones": self.limitaciones.toPlainText().strip(),
@@ -831,12 +931,13 @@ class PestanaDatosSolicitud(QWidget):
 
                 self.guardar_informacion_inmueble(self.matricula_actual)
                 
-                db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+                db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
                 db.conectar()
                 
-                query = """insert into inmuebles (matricula_inmobiliaria, tipo_inmueble, direccion, barrio, municipio, departamento, cedula_catastral, modo_adquicision, limitaciones, longitud, latitud, avaluo_id, doc_propiedad, propietario, id_propietario) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) returning id_inmueble """
+                query = """insert into inmuebles (matricula_inmobiliaria, tipo_inmueble, direccion, barrio, municipio, departamento, cedula_catastral, modo_adquicision, limitaciones, longitud, latitud, avaluo_id, doc_propiedad, propietario, id_propietario, zona) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) returning id_inmueble """
                     
-                db.insertar(query, (texto_matricula, inmueble_data["tipo_inmueble"], inmueble_data["direccion"], inmueble_data["barrio"], inmueble_data["municipio"], inmueble_data["departamento"], inmueble_data["cedula_catastral"], inmueble_data["modo_adquisicion"], inmueble_data["limitaciones"], 4.6097, -74.0817, self.id_avaluo, inmueble_data["doc_propiedad"], inmueble_data["propietario"], inmueble_data["id_propietario"]))
+                id_matricula = db.insertar(query, (texto_matricula, inmueble_data["tipo_inmueble"], inmueble_data["direccion"], inmueble_data["barrio"], inmueble_data["municipio"], inmueble_data["departamento"], inmueble_data["cedula_catastral"], inmueble_data["modo_adquisicion"], inmueble_data["limitaciones"], 4.6097, -74.0817, self.id_avaluo, inmueble_data["doc_propiedad"], inmueble_data["propietario"], inmueble_data["id_propietario"], inmueble_data["zona"]))
+                campo_container.setProperty("id_matricula", id_matricula)
                 
                 db.cerrar_conexion()
 
@@ -900,7 +1001,7 @@ class PestanaDatosSolicitud(QWidget):
                 if self.id_avaluo != "":
                     
                     # Crear una instancia de la clase DB
-                    db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+                    db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
                     db.conectar()
                     
                     query = "DELETE FROM inmuebles WHERE matricula_inmobiliaria = %s AND avaluo_id = %s"
@@ -998,6 +1099,7 @@ class PestanaDatosSolicitud(QWidget):
                 "barrio": self.barrio_inmueble.text().strip(),
                 "municipio": self.municipio_inmueble.currentData(role=Qt.ItemDataRole.UserRole),
                 "departamento": self.departamento_inmueble.currentData(role=Qt.ItemDataRole.UserRole),
+                "zona": self.zona.currentData(role=Qt.ItemDataRole.UserRole),
                 "cedula_catastral": self.cedula_catastral.text().strip(),
                 "modo_adquisicion": self.modo_adquisicion.currentText(),
                 "limitaciones": self.limitaciones.toPlainText().strip(),
@@ -1052,13 +1154,13 @@ class PestanaDatosSolicitud(QWidget):
                 try:
                 
                     self.inmuebles[matricula].update(inmueble_data)
-                    
-                    db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+
+                    db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
                     db.conectar()
                     
-                    query = """ UPDATE inmuebles SET tipo_inmueble=%s, direccion=%s, barrio=%s, municipio=%s, departamento=%s, cedula_catastral=%s, modo_adquicision=%s, limitaciones=%s, longitud=%s, latitud=%s, doc_propiedad=%s, propietario=%s, id_propietario=%s WHERE matricula_inmobiliaria=%s AND avaluo_id=%s """
+                    query = """ UPDATE inmuebles SET tipo_inmueble=%s, direccion=%s, barrio=%s, municipio=%s, departamento=%s, cedula_catastral=%s, modo_adquicision=%s, limitaciones=%s, longitud=%s, latitud=%s, doc_propiedad=%s, propietario=%s, id_propietario=%s, zona=%s WHERE matricula_inmobiliaria=%s AND avaluo_id=%s """
                     
-                    db.actualizar(query, (inmueble_data["tipo_inmueble"], inmueble_data["direccion"], inmueble_data["barrio"], inmueble_data["municipio"], inmueble_data["departamento"], inmueble_data["cedula_catastral"], inmueble_data["modo_adquisicion"], inmueble_data["limitaciones"], inmueble_data["longitud"], inmueble_data["latitud"], inmueble_data["doc_propiedad"], inmueble_data["propietario"], inmueble_data["id_propietario"], matricula, self.id_avaluo))
+                    db.actualizar(query, (inmueble_data["tipo_inmueble"], inmueble_data["direccion"], inmueble_data["barrio"], inmueble_data["municipio"], inmueble_data["departamento"], inmueble_data["cedula_catastral"], inmueble_data["modo_adquisicion"], inmueble_data["limitaciones"], inmueble_data["longitud"], inmueble_data["latitud"], inmueble_data["doc_propiedad"], inmueble_data["propietario"], inmueble_data["id_propietario"], inmueble_data["zona"], matricula, self.id_avaluo))
                     
                     db.cerrar_conexion()
                     QMessageBox.information(
@@ -1095,7 +1197,7 @@ class PestanaDatosSolicitud(QWidget):
         
         try:
             # Ejecutar la consulta para obtener todos los registros de la tabla inmuebles
-            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
             db.conectar()            
             
             registros = db.consultar(query)
@@ -1143,6 +1245,7 @@ class PestanaDatosSolicitud(QWidget):
                 
                 # Contenedor para el campo y el botón
                 campo_container = QWidget()
+                campo_container.setProperty("id_matricula", registro[0])  # Almacenar el ID del inmueble en el contenedor
                 layout_container = QHBoxLayout(campo_container)
                 layout_container.addWidget(campo)
                 layout_container.addWidget(btn_eliminar)
@@ -1226,7 +1329,7 @@ class PestanaDatosSolicitud(QWidget):
                 if texto_documento:  # Verificar que no esté vacío
                     
                     campo.setText(texto_documento)
-                    db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+                    db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
                     db.conectar()
                     
                     resultado_documento = db.insertar(""" insert into documentacion_aportada ("Avaluo_id", documento) values (%s, %s) returning id_documentacin """, (self.id_avaluo, texto_documento))
@@ -1288,8 +1391,8 @@ class PestanaDatosSolicitud(QWidget):
                 )
                 
                 if respuesta == QMessageBox.StandardButton.Yes:
-                    
-                    db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+
+                    db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
                     db.conectar()
                     
                     if campo:
@@ -1317,3 +1420,22 @@ class PestanaDatosSolicitud(QWidget):
                     db.cerrar_conexion()
         except Exception as e:
             print(f"Error al eliminar el contenedor o el registro de la base de datos: {e}")
+
+    def resaltar_errores(self, text_edit, *args):
+        dic = enchant.Dict("es_ES")  # Español
+        texto = text_edit.toPlainText()
+        cursor = text_edit.textCursor()
+        cursor.select(cursor.SelectionType.Document)
+        cursor.setCharFormat(QTextCharFormat())  # Limpia formato previo
+
+        palabras = texto.split()
+        pos = 0
+        for palabra in palabras:
+            formato = QTextCharFormat()
+            if not dic.check(palabra):
+                formato.setUnderlineColor(QColor("red"))
+                formato.setUnderlineStyle(QTextCharFormat.UnderlineStyle.SpellCheckUnderline)
+            cursor.setPosition(pos)
+            cursor.movePosition(cursor.MoveOperation.Right, cursor.MoveMode.KeepAnchor, len(palabra))
+            cursor.setCharFormat(formato)
+            pos += len(palabra) + 1  # +1 por el espacio

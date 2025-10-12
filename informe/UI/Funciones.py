@@ -15,7 +15,8 @@ from num2words import num2words
 from Estilos import Estilos
 from Pestana_Datos_solicitud import (PestanaDatosSolicitud)
 from Pestana_caracteristicas_sector import (PestanaCaracteristicasSector)
-
+import enchant
+from PyQt6.QtGui import QTextCharFormat, QColor
 
 import subprocess
 import os
@@ -127,3 +128,21 @@ class Funciones:
             print("\n¡Error! Necesitas LaTeX instalado (pdflatex)") """
             
     
+    def resaltar_errores(text_edit):
+        dic = enchant.Dict("es_ES")  # Español
+        texto = text_edit.toPlainText()
+        cursor = text_edit.textCursor()
+        cursor.select(cursor.SelectionType.Document)
+        cursor.setCharFormat(QTextCharFormat())  # Limpia formato previo
+    
+        palabras = texto.split()
+        pos = 0
+        for palabra in palabras:
+            formato = QTextCharFormat()
+            if not dic.check(palabra):
+                formato.setUnderlineColor(QColor("red"))
+                formato.setUnderlineStyle(QTextCharFormat.UnderlineStyle.SpellCheckUnderline)
+            cursor.setPosition(pos)
+            cursor.movePosition(cursor.MoveOperation.Right, cursor.MoveMode.KeepAnchor, len(palabra))
+            cursor.setCharFormat(formato)
+            pos += len(palabra) + 1  # +1 por el espacio

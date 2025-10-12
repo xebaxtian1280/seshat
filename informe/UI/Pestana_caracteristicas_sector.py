@@ -18,6 +18,7 @@ class PestanaCaracteristicasSector(QWidget):
     def __init__(self, tab_panel: QTabWidget, id_avaluo = None):
         super().__init__()
         
+        self.basededatos = 'seshat'
         self.id_avaluo = id_avaluo
         self.pestana_activa = False  # Estado para rastrear si la pestaña está activa
         self.caracteristicas_sector_id = None  # ID del registro en la tabla caracteristicas_sector
@@ -274,8 +275,8 @@ class PestanaCaracteristicasSector(QWidget):
 
     def guardar_datos(self):
         try:
-            
-            db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+
+            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
             db.conectar()
 
             valores_checkbox = {cb.text(): cb.isChecked() for cb in self.col1.parentWidget().findChildren(QCheckBox) + self.col2.parentWidget().findChildren(QCheckBox)}
@@ -305,10 +306,10 @@ class PestanaCaracteristicasSector(QWidget):
                     via_secundaria = %s
                 WHERE id_avaluo = %s;"""
 
-                id_caracteristicas = db.actualizar(query_caracteristicas, (
+                db.actualizar(query_caracteristicas, (
                     self.transporte_texto.toPlainText(), self.amoblamiento_texto.toPlainText(), valores_checkbox["Acueducto"], valores_checkbox["Gas Natural"], valores_checkbox["Telefonía Fija"], valores_checkbox["Recolección de Basuras"], valores_checkbox["Alcantarillado"], valores_checkbox["Energía Eléctrica"], valores_checkbox["Contador de Agua"], valores_checkbox["Contador de Energia"], valores_checkbox["Contador de Gas"], self.descripcion_tratamientos.toPlainText(), self.descripcion_usos.toPlainText(), self.norte.text(), self.sur.text(), self.oriente.text(), self.occidente.text(), self.vias_principales_texto.toPlainText(), self.vias_secundarias_texto.toPlainText(), self.id_avaluo
                 ))
-
+                id_caracteristicas = self.caracteristicas_sector_id
             else:
                 
                 query_caracteristicas = """
@@ -366,7 +367,7 @@ class PestanaCaracteristicasSector(QWidget):
                         """
                         print(query_usos)
                         
-                        id_imagen = db.insertar(query_usos, (self.caracteristicas_sector_id, texto_descripcion, path_imagen))
+                        id_imagen = db.insertar(query_usos, (id_caracteristicas, texto_descripcion, path_imagen))
 
                         contenedor.setProperty("id_imagen", id_imagen)
             
@@ -407,7 +408,7 @@ class PestanaCaracteristicasSector(QWidget):
                         """
                         print(query_tratamiento)
                         
-                        id_imagen = db.insertar(query_tratamiento, (self.caracteristicas_sector_id, texto_descripcion, path_imagen))
+                        id_imagen = db.insertar(query_tratamiento, (id_caracteristicas, texto_descripcion, path_imagen))
                         
                         contenedor.setProperty("id_imagen", id_imagen)
 
@@ -497,7 +498,7 @@ class PestanaCaracteristicasSector(QWidget):
             self.pestana_activa = False  # Resetear el estado
 
     def cargar_datos_sector(self, id_avaluo):
-        db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
         db.conectar()
         try:
             # Consulta principal
@@ -509,7 +510,7 @@ class PestanaCaracteristicasSector(QWidget):
             FROM caracteristicas_sector
             WHERE id_avaluo = %s
             """
-            resultado = db.consultar(query, (id_avaluo,))
+            resultado = db.consultar(query, (id_avaluo))
             if resultado:
                 datos = resultado[0]
                 self.transporte_texto.setPlainText(datos[0])
@@ -534,6 +535,7 @@ class PestanaCaracteristicasSector(QWidget):
                 self.vias_principales_texto.setPlainText(datos[17])
                 self.vias_secundarias_texto.setPlainText(datos[18])
                 self.caracteristicas_sector_id = datos[19]  # Guardar el ID para usos y tratamientos
+                
 
             else:
                 print("No se encontraron datos para el avalúo.")
@@ -552,7 +554,7 @@ class PestanaCaracteristicasSector(QWidget):
     
     def cargar_tratamientos_sector(self, caracteristicas_sector_id):
 
-        db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
         db.conectar()
 
         try:
@@ -574,7 +576,7 @@ class PestanaCaracteristicasSector(QWidget):
     
     def cargar_usos_sector(self, caracteristicas_sector_id):
 
-        db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
         db.conectar()
 
         try:

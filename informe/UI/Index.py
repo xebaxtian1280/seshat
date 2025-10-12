@@ -32,6 +32,8 @@ class ReportApp(QMainWindow):
         self.create_tray_icon_with_file() # Asegúrate de tener un icono en la ruta especificada
         #self.setMinimumSize(1000, 700)
 
+        self.basededatos = "seshat"
+
         self.showMaximized()
         self.default_save_path = ""
         self.file_path = None
@@ -107,8 +109,7 @@ class ReportApp(QMainWindow):
         main_layout.addWidget(self.progress_bar)
 
     def on_tab_changed(self, tab_panel, index):
-        
-        
+        print(f"Cambio a la pestaña con índice: {index}")
         if self.pestana_anterior == None:
             self.pestana_anterior = index
         else:
@@ -228,7 +229,7 @@ class ReportApp(QMainWindow):
         self.id_avaluo = getattr(self, 'id_avaluo', None)
         
         # Conectar a la base de datos
-        db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
         db.conectar()           
         
         
