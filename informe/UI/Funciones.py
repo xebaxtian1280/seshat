@@ -15,6 +15,9 @@ from num2words import num2words
 from Estilos import Estilos
 from Pestana_Datos_solicitud import (PestanaDatosSolicitud)
 from Pestana_caracteristicas_sector import (PestanaCaracteristicasSector)
+from Pestana_caracteristicas_construccion import (PestanaCaracteristicasConstruccion)
+from Pestana_condiciones_valuacion import (PestanaCondicionesValuacion)
+from Pestana_Imagenes import agregar_pestana_imagenes
 import enchant
 from PyQt6.QtGui import QTextCharFormat, QColor
 
@@ -63,6 +66,9 @@ class Funciones:
             if id_avaluo != "":
             
                 PestanaCaracteristicasSector(tab_panel, id_avaluo)
+                PestanaCaracteristicasConstruccion(tab_panel, id_avaluo)
+                PestanaCondicionesValuacion(self.tab_panel)
+                agregar_pestana_imagenes(self.tab_panel)
                 
             print(f"Movido a la pestaña existente 'PestanaDatosSolicitud' con id_avaluo: {id_avaluo}")
             """ PestanaCaracteristicasSector(self.tab_panel)
@@ -73,10 +79,11 @@ class Funciones:
             tab_panel.setCurrentIndex(index+1)
             
             seguimiento_index = tab_panel.indexOf(self)
-            print("Cantidad de pesta;as : ",(seguimiento_index))
+            print("Cantidad de pestañ" \
+            "as : ",(seguimiento_index))
             if tab_panel.count()>1:
                 tab_panel.removeTab(index)
-                print("Pestaña de seguimiento cerrada.")
+                print("Informe Cerrado.")
     
             print(f"Pestañas agregadas para el avalúo con ID: {id_avaluo}")
                 

@@ -13,12 +13,24 @@ from PyQt6.QtCore import QUrl, QFileInfo, Qt
 from PyQt6.QtGui import QPixmap
 from num2words import num2words
 from Estilos import Estilos
-from Funciones import Funciones
+from Funciones_imagenes import FuncionesImagenes
+from DB import DB
 
 class PestanaCaracteristicasConstruccion(QWidget):
-    def __init__(self, tab_panel: QTabWidget):
+    
+    def __init__(self, tab_panel: QTabWidget, id_avaluo= ""):
         super().__init__()
     # Widget principal para la pestaña
+
+        self.basededatos = 'seshat'
+        self.id_avaluo = id_avaluo
+
+        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+        db.conectar()
+        query = "SELECT matricula_inmobiliaria, id_inmueble FROM inmuebles WHERE avaluo_id = %s"
+        self.matriculas = db.consultar(query, (self.id_avaluo))
+        
+        db.cerrar_conexion()
         
         pestana = QWidget()
         
@@ -89,7 +101,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
         
         # Botón para agregar croquis
         btn_agregar_croquis = QPushButton("Agregar Croquis")
-        btn_agregar_croquis.clicked.connect(lambda: Funciones.agregar_imagen(self, self.croquis_container))
+        btn_agregar_croquis.clicked.connect(lambda: FuncionesImagenes.agregar_imagen(self, self.croquis_container))
         
         layout_croquis.addLayout(self.croquis_container)
         layout_croquis.addWidget(btn_agregar_croquis)
@@ -100,8 +112,8 @@ class PestanaCaracteristicasConstruccion(QWidget):
         layout_area = QVBoxLayout(grupo_area)
         
         # Crear tabla
-        self.tabla_area = QTableWidget(0, 4)  # 0 filas iniciales, 3 columnas
-        self.tabla_area.setHorizontalHeaderLabels(["Identificación", "Área (m²)", "Destinación", "Dependencias"])
+        self.tabla_area = QTableWidget(0, 5)  # 0 filas iniciales, 3 columnas
+        self.tabla_area.setHorizontalHeaderLabels(["MI", "Identificación", "Área (m²)", "Destinación", "Dependencias"])
         
         # Configurar tabla
         self.tabla_area.horizontalHeader().setStretchLastSection(True)
@@ -254,23 +266,170 @@ class PestanaCaracteristicasConstruccion(QWidget):
     def agregar_fila_area(self):
         row_count = self.tabla_area.rowCount()
         self.tabla_area.insertRow(row_count)
+
+        # Crear combo box para la columna "MI"
+        self.combo_matriculas = QComboBox()
         
+        for r in self.matriculas:
+            print(r)
+            self.combo_matriculas.addItem(str(r[0]))
+            index = self.combo_matriculas.count() - 1
+            self.combo_matriculas.setItemData(index, r[1], role=Qt.ItemDataRole.UserRole)
+        
+        self.tabla_area.setCellWidget(row_count, 0, self.combo_matriculas)
+
         # Identificación
-        id_item = QTableWidgetItem()
-        self.tabla_area.setItem(row_count, 0, id_item)
+
+        tipos_construccion = [
+            "Casa", "Bodega", "Local comercial", "Ramada", "Cobertizo", "Galpon", "Establo", "Cochera", "Silo", "Piscina", "Tanque", "Beneficiadero", "Secadero", "Kiosco", "Alberca", "Capilla", "Corral", "Poso", "Muelle", "Cancha", "Via", "Placa huella", "Zona Dura", "Cimientos", "Hangar", "Camaronera", "Pergola", "Glamping", "Cerca", "Cerramiento", "Sotano", "Cocina", "Baño", "Deposito", "Urbanismo"
+        ]
+        self.combo_tipo_construccion = QComboBox()
+        self.combo_tipo_construccion.addItems(tipos_construccion)
+        self.tabla_area.setCellWidget(row_count, 1, self.combo_tipo_construccion)
         
         # Área (solo números)
         area_item = QTableWidgetItem()
         area_item.setFlags(area_item.flags() | Qt.ItemFlag.ItemIsEditable)
-        self.tabla_area.setItem(row_count, 1, area_item)
+        self.tabla_area.setItem(row_count, 2, area_item)
         
-        # Destinación
-        dest_item = QTableWidgetItem()
-        self.tabla_area.setItem(row_count, 2, dest_item)
+        # 3. ComboBox de usos
+        usos = ["Residencial", "Comercial", "Industrial", "Servicios", "Dotacional", "Anexo"]
+        self.combo_usos = QComboBox()
+        self.combo_usos.addItems(usos)
+        self.tabla_area.setCellWidget(row_count, 3, self.combo_usos)
+
+        if self.tabla_area.rowCount() > 1:
+            result, mensaje = self.validar_campos_construccion(row_count)
+            if result:
+
+                self.guardar_construccion(row_count)
+            else:
+                QMessageBox.warning(self, "Advertencia", mensaje)
 
     def eliminar_fila_area(self):
         current_row = self.tabla_area.currentRow()
         if current_row >= 0:
             self.tabla_area.removeRow(current_row)
 
+    def validar_campos_construccion(self, row):
+        # Validar combo matriculas
+        combo_matricula = self.tabla_area.cellWidget(row, 0)
+        if not combo_matricula or not combo_matricula.currentText().strip():
+            return False, "Seleccione la matrícula inmobiliaria."
+
+        # Validar tipo de construcción
+        combo_tipo = self.tabla_area.cellWidget(row, 1)
+        if not combo_tipo or not combo_tipo.currentText().strip():
+            return False, "Seleccione el tipo de construcción."
+
+        # Validar área
+        area_item = self.tabla_area.item(row, 2)
+        if not area_item or not area_item.text().strip():
+            return False, "Ingrese el área construida."
+
+        # Validar uso
+        combo_uso = self.tabla_area.cellWidget(row, 3)
+        if not combo_uso or not combo_uso.currentText().strip():
+            return False, "Seleccione el uso de la construcción."
+
+        # Validar dependencias
+        dependencias_item = self.tabla_area.item(row, 4)
+        if not dependencias_item or not dependencias_item.text().strip():
+            return False, "Ingrese las dependencias."
+
+        # Validar datos generales
+        if self.num_pisos.value() == 0:
+            return False, "Ingrese el número de pisos."
+        if self.vetustez.text().strip() == "":
+            return False, "Ingrese la vetustez."
+        if self.vida_util.text().strip() == "":
+            return False, "Ingrese la vida útil."
+        if self.vida_restante.text().strip() == "":
+            return False, "Ingrese la vida restante."
+
+        # Validar especificaciones constructivas
+        if self.cimentacion.currentText().strip() == "":
+            return False, "Seleccione la cimentación."
+        if self.estructura_const.currentText().strip() == "":
+            return False, "Seleccione la estructura."
+        if self.muros.currentText().strip() == "":
+            return False, "Seleccione los muros."
+        if self.cubierta.currentText().strip() == "":
+            return False, "Seleccione la cubierta."
+        if self.fachada.currentText().strip() == "":
+            return False, "Seleccione la fachada."
+        if self.cielo_raso.currentText().strip() == "":
+            return False, "Seleccione el cielo raso."
+
+        # Validar estado de conservación
+        if self.estructura.toPlainText().strip() == "":
+            return False, "Ingrese la descripción de la estructura."
+        if self.acabados.toPlainText().strip() == "":
+            return False, "Ingrese la descripción de los acabados."
+
+        return True, ""    
+
+    def guardar_construccion(self, row):
+        
+        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+        db.conectar()
     
+        # Obtén los datos de la fila
+        combo_matricula = self.tabla_area.cellWidget(row, 0)
+        combo_tipo_construccion = self.tabla_area.cellWidget(row, 1)
+        area_item = self.tabla_area.item(row, 2)
+        combo_uso = self.tabla_area.cellWidget(row, 3)
+        dependencias_item = self.tabla_area.item(row, 4)
+
+        # Obtiene el id del inmueble seleccionado
+        inmueble_id = combo_matricula.currentData(role=Qt.ItemDataRole.UserRole)  # O el valor real del id según tu lógica
+        print("Inmueble ID seleccionado:", inmueble_id)
+        # Datos principales de la construcción
+        query_construccion = """
+            INSERT INTO construcciones (
+                inmueble_id, num_pisos, num_sotanos, vetustez, vida_util, vida_restante,
+                tipo_construccion, uso, area, dependencias, cimentacion,
+                estructura, muros, cubierta, fachada, cielo_raso, estructura_estado, acabados_estado,
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            RETURNING id
+        """
+        datos = (
+            inmueble_id,
+            self.num_pisos.value(),
+            self.num_sotanos.value(),
+            self.vetustez.text(),
+            self.vida_util.text(),
+            self.vida_restante.text(),
+            combo_tipo_construccion.currentText(),
+            combo_uso.currentText(),
+            area_item.text() if area_item else None,
+            combo_uso.currentText(),
+            dependencias_item.text() if dependencias_item else None,
+            self.cimentacion.currentText(),
+            self.estructura_const.currentText(),
+            self.muros.currentText(),
+            self.cubierta.currentText(),
+            self.fachada.currentText(),
+            self.cielo_raso.currentText(),
+            self.acabados.toPlainText(),
+            self.estructura.toPlainText()
+        )
+
+        id_construccion = db.insertar(query_construccion, datos)
+    
+        # Guardar croquis asociados
+        for i in range(self.croquis_container.count()):
+            widget = self.croquis_container.itemAt(i).widget()
+            if widget:
+                label = widget.findChild(QLabel)
+                descripcion = widget.findChild(QLineEdit)
+                path_imagen = label.property("path_imagen") if label else None
+                texto_descripcion = descripcion.text() if descripcion else ""
+                query_croquis = """
+                    INSERT INTO croquis_construccion (construccion_id, imagen_path, descripcion)
+                    VALUES (%s, %s, %s)
+                """
+                db.insertar(query_croquis, (id_construccion, path_imagen, texto_descripcion))
+    
+        db.cerrar_conexion()
+        QMessageBox.information(self, "Guardado", "Datos de la construcción guardados correctamente.")

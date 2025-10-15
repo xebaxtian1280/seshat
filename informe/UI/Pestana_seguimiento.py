@@ -300,8 +300,7 @@ class PestanaSeguimiento(QWidget):
          # Agregar los resultados a la tabla_resultados
         self.agregar_resultados_tabla(db, resultados)
         db.cerrar_conexion()
-    
-    
+       
     def ver_seguimiento(self, id):
         """
         Función para manejar la acción de ver un seguimiento.

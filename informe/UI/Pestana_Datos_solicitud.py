@@ -10,7 +10,7 @@ from Estilos import Estilos
 from DB import DB
 
 
-import enchant
+import enchant, re
 from PyQt6.QtGui import QTextCharFormat, QColor
 
 import webview
@@ -310,17 +310,7 @@ class PestanaDatosSolicitud(QWidget):
                     )
 
         db.cerrar_conexion()
-        #QMessageBox.information(self, "Actualización", "La información ha sido actualizada correctamente.")
-        self.mostrar_mensaje_temporal("¡Actualización exitosa!", 5000)
-
-    def mostrar_mensaje_temporal(self,texto, milisegundos=5000):
-        mensaje = QLabel(texto)
-        mensaje.setStyleSheet("background: #e0ffe0; color: #333; border: 1px solid #8f8; padding: 8px;")
-        mensaje.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        mensaje.setGeometry(50, 50, 300, 40)  # Ajusta posición y tamaño según tu ventana
-        mensaje.show()
-
-        QTimer.singleShot(milisegundos, mensaje.deleteLater)
+        print("Información de la solicitud actualizada correctamente.")
 
     def cargar_datos_solicitud(self, id_avaluo):
         """
@@ -518,12 +508,35 @@ class PestanaDatosSolicitud(QWidget):
         y la asigna al QComboBox de departamentos.
         """
         # Recuperar la propiedad asociada al índice 2 (por ejemplo, el id del departamento)
+        id_municipio = self.municipio_inmueble.currentData(role=Qt.ItemDataRole.UserRole)
         id_departamento = self.municipio_inmueble.currentData(role=Qt.ItemDataRole.UserRole + 1)
         indice = self.departamento_inmueble.findData(id_departamento, role=Qt.ItemDataRole.UserRole)
         print("ID Departamento recuperado:", id_departamento)
         if indice is not None:
             # Asignar el valor recuperado al QComboBox de departamentos
             self.departamento_inmueble.setCurrentIndex(indice)
+            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db.conectar()
+
+            if id_municipio < 10000:
+                id_municipio = '0'+str(id_municipio)
+            else:
+                id_municipio = str(id_municipio)
+            query = """
+                select  ST_AsGeoJSON(mc.geom ), ST_Extent(mc.geom)
+                from  "Municipios_cartografia" mc 
+                where mc."MpCodigo" = %s
+                GROUP BY mc.geom
+            """
+            print(query, (str(id_municipio),))
+            resultado = db.consultar(query, (id_municipio,))
+            
+            db.cerrar_conexion()
+            if resultado:
+                geojson, extent = resultado[0]
+                self.actualizar_mapa(geojson, extent)
+            else:
+                print("No se encontró el municipio.")
         else:
             print("No se encontró un departamento asociado al municipio seleccionado.")
     
@@ -669,17 +682,42 @@ class PestanaDatosSolicitud(QWidget):
             
             print("Información del inmueble guardada:", self.inmuebles)
             return ""
-        
-    def actualizar_mapa(self):
+
+    def actualizar_mapa(self, geojson=None, extent=None):
+
+
         # Obtener coordenadas de los campos
         lat = self.latitud.text().strip() or "4.6097"  # Bogotá por defecto
         lon = self.longitud.text().strip() or "-74.0817"
         
+        # Procesar bounds desde el extent si está disponible
+
+        # Procesar geojson para dibujar el municipio
+        if extent:
+            match = re.match(r'BOX\(([-\d\.]+) ([-\d\.]+),([-\d\.]+) ([-\d\.]+)\)', extent)
+            if match:
+                xmin, ymin, xmax, ymax = map(float, match.groups())
+                # Leaflet espera [[sur, oeste], [norte, este]]
+                bounds_js = f"var bounds = [[{ymin}, {xmin}], [{ymax}, {xmax}]];\nmap.fitBounds(bounds);"
+     
+        geojson_js = ""
+        if geojson:
+            geojson_js = f"""
+            var municipioLayer = L.geoJSON({geojson}).addTo(map);
+            map.fitBounds(municipioLayer.getBounds());
+            """
        
         # Generar HTML con el mapa
         """
         Carga un mapa interactivo en el QWebEngineView.
         """
+
+        if geojson is None and extent is None:
+            bounds_js = ""
+            geojson_js = ""
+        
+        
+
         mapa_html = f"""
         <!DOCTYPE html>
         <html lang="en">
@@ -718,6 +756,9 @@ class PestanaDatosSolicitud(QWidget):
                 var marker = L.marker([{lat},{lon}]).addTo(map)
                     .bindPopup('Ubicación inmueble')
                     .openPopup();
+
+                {bounds_js}
+                {geojson_js}
 
                 map.on('click', function(e) {{
                     var clickedLat = e.latlng.lat;

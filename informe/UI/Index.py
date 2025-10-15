@@ -35,6 +35,9 @@ class ReportApp(QMainWindow):
         self.basededatos = "seshat"
 
         self.showMaximized()
+        
+
+        
         self.default_save_path = ""
         self.file_path = None
         self.pestana_anterior = None

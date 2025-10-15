@@ -13,7 +13,7 @@ from PyQt6.QtCore import QUrl, QFileInfo, Qt
 from PyQt6.QtGui import QPixmap
 from num2words import num2words
 from Estilos import Estilos
-from Funciones import Funciones
+from Funciones_imagenes import FuncionesImagenes
 
 class PestanaCondicionesValuacion(QWidget):
     def __init__(self, tab_panel: QTabWidget):
@@ -128,7 +128,7 @@ class PestanaCondicionesValuacion(QWidget):
         lista_imagenes = QVBoxLayout()
         
         layout_valuacion.addLayout(lista_imagenes, 1, 0, 1, 2)
-        boton_agregar_imagen.clicked.connect(lambda:Funciones.agregar_imagen(self, lista_imagenes))
+        boton_agregar_imagen.clicked.connect(lambda:FuncionesImagenes.agregar_imagen(self, lista_imagenes))
         
         # Contenedor para imágenes y descripciones
         self.valuation_container = QVBoxLayout()
