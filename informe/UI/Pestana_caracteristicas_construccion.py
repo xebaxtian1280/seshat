@@ -17,7 +17,7 @@ from Funciones_imagenes import FuncionesImagenes
 from DB import DB
 
 class PestanaCaracteristicasConstruccion(QWidget):
-    
+
     def __init__(self, tab_panel: QTabWidget, id_avaluo= ""):
         super().__init__()
     # Widget principal para la pestaña
@@ -81,10 +81,13 @@ class PestanaCaracteristicasConstruccion(QWidget):
         self.num_sotanos = QSpinBox()
         self.num_sotanos.setRange(0, 10)
         
-        self.vetustez = QLineEdit()
-        self.vida_util = QLineEdit()
-        self.vida_restante = QLineEdit()
-        
+        self.vetustez = QSpinBox()
+        self.vetustez.setRange(0, 100)
+        self.vida_util = QSpinBox()
+        self.vida_util.setRange(0, 100)
+        self.vida_restante = QSpinBox()
+        self.vida_restante.setRange(0, 100)
+
         form_datos.addRow("Número de Pisos:", self.num_pisos)
         form_datos.addRow("Sótanos:", self.num_sotanos)
         form_datos.addRow("Vetustez:", self.vetustez)
@@ -261,10 +264,25 @@ class PestanaCaracteristicasConstruccion(QWidget):
         
         # Agregar fila inicial a la tabla
         self.agregar_fila_area()
+        self.cargar_datos_construccion()
     # Métodos auxiliares
 
     def agregar_fila_area(self):
+
         row_count = self.tabla_area.rowCount()
+        
+        if row_count >= 1:
+            result, mensaje = self.validar_campos_construccion(row_count-1)
+
+            if result:
+                    
+                self.guardar_construccion(row_count-1)
+
+            else:
+                QMessageBox.warning(self, "Advertencia", mensaje)
+                return
+            self.limpiar_datos()
+        
         self.tabla_area.insertRow(row_count)
 
         # Crear combo box para la columna "MI"
@@ -281,7 +299,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
         # Identificación
 
         tipos_construccion = [
-            "Casa", "Bodega", "Local comercial", "Ramada", "Cobertizo", "Galpon", "Establo", "Cochera", "Silo", "Piscina", "Tanque", "Beneficiadero", "Secadero", "Kiosco", "Alberca", "Capilla", "Corral", "Poso", "Muelle", "Cancha", "Via", "Placa huella", "Zona Dura", "Cimientos", "Hangar", "Camaronera", "Pergola", "Glamping", "Cerca", "Cerramiento", "Sotano", "Cocina", "Baño", "Deposito", "Urbanismo"
+            "", "Casa", "Bodega", "Local comercial", "Ramada", "Cobertizo", "Galpon", "Establo", "Cochera", "Silo", "Piscina", "Tanque", "Beneficiadero", "Secadero", "Kiosco", "Alberca", "Capilla", "Corral", "Poso", "Muelle", "Cancha", "Via", "Placa huella", "Zona Dura", "Cimientos", "Hangar", "Camaronera", "Pergola", "Glamping", "Cerca", "Cerramiento", "Sotano", "Cocina", "Baño", "Deposito", "Urbanismo"
         ]
         self.combo_tipo_construccion = QComboBox()
         self.combo_tipo_construccion.addItems(tipos_construccion)
@@ -293,18 +311,10 @@ class PestanaCaracteristicasConstruccion(QWidget):
         self.tabla_area.setItem(row_count, 2, area_item)
         
         # 3. ComboBox de usos
-        usos = ["Residencial", "Comercial", "Industrial", "Servicios", "Dotacional", "Anexo"]
+        usos = ["" , "Residencial", "Comercial", "Industrial", "Servicios", "Dotacional", "Anexo"]
         self.combo_usos = QComboBox()
         self.combo_usos.addItems(usos)
         self.tabla_area.setCellWidget(row_count, 3, self.combo_usos)
-
-        if self.tabla_area.rowCount() > 1:
-            result, mensaje = self.validar_campos_construccion(row_count)
-            if result:
-
-                self.guardar_construccion(row_count)
-            else:
-                QMessageBox.warning(self, "Advertencia", mensaje)
 
     def eliminar_fila_area(self):
         current_row = self.tabla_area.currentRow()
@@ -337,15 +347,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
         if not dependencias_item or not dependencias_item.text().strip():
             return False, "Ingrese las dependencias."
 
-        # Validar datos generales
-        if self.num_pisos.value() == 0:
-            return False, "Ingrese el número de pisos."
-        if self.vetustez.text().strip() == "":
-            return False, "Ingrese la vetustez."
-        if self.vida_util.text().strip() == "":
-            return False, "Ingrese la vida útil."
-        if self.vida_restante.text().strip() == "":
-            return False, "Ingrese la vida restante."
+
 
         # Validar especificaciones constructivas
         if self.cimentacion.currentText().strip() == "":
@@ -371,65 +373,268 @@ class PestanaCaracteristicasConstruccion(QWidget):
 
     def guardar_construccion(self, row):
         
+        try:
+             
+            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db.conectar()
+        
+            # Obtén los datos de la fila
+            combo_matricula = self.tabla_area.cellWidget(row, 0)
+            combo_tipo_construccion = self.tabla_area.cellWidget(row, 1)
+            area_item = self.tabla_area.item(row, 2)
+            combo_uso = self.tabla_area.cellWidget(row, 3)
+            dependencias_item = self.tabla_area.item(row, 4)
+
+            # Obtiene el id del inmueble seleccionado
+            inmueble_id = combo_matricula.currentData(role=Qt.ItemDataRole.UserRole)  # O el valor real del id según tu lógica
+            print("Inmueble ID seleccionado:", inmueble_id)
+
+            # Verificar si ya existe una construcción para este inmueble con este id
+            existe_construccion = db.consultar("SELECT id FROM construcciones WHERE inmueble_id = %s", (inmueble_id,))
+            if len(existe_construccion) > 0:
+                print("Ya existe una construcción para este inmueble.")
+
+                # Actualizar los datos de la construcción existente
+                query_update = """
+                    UPDATE construcciones
+                    SET num_pisos = %s, num_sotanos = %s, vetustez = %s, vida_util = %s, vida_restante = %s, tipo_construccion = %s, uso = %s, area = %s, dependencias = %s, cimentacion = %s, estructura = %s, muros = %s, cubierta = %s, fachada = %s, cielo_raso = %s, estructura_estado = %s, acabados_estado = %s
+                    WHERE inmueble_id = %s
+                """
+                datos_update = (
+                    self.num_pisos.value(),
+                    self.num_sotanos.value(),
+                    self.vetustez.value(),
+                    self.vida_util.value(),
+                    self.vida_restante.value(),
+                    combo_tipo_construccion.currentText(),          
+                    combo_uso.currentText(),
+                    area_item.text() if area_item else None,
+                    dependencias_item.text() if dependencias_item else None,
+                    self.cimentacion.currentText(),
+                    self.estructura_const.currentText(),
+                    self.muros.currentText(),
+                    self.cubierta.currentText(),
+                    self.fachada.currentText(),
+                    self.cielo_raso.currentText(),
+                    self.estructura.toPlainText(),
+                    self.acabados.toPlainText(),
+                    inmueble_id
+                )
+                print("Actualizando construcción:", (query_update, datos_update))
+                db.actualizar(query_update, datos_update)
+
+                return  # Evitar insertar duplicados
+
+            else:
+
+                # Datos principales de la construcción
+                query_construccion = """
+                    INSERT INTO construcciones (
+                        inmueble_id, num_pisos, num_sotanos, vetustez, vida_util, vida_restante, tipo_construccion, uso, area, dependencias, cimentacion, estructura, muros, cubierta, fachada, cielo_raso, estructura_estado, acabados_estado
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    RETURNING id
+                """
+                datos = (
+                    inmueble_id,
+                    self.num_pisos.value(),
+                    self.num_sotanos.value(),
+                    self.vetustez.value(),
+                    self.vida_util.value(),
+                    self.vida_restante.value(),
+                    combo_tipo_construccion.currentText(),
+                    combo_uso.currentText(),
+                    area_item.text() if area_item else None,
+                    dependencias_item.text() if dependencias_item else None,
+                    self.cimentacion.currentText(),
+                    self.estructura_const.currentText(),
+                    self.muros.currentText(),
+                    self.cubierta.currentText(),
+                    self.fachada.currentText(),
+                    self.cielo_raso.currentText(),
+                    self.acabados.toPlainText(),
+                    self.estructura.toPlainText()
+                )
+
+                print("Datos a insertar:", (query_construccion, datos))
+
+                id_construccion = db.insertar(query_construccion, datos)
+        
+            # Guardar croquis asociados
+            for i in range(self.croquis_container.count()):
+                widget = self.croquis_container.itemAt(i).widget()
+                id_imagen = widget.property("id_imagen") if widget else None
+
+                if widget:
+
+                    # Obtener qlineedit y qlabel de la imagen
+                    label = widget.findChild(QLabel)
+                    descripcion = widget.findChild(QLineEdit)
+
+                    #obtener texto descripcion y path imagen
+                    texto_descripcion = descripcion.text() if descripcion else ""
+                    path_imagen = widget.property("path_imagen") if label else None
+
+                    existe_imagen = db.consultar("SELECT id FROM croquis_construccion WHERE id = %s", (id_imagen,))
+
+                    if len(existe_imagen) > 0:
+                        query_croquis = """
+                            UPDATE croquis_construccion
+                            SET imagen_path = %s, descripcion = %s
+                            WHERE id = %s
+                        """
+                        print("Actualizando croquis:", (query_croquis, (path_imagen, texto_descripcion, id_imagen)))
+                        db.actualizar(query_croquis, (path_imagen, texto_descripcion, id_imagen))
+                    else:   
+                        query_croquis = """
+                            INSERT INTO croquis_construccion (construccion_id, imagen_path, descripcion)
+                            VALUES (%s, %s, %s) RETURNING id
+                        """
+                        print("Insertando croquis:", (query_croquis, (id_construccion, path_imagen, texto_descripcion)))
+                        db.insertar(query_croquis, (id_construccion, path_imagen, texto_descripcion))
+        
+            db.cerrar_conexion()
+            QMessageBox.information(self, "Guardado", "Datos de la construcción guardados correctamente.")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Ocurrió un error al guardar los datos de la construcción: {e}")
+            print(f"Error al guardar los datos de la construcción: {e}")
+
+    def cargar_datos_construccion(self):
+
         db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
         db.conectar()
-    
-        # Obtén los datos de la fila
-        combo_matricula = self.tabla_area.cellWidget(row, 0)
-        combo_tipo_construccion = self.tabla_area.cellWidget(row, 1)
-        area_item = self.tabla_area.item(row, 2)
-        combo_uso = self.tabla_area.cellWidget(row, 3)
-        dependencias_item = self.tabla_area.item(row, 4)
 
-        # Obtiene el id del inmueble seleccionado
-        inmueble_id = combo_matricula.currentData(role=Qt.ItemDataRole.UserRole)  # O el valor real del id según tu lógica
-        print("Inmueble ID seleccionado:", inmueble_id)
-        # Datos principales de la construcción
-        query_construccion = """
-            INSERT INTO construcciones (
-                inmueble_id, num_pisos, num_sotanos, vetustez, vida_util, vida_restante,
-                tipo_construccion, uso, area, dependencias, cimentacion,
-                estructura, muros, cubierta, fachada, cielo_raso, estructura_estado, acabados_estado,
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            RETURNING id
+        # Consulta construcciones asociadas al avaluo
+        query = """
+            SELECT c.id, c.inmueble_id, i.matricula_inmobiliaria, c.tipo_construccion, c.uso, c.area, c.dependencias,
+                   c.num_pisos, c.num_sotanos, c.vetustez, c.vida_util, c.vida_restante,
+                   c.estructura, c.acabados_estado, c.muros, c.cubierta, c.fachada, c.cielo_raso, c.cimentacion, c.estructura_estado 
+            FROM construcciones c
+            JOIN inmuebles i ON c.inmueble_id = i.id_inmueble
+            WHERE i.avaluo_id =  %s
         """
-        datos = (
-            inmueble_id,
-            self.num_pisos.value(),
-            self.num_sotanos.value(),
-            self.vetustez.text(),
-            self.vida_util.text(),
-            self.vida_restante.text(),
-            combo_tipo_construccion.currentText(),
-            combo_uso.currentText(),
-            area_item.text() if area_item else None,
-            combo_uso.currentText(),
-            dependencias_item.text() if dependencias_item else None,
-            self.cimentacion.currentText(),
-            self.estructura_const.currentText(),
-            self.muros.currentText(),
-            self.cubierta.currentText(),
-            self.fachada.currentText(),
-            self.cielo_raso.currentText(),
-            self.acabados.toPlainText(),
-            self.estructura.toPlainText()
-        )
+        construcciones = db.consultar(query, (self.id_avaluo,))
+        print("Construcciones encontradas:", construcciones)
+        self.tabla_area.setRowCount(0)
 
-        id_construccion = db.insertar(query_construccion, datos)
-    
-        # Guardar croquis asociados
-        for i in range(self.croquis_container.count()):
-            widget = self.croquis_container.itemAt(i).widget()
-            if widget:
-                label = widget.findChild(QLabel)
-                descripcion = widget.findChild(QLineEdit)
-                path_imagen = label.property("path_imagen") if label else None
-                texto_descripcion = descripcion.text() if descripcion else ""
-                query_croquis = """
-                    INSERT INTO croquis_construccion (construccion_id, imagen_path, descripcion)
-                    VALUES (%s, %s, %s)
-                """
-                db.insertar(query_croquis, (id_construccion, path_imagen, texto_descripcion))
-    
+        for row_data in construcciones:
+            row_count = self.tabla_area.rowCount()
+            self.tabla_area.insertRow(row_count)
+
+            # MI (matricula)
+            combo_matricula = QComboBox()
+            combo_matricula.addItem("")
+            for r in self.matriculas:
+                combo_matricula.addItem(str(r[0]))
+                index = combo_matricula.count() - 1
+                combo_matricula.setItemData(index, r[1], role=Qt.ItemDataRole.UserRole)
+            # Seleccionar la matrícula correspondiente
+            idx = combo_matricula.findText(str(row_data[2]))
+            if idx >= 0:
+                combo_matricula.setCurrentIndex(idx)
+            self.tabla_area.setCellWidget(row_count, 0, combo_matricula)
+
+            # Tipo construcción
+            combo_tipo = QComboBox()
+            tipos_construccion = [
+                "Casa", "Bodega", "Local comercial", "Ramada", "Cobertizo", "Galpon", "Establo", "Cochera", "Silo", "Piscina", "Tanque", "Beneficiadero", "Secadero", "Kiosco", "Alberca", "Capilla", "Corral", "Poso", "Muelle", "Cancha", "Via", "Placa huella", "Zona Dura", "Cimientos", "Hangar", "Camaronera", "Pergola", "Glamping", "Cerca", "Cerramiento", "Sotano", "Cocina", "Baño", "Deposito", "Urbanismo"
+            ]
+            combo_tipo.addItems(tipos_construccion)
+            idx_tipo = combo_tipo.findText(str(row_data[3]))
+            if idx_tipo >= 0:
+                combo_tipo.setCurrentIndex(idx_tipo)
+            self.tabla_area.setCellWidget(row_count, 1, combo_tipo)
+
+            # Área
+            area_item = QTableWidgetItem(str(row_data[5]) if row_data[5] is not None else "")
+            self.tabla_area.setItem(row_count, 2, area_item)
+
+            # Uso
+            combo_uso = QComboBox()
+            usos = ["Residencial", "Comercial", "Industrial", "Servicios", "Dotacional", "Anexo"]
+            combo_uso.addItems(usos)
+            idx_uso = combo_uso.findText(str(row_data[4]))
+            if idx_uso >= 0:
+                combo_uso.setCurrentIndex(idx_uso)
+            self.tabla_area.setCellWidget(row_count, 3, combo_uso)
+
+            # Dependencias
+            dependencias_item = QTableWidgetItem(str(row_data[6]) if row_data[6] is not None else "")
+            self.tabla_area.setItem(row_count, 4, dependencias_item)
+
+            # Cargar datos generales y especificaciones
+            self.num_pisos.setValue(row_data[7] if row_data[7] is not None else 0)
+            self.num_sotanos.setValue(int(row_data[8]) if row_data[8] is not None else 0)
+            self.vetustez.setValue(int(row_data[9]) if row_data[9] is not None else 0)
+            self.vida_util.setValue(int(row_data[10]) if row_data[10] is not None else 0)
+            self.vida_restante.setValue(int(row_data[11]) if row_data[11] is not None else 0)
+            self.estructura_const.setCurrentText(str(row_data[12]) if row_data[12] is not None else "")
+            self.acabados.setPlainText(str(row_data[13]) if row_data[13] is not None else "")
+            self.muros.setCurrentText(str(row_data[14]) if row_data[14] is not None else "")
+            self.cubierta.setCurrentText(str(row_data[15]) if row_data[15] is not None else "")
+            self.fachada.setCurrentText(str(row_data[16]) if row_data[16] is not None else "")
+            self.cielo_raso.setCurrentText(str(row_data[17]) if row_data[17] is not None else "")
+            self.cimentacion.setCurrentText(str(row_data[18]) if row_data[18] is not None else "")
+            self.estructura.setPlainText(str(row_data[19]) if row_data[19] is not None else "")
+
+            # Cargar croquis asociados
+            croquis_query = "SELECT imagen_path, descripcion FROM croquis_construccion WHERE construccion_id = %s"
+            croquis = db.consultar(croquis_query, (row_data[0],))
+            for imagen_path, descripcion in croquis:
+                FuncionesImagenes.agregar_imagen(self, self.croquis_container, imagen_path, descripcion)
+
         db.cerrar_conexion()
-        QMessageBox.information(self, "Guardado", "Datos de la construcción guardados correctamente.")
+    
+    def limpiar_datos(self):
+        row = self.tabla_area.currentRow()
+        if row < 0:
+            QMessageBox.warning(self, "Advertencia", "No hay ninguna fila seleccionada.")
+            return
+
+        # Limpiar combo matricula
+        combo_matricula = self.tabla_area.cellWidget(row, 0)
+        if combo_matricula:
+            combo_matricula.setCurrentIndex(0)
+
+        # Limpiar tipo construcción
+        combo_tipo = self.tabla_area.cellWidget(row, 1)
+        if combo_tipo:
+            combo_tipo.setCurrentIndex(0)
+
+        # Limpiar área
+        area_item = self.tabla_area.item(row, 2)
+        if area_item:
+            area_item.setText("")
+
+        # Limpiar uso
+        combo_uso = self.tabla_area.cellWidget(row, 3)
+        if combo_uso:
+            combo_uso.setCurrentIndex(0)
+
+        # Limpiar dependencias
+        dependencias_item = self.tabla_area.item(row, 4)
+        if dependencias_item:
+            dependencias_item.setText("")
+
+        # Limpiar campos generales y especificaciones
+        self.num_pisos.setValue(0)
+        self.num_sotanos.setValue(0)
+        self.vetustez.setValue(0)
+        self.vida_util.setValue(0)
+        self.vida_restante.setValue(0)
+        self.estructura.clear()
+        self.acabados.clear()
+        self.cimentacion.setCurrentIndex(0)
+        self.estructura_const.setCurrentIndex(0)
+        self.muros.setCurrentIndex(0)
+        self.cubierta.setCurrentIndex(0)
+        self.fachada.setCurrentIndex(0)
+        self.cielo_raso.setCurrentIndex(0)
+        # Limpiar croquis
+        while self.croquis_container.count():
+            item = self.croquis_container.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.deleteLater()
+        
+        self.acabados.clear()
+        self.estructura.clear()
