@@ -200,6 +200,7 @@ class PestanaSeguimiento(QWidget):
                 peritos p ON a.id_peritos  = p.id_peritos 
             LEFT JOIN 
                 revisores r ON a.id_revisor  = r.id_revisor 
+            ORDER BY a."Avaluo_id" ASC
             """
 
             # Ejecutar la consulta
