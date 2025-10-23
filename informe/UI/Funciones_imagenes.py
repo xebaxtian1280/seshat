@@ -99,7 +99,7 @@ class FuncionesImagenes:
         def eliminar_imagen(self, widget):
             #self.lista_imagenes.removeWidget(widget)
             if id_imagen:
-                db = DB(host="localhost", database="postgres", user="postgres", password="ironmaiden")
+                db = DB(host="localhost", database='seshat', user="postgres", password="ironmaiden")
                 db.conectar()
                 db.eliminar(f"DELETE FROM {tabla} WHERE id = %s", (id_imagen,))
                 print(f"Imagen con ID {id_imagen} eliminada de la base de datos.")

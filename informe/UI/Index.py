@@ -40,7 +40,7 @@ class ReportApp(QMainWindow):
         
         self.default_save_path = ""
         self.file_path = None
-        self.pestana_anterior = None
+        self.pestana_anterior = 0
         self.init_ui()
 
     def init_ui(self):

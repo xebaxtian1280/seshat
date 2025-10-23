@@ -112,8 +112,8 @@ class PestanaCaracteristicasConstruccion(QWidget):
         btn_agregar_croquis = QPushButton("Agregar Croquis")
         btn_agregar_croquis.clicked.connect(lambda: FuncionesImagenes.agregar_imagen(self, self.croquis_container))
         
-        layout_croquis.addLayout(self.croquis_container)
         layout_croquis.addWidget(btn_agregar_croquis)
+        layout_croquis.addLayout(self.croquis_container)
         
         # Grupo 3: Área construida
         grupo_area = QGroupBox("Área Construida")
@@ -276,6 +276,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
         pestana_layout = QVBoxLayout(pestana)
         pestana_layout.addWidget(scroll_area)
         pestana_layout.setContentsMargins(0, 0, 0, 0)
+        pestana.mi_pestana = self
         
         tab_panel.addTab(pestana, "Características de Construcción")
         
@@ -622,7 +623,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
             croquis = db.consultar(croquis_query, (construccion_id,))
             for id_img, imagen_path, descripcion in croquis:
                 # usar la función existente para añadir imagen pero con path y descripcion
-                FuncionesImagenes.agregar_imagen(self, self.croquis_container, imagen_path, descripcion, id_img)
+                FuncionesImagenes.agregar_imagen(self, self.croquis_container, imagen_path, descripcion, id_img, "croquis_construccion")
         self.datos_actuales = self.obtener_actuales(row)
         self.fila_anterior = row
         print('Datos actuales cargados para fila', row, ':', self.datos_actuales)
@@ -959,8 +960,9 @@ class PestanaCaracteristicasConstruccion(QWidget):
             WHERE i.avaluo_id =  %s
         """
         construcciones = db.consultar(query, (self.id_avaluo,))
-        print("Construcciones encontradas:", construcciones)
+        print("Construcciones encontradas:", len(construcciones))
         self.tabla_area.setRowCount(0)
+        self.fila_anterior = len(construcciones) -1 if len(construcciones) >0 else 0
 
         for row_data in construcciones:
             row_count = self.tabla_area.rowCount()
@@ -1037,8 +1039,8 @@ class PestanaCaracteristicasConstruccion(QWidget):
                 if widget:
                     widget.setParent(None)
             for imagen_path, descripcion, id in croquis:
-                FuncionesImagenes.agregar_imagen(self, self.croquis_container, imagen_path, descripcion, id)
-
+                FuncionesImagenes.agregar_imagen(self, self.croquis_container, imagen_path, descripcion, id, "croquis_construccion")
+        self.tabla_area.selectRow(self.fila_anterior); self.tabla_area.setCurrentCell(self.fila_anterior, 4)
         db.cerrar_conexion()
 
     def limpiar_datos(self):
@@ -1068,10 +1070,38 @@ class PestanaCaracteristicasConstruccion(QWidget):
         self.estructura.clear()
 
     def on_tab_changed(self, tab_panel, index):
-        if tab_panel.objectName() == "pestana_caracteristicas_construccion":
+        print("Pestaña cambiada a index:", index, "nombre:", tab_panel.tabText(index))
+        if tab_panel.tabText(index) == "Características de Construcción":
             print("Cambiando a pestaña de características de construcción.")
             current_row = self.tabla_area.currentRow()
-            if current_row >= 0:
-                print("Fila actual en tabla de área:", current_row)
-                # Validar si hay datos sin guardar en la fila anterior
-                self.guardar_construccion(current_row)
+
+            datos_comparacion = self.obtener_actuales(self.fila_anterior)
+
+            # comparar datos para evaluar si hay cambios sin guardar
+        
+            if self.datos_actuales:
+                for key in datos_comparacion:
+                    if key in self.datos_actuales:
+                        if datos_comparacion[key] != self.datos_actuales[key]:
+                            
+                            """
+                            Muestra un QMessageBox preguntando si guardar o descartar los cambios.
+                            Retorna: "guardar", "descartar" o "cancelar"
+                            """
+                            msg = QMessageBox(self)
+                            msg.setWindowTitle("Guardar cambios")
+                            msg.setText("Se han detectado cambios en la construcción. ¿Desea guardar los cambios actuales o descartarlos?")
+                            msg.setIcon(QMessageBox.Icon.Question)
+
+                            btn_guardar = msg.addButton("Guardar", QMessageBox.ButtonRole.AcceptRole)
+                            btn_descartar = msg.addButton("Descartar", QMessageBox.ButtonRole.DestructiveRole)
+
+                            msg.setDefaultButton(btn_guardar)
+                            msg.exec()
+
+                            clicked = msg.clickedButton()
+                            if clicked == btn_guardar:
+                                self.guardar_construccion(self.fila_anterior)
+                            self.datos_actuales = self.obtener_actuales(self.fila_anterior)
+
+                                
