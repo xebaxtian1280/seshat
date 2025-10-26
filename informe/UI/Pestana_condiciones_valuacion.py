@@ -346,9 +346,7 @@ class PestanaCondicionesValuacion(QWidget):
             db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
             db.conectar()
 
-            valores_checkboxes = {cb.text(): cb.isChecked() for cb in self.layout_metodologias.parentWidget().findChildren(QCheckBox)}
-            print("Valores de checkboxes:", valores_checkboxes)
-            
+            valores_checkboxes = {cb.text(): cb.isChecked() for cb in self.layout_metodologias.parentWidget().findChildren(QCheckBox)}            
 
             if self.id_valuacion is None:
                 query_insert = """
@@ -369,7 +367,7 @@ class PestanaCondicionesValuacion(QWidget):
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING id_valoracion
                 """
-                print("Insertando nueva valoración con query:", query_insert)
+                
                 self.id_valuacion = db.insertar(query_insert, (
                     self.id_avaluo,
                     self.problemas_estabilidad.text(),
@@ -419,8 +417,7 @@ class PestanaCondicionesValuacion(QWidget):
                     self.valor_en_letras.text(),
                     self.id_valuacion
                 )
-                print("Actualizando valoración con query:", query_update)
-                print("Valores de actualización:", valores_update)
+                
 
                 db.actualizar(query_update, valores_update)
             
@@ -438,12 +435,10 @@ class PestanaCondicionesValuacion(QWidget):
                 if le and isinstance(le, QLineEdit):
                     text = le.text().strip()
                     if text:
-                        print("Condición encontrada:", text)
-                        print("ID de valoración asociado:", self.id_valuacion)
-
+                        
                         resultado = le.property("id_condicion")
                         
-                        print("Resultado de la consulta de condiciones:", resultado)
+                        
 
                         if resultado:                           
                             query_update_condicion = """
@@ -462,18 +457,18 @@ class PestanaCondicionesValuacion(QWidget):
 
             # Insertar en imangenes del cuadro de valuación
             
-            print("Cantidad de imágenes en el contenedor de valuación:", self.lista_imagenes.count())
+            
             for i in range(self.lista_imagenes.count()):
                 # Obtener el contenedor en la posición actual
                 contenedor = self.lista_imagenes.itemAt(i).widget()
                 id_imagen = contenedor.property("id_imagen") if contenedor else None
-                print(f"Procesando imagen en contenedor {i}, ID imagen: {id_imagen}")
+                
 
                 if contenedor:
                     # Obtener el QLabel y el QLineEdit dentro del contenedor
                     label = contenedor.findChild(QLabel)
                     line_edit = contenedor.findChild(QLineEdit)
-                    print(f"LineEdit encontrado: {line_edit}")
+                    
                     
                     # Obtener el texto del QLineEdit
                     texto_descripcion = line_edit.text() if line_edit else "Sin descripción"
@@ -489,8 +484,7 @@ class PestanaCondicionesValuacion(QWidget):
                         SET descripcion = %s, imagen_path = %s
                         WHERE id_cuadro = %s
                         """
-                        print(query_usos)
-                        print(f"Actualizando uso con ID {id_imagen}")
+                        
                         
                         db.actualizar(query_usos, (texto_descripcion, path_imagen,id_imagen))
 
@@ -500,7 +494,7 @@ class PestanaCondicionesValuacion(QWidget):
                         INSERT INTO cuadro_valuacion (valoracion_id, descripcion, imagen_path)
                         VALUES (%s, %s, %s) RETURNING id_cuadro;
                         """
-                        print(query_usos)
+                        
                         
                         id_imagen = db.insertar(query_usos, (self.id_valuacion, texto_descripcion, path_imagen))
 
@@ -611,13 +605,13 @@ class PestanaCondicionesValuacion(QWidget):
             clear_layout(self.lista_imagenes)
             if self.id_valuacion:
                 usos = db.consultar("SELECT id_cuadro, descripcion, imagen_path FROM cuadro_valuacion WHERE valoracion_id = %s ORDER BY id_cuadro", (self.id_valuacion,))
-                print("Cuadro de valuación cargado:", usos)
+                
                 if usos:
                     for u in usos:
                         id_cuadro = u[0]
                         descripcion = u[1] if len(u) > 1 else ""
                         path = u[2] if len(u) > 2 else None
-                        print(f"Cargando imagen ID {id_cuadro} con path {path} y descripción '{descripcion}'")
+                        
                         FuncionesImagenes.agregar_imagen(self, self.lista_imagenes, path, descripcion, id_cuadro, "cuadro_valuacion")
 
             db.cerrar_conexion()

@@ -68,7 +68,7 @@ class Funciones:
                 PestanaCaracteristicasSector(tab_panel, id_avaluo)
                 PestanaCaracteristicasConstruccion(tab_panel, id_avaluo)
                 PestanaCondicionesValuacion(self.tab_panel, id_avaluo)
-                agregar_pestana_imagenes(self.tab_panel)
+                agregar_pestana_imagenes(self.tab_panel, id_avaluo)
                 
             print(f"Movido a la pestaña existente 'PestanaDatosSolicitud' con id_avaluo: {id_avaluo}")
             """ PestanaCaracteristicasSector(self.tab_panel)

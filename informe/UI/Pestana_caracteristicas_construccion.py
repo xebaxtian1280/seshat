@@ -957,7 +957,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
                    c.estructura, c.acabados_estado, c.muros, c.cubierta, c.fachada, c.cielo_raso, c.cimentacion, c.estructura_estado 
             FROM construcciones c
             JOIN inmuebles i ON c.inmueble_id = i.id_inmueble
-            WHERE i.avaluo_id =  %s
+            WHERE i.avaluo_id =  %s ORDER BY c.id ASC
         """
         construcciones = db.consultar(query, (self.id_avaluo,))
         print("Construcciones encontradas:", len(construcciones))

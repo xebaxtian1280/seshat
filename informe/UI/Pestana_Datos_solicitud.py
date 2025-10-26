@@ -388,8 +388,8 @@ class PestanaDatosSolicitud(QWidget):
             resultado_documentacion = db.consultar(consulta_documentacion)
             print(resultado_documentacion)
             if resultado_documentacion:
-                for doc, id_documentacion in resultado_documentacion:
-                    self.agregar_campo_documento(doc, id_documentacion)
+                for doc in resultado_documentacion:
+                    self.agregar_campo_documento(doc)
 
             db.cerrar_conexion()
             
