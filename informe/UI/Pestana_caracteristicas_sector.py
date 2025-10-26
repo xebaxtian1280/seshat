@@ -270,8 +270,6 @@ class PestanaCaracteristicasSector(QWidget):
         tab_panel.addTab(pestana, "Características del Sector")
 
         self.cargar_datos_sector(self.id_avaluo)
-    
-
 
     def guardar_datos(self):
         try:
@@ -510,7 +508,11 @@ class PestanaCaracteristicasSector(QWidget):
             FROM caracteristicas_sector
             WHERE id_avaluo = %s
             """
-            resultado = db.consultar(query, (id_avaluo))
+            print(f"Ejecutando consulta para id_avaluo: {id_avaluo}")
+            # IMPORTANTE: pasar los parámetros como tupla (incluso si es 1) -> (id_avaluo,)
+            # Pasar (id_avaluo) no crea una tupla y puede provocar errores de formateo
+            resultado = db.consultar(query, (id_avaluo,))
+            print(f"Resultado de la consulta: {resultado}")
             if resultado:
                 datos = resultado[0]
                 self.transporte_texto.setPlainText(datos[0])

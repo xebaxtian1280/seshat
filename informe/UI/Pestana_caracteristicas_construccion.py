@@ -33,7 +33,8 @@ class PestanaCaracteristicasConstruccion(QWidget):
         db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
         db.conectar()
         query = "SELECT matricula_inmobiliaria, id_inmueble FROM inmuebles WHERE avaluo_id = %s"
-        self.matriculas = db.consultar(query, (self.id_avaluo))
+        # Pasar el parámetro como tupla de un elemento para evitar errores de formateo
+        self.matriculas = db.consultar(query, (self.id_avaluo,))
 
 
         db.cerrar_conexion()

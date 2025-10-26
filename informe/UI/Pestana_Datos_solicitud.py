@@ -629,7 +629,7 @@ class PestanaDatosSolicitud(QWidget):
                    
     
         except Exception as e:
-            print(f"Error al agregar las pestañas: {e}")
+            print(f"Error al agregar las pestañas, Pestaña datos de la solicitud: {e}")
         
         db.cerrar_conexion()  
         
