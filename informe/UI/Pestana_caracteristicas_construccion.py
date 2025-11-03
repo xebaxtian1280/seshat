@@ -364,36 +364,8 @@ class PestanaCaracteristicasConstruccion(QWidget):
         if row is None or row < 0:
             return
 
-        datos_comparacion = self.obtener_actuales(self.fila_anterior)
-
         # comparar datos para evaluar si hay cambios sin guardar
-        
-        if self.datos_actuales:
-            for key in datos_comparacion:
-                if key in self.datos_actuales:
-                    if datos_comparacion[key] != self.datos_actuales[key]:
-                        
-                        """
-                        Muestra un QMessageBox preguntando si guardar o descartar los cambios.
-                        Retorna: "guardar", "descartar" o "cancelar"
-                        """
-                        msg = QMessageBox(self)
-                        msg.setWindowTitle("Guardar cambios")
-                        msg.setText("Se han detectado cambios. ¿Desea guardar los cambios actuales o descartarlos?")
-                        msg.setIcon(QMessageBox.Icon.Question)
-
-                        btn_guardar = msg.addButton("Guardar", QMessageBox.ButtonRole.AcceptRole)
-                        btn_descartar = msg.addButton("Descartar", QMessageBox.ButtonRole.DestructiveRole)
-
-                        msg.setDefaultButton(btn_guardar)
-                        msg.exec()
-
-                        clicked = msg.clickedButton()
-                        if clicked == btn_guardar:
-                            self.guardar_construccion(self.fila_anterior)
-                        """ elif clicked == btn_descartar:
-                            return "descartar" """
-             
+        self.comparar_cambios(row)            
  
 
         # Obtener combo matricula de la fila
@@ -630,26 +602,55 @@ class PestanaCaracteristicasConstruccion(QWidget):
         print('Datos actuales cargados para fila', row, ':', self.datos_actuales)
         db.cerrar_conexion()
 
+    def comparar_cambios(self, row):
+
+        datos_comparacion = self.obtener_actuales(self.fila_anterior)
+
+        # comparar datos para evaluar si hay cambios sin guardar
+        
+        if self.datos_actuales:
+            for key in datos_comparacion:
+                if key in self.datos_actuales and self.fila_anterior != row:
+                    if datos_comparacion[key] != self.datos_actuales[key]:
+                        
+                        """
+                        Muestra un QMessageBox preguntando si guardar o descartar los cambios.
+                        Retorna: "guardar", "descartar" o "cancelar"
+                        """
+                        msg = QMessageBox(self)
+                        msg.setWindowTitle("Guardar cambios")
+                        msg.setText("Se han detectado cambios. ¿Desea guardar los cambios actuales o descartarlos?")
+                        msg.setIcon(QMessageBox.Icon.Question)
+
+                        btn_guardar = msg.addButton("Guardar", QMessageBox.ButtonRole.AcceptRole)
+                        btn_descartar = msg.addButton("Descartar", QMessageBox.ButtonRole.DestructiveRole)
+
+                        msg.setDefaultButton(btn_guardar)
+                        msg.exec()
+
+                        clicked = msg.clickedButton()
+                        if clicked == btn_guardar:
+                            self.guardar_construccion(self.fila_anterior)
+                            return True, "Se han guardado los cambios."
+                        elif clicked == btn_descartar:
+                            return False , "Se han descartado los cambios."
+
     def agregar_fila_area(self):
 
         row_count = self.tabla_area.rowCount()
         self.editando_fila = True
         
         if row_count >= 1:
-            result, mensaje = self.validar_campos_construccion(row_count-1)
 
-            """ if result:
-                # Crea un mensaje preguntando al usuario si desea guardar los datos antes de agregar una nueva fila
-                respuesta = QMessageBox.question(self, "Confirmar", "¿Desea guardar los cambios en la fila anterior?",
-                                                  QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            result, mensaje = self.validar_campos_construccion(self.fila_anterior)
 
-                if respuesta == QMessageBox.StandardButton.Yes:
-                    print("Guardando construcción de la fila anterior antes de agregar nueva fila.")
-                    self.guardar_construccion(row_count-1)
+            if result:
+
+                self.comparar_cambios(self.fila_anterior)
                 
             else:
                 QMessageBox.warning(self, "Advertencia", mensaje)
-                return """
+                return
             self.limpiar_datos()
         
         self.tabla_area.insertRow(row_count)
@@ -939,7 +940,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
                         """
                         print("Insertando croquis:", (query_croquis, (construccion_id, path_imagen, texto_descripcion)))
                         db.insertar(query_croquis, (construccion_id, path_imagen, texto_descripcion))
-            #self.cargar_datos_construccion()
+            self.datos_actuales = self.obtener_actuales(row)
             db.cerrar_conexion()
             QMessageBox.information(self, "Guardado", "Datos de la construcción guardados correctamente.")
         except Exception as e:
@@ -1041,6 +1042,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
                     widget.setParent(None)
             for imagen_path, descripcion, id in croquis:
                 FuncionesImagenes.agregar_imagen(self, self.croquis_container, imagen_path, descripcion, id, "croquis_construccion")
+            self.datos_actuales = self.obtener_actuales(row_count)
         self.tabla_area.selectRow(self.fila_anterior); self.tabla_area.setCurrentCell(self.fila_anterior, 4)
         db.cerrar_conexion()
 
@@ -1079,7 +1081,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
             datos_comparacion = self.obtener_actuales(self.fila_anterior)
 
             # comparar datos para evaluar si hay cambios sin guardar
-        
+            print("Comparando datos actuales con datos en pantalla:", self.datos_actuales)
             if self.datos_actuales:
                 for key in datos_comparacion:
                     if key in self.datos_actuales:
@@ -1104,5 +1106,20 @@ class PestanaCaracteristicasConstruccion(QWidget):
                             if clicked == btn_guardar:
                                 self.guardar_construccion(self.fila_anterior)
                             self.datos_actuales = self.obtener_actuales(self.fila_anterior)
-
-                                
+            else:
+                """
+                Muestra un QMessageBox preguntando si guardar o descartar los cambios.
+                Retorna: "guardar", "descartar" o "cancelar"
+                """
+                msg = QMessageBox(self)
+                msg.setWindowTitle("Guardar cambios")
+                msg.setText("Aún no se han guardado los datos. ¿Desea guardar los cambios actuales o descartarlos?")
+                msg.setIcon(QMessageBox.Icon.Question)
+                btn_guardar = msg.addButton("Guardar", QMessageBox.ButtonRole.AcceptRole)
+                btn_descartar = msg.addButton("Descartar", QMessageBox.ButtonRole.DestructiveRole)
+                msg.setDefaultButton(btn_guardar)
+                msg.exec()
+                clicked = msg.clickedButton()
+                if clicked == btn_guardar:
+                    self.guardar_construccion(self.fila_anterior)
+                    self.datos_actuales = self.obtener_actuales(current_row)

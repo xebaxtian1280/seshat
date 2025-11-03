@@ -166,7 +166,6 @@ class ReportApp(QMainWindow):
         except Exception as e:
             print(f"Error al agregar las pestañas: {e}") 
     
-    
     def recibir_id_avaluo(self, id_avaluo):
         """
         Maneja el id_avaluo recibido desde PestanaSeguimiento.

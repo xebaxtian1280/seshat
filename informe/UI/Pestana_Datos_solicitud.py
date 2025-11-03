@@ -10,7 +10,7 @@ from Estilos import Estilos
 from DB import DB
 
 
-import enchant, re
+import enchant, re, json
 from PyQt6.QtGui import QTextCharFormat, QColor
 
 import webview
@@ -646,7 +646,7 @@ class PestanaDatosSolicitud(QWidget):
         
         if matricula == "" or matricula is None:
             """
-            Muestra un cuadro de advertencia con un color personalizado y centrado.
+            Muestra un cuadro de advertencia sobre la falta de matrícula.
             """
             # Crear el cuadro de mensaje
             QMessageBox.warning(
@@ -691,7 +691,7 @@ class PestanaDatosSolicitud(QWidget):
         lon = self.longitud.text().strip() or "-74.0817"
         
         # Procesar bounds desde el extent si está disponible
-
+        bounds_js = ""
         # Procesar geojson para dibujar el municipio
         if extent:
             match = re.match(r'BOX\(([-\d\.]+) ([-\d\.]+),([-\d\.]+) ([-\d\.]+)\)', extent)
@@ -699,24 +699,17 @@ class PestanaDatosSolicitud(QWidget):
                 xmin, ymin, xmax, ymax = map(float, match.groups())
                 # Leaflet espera [[sur, oeste], [norte, este]]
                 bounds_js = f"var bounds = [[{ymin}, {xmin}], [{ymax}, {xmax}]];\nmap.fitBounds(bounds);"
-     
+
         geojson_js = ""
         if geojson:
+            # geojson viene como una cadena JSON desde PostGIS. Para evitar romper el
+            # script (comillas, saltos de línea, caracteres especiales) envolvemos
+            # la cadena como literal JS y la parseamos en el frontend.
+            safe_geojson = json.dumps(geojson)
             geojson_js = f"""
-            var municipioLayer = L.geoJSON({geojson}).addTo(map);
+            var municipioLayer = L.geoJSON(JSON.parse({safe_geojson})).addTo(map);
             map.fitBounds(municipioLayer.getBounds());
             """
-       
-        # Generar HTML con el mapa
-        """
-        Carga un mapa interactivo en el QWebEngineView.
-        """
-
-        if geojson is None and extent is None:
-            bounds_js = ""
-            geojson_js = ""
-        
-        
 
         mapa_html = f"""
         <!DOCTYPE html>
@@ -774,7 +767,7 @@ class PestanaDatosSolicitud(QWidget):
         </body>
         </html>
         """
-        
+        print("Mapa HTML generado.", mapa_html)
         
         # Agregar el QWebEngineView al contenedor en la interfaz
          
@@ -975,9 +968,9 @@ class PestanaDatosSolicitud(QWidget):
                 db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
                 db.conectar()
                 
-                query = """insert into inmuebles (matricula_inmobiliaria, tipo_inmueble, direccion, barrio, municipio, departamento, cedula_catastral, modo_adquicision, limitaciones, longitud, latitud, avaluo_id, doc_propiedad, propietario, id_propietario, zona) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) returning id_inmueble """
+                query = """insert into inmuebles (matricula_inmobiliaria, tipo_inmueble, direccion, barrio, municipio, departamento, cedula_catastral, modo_adquicision, limitaciones, longitud, latitud, avaluo_id, doc_propiedad, propietario, id_propietario) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) returning id_inmueble """
                     
-                id_matricula = db.insertar(query, (texto_matricula, inmueble_data["tipo_inmueble"], inmueble_data["direccion"], inmueble_data["barrio"], inmueble_data["municipio"], inmueble_data["departamento"], inmueble_data["cedula_catastral"], inmueble_data["modo_adquisicion"], inmueble_data["limitaciones"], 4.6097, -74.0817, self.id_avaluo, inmueble_data["doc_propiedad"], inmueble_data["propietario"], inmueble_data["id_propietario"], inmueble_data["zona"]))
+                id_matricula = db.insertar(query, (texto_matricula, inmueble_data["tipo_inmueble"], inmueble_data["direccion"], inmueble_data["barrio"], inmueble_data["municipio"], inmueble_data["departamento"], inmueble_data["cedula_catastral"], inmueble_data["modo_adquisicion"], inmueble_data["limitaciones"], 4.6097, -74.0817, self.id_avaluo, inmueble_data["doc_propiedad"], inmueble_data["propietario"], inmueble_data["id_propietario"]))
                 campo_container.setProperty("id_matricula", id_matricula)
                 
                 db.cerrar_conexion()
@@ -1199,9 +1192,9 @@ class PestanaDatosSolicitud(QWidget):
                     db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
                     db.conectar()
                     
-                    query = """ UPDATE inmuebles SET tipo_inmueble=%s, direccion=%s, barrio=%s, municipio=%s, departamento=%s, cedula_catastral=%s, modo_adquicision=%s, limitaciones=%s, longitud=%s, latitud=%s, doc_propiedad=%s, propietario=%s, id_propietario=%s, zona=%s WHERE matricula_inmobiliaria=%s AND avaluo_id=%s """
+                    query = """ UPDATE inmuebles SET tipo_inmueble=%s, direccion=%s, barrio=%s, municipio=%s, departamento=%s, cedula_catastral=%s, modo_adquicision=%s, limitaciones=%s, longitud=%s, latitud=%s, doc_propiedad=%s, propietario=%s, id_propietario=%s WHERE matricula_inmobiliaria=%s AND avaluo_id=%s """
                     
-                    db.actualizar(query, (inmueble_data["tipo_inmueble"], inmueble_data["direccion"], inmueble_data["barrio"], inmueble_data["municipio"], inmueble_data["departamento"], inmueble_data["cedula_catastral"], inmueble_data["modo_adquisicion"], inmueble_data["limitaciones"], inmueble_data["longitud"], inmueble_data["latitud"], inmueble_data["doc_propiedad"], inmueble_data["propietario"], inmueble_data["id_propietario"], inmueble_data["zona"], matricula, self.id_avaluo))
+                    db.actualizar(query, (inmueble_data["tipo_inmueble"], inmueble_data["direccion"], inmueble_data["barrio"], inmueble_data["municipio"], inmueble_data["departamento"], inmueble_data["cedula_catastral"], inmueble_data["modo_adquisicion"], inmueble_data["limitaciones"], inmueble_data["longitud"], inmueble_data["latitud"], inmueble_data["doc_propiedad"], inmueble_data["propietario"], inmueble_data["id_propietario"], matricula, self.id_avaluo))
                     
                     db.cerrar_conexion()
                     QMessageBox.information(
