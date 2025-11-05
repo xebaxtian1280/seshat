@@ -218,8 +218,9 @@ class PestanaCaracteristicasConstruccion(QWidget):
             "Carraplast", 
             "Cemento afinado", 
             "Pañete y pintura", 
-            "Cerámica", 
-            "Madera",
+            "Estuco y Pintura", 
+            "Ceramica",
+            "Estuco acrílico",
             "Sin Fachada"
         ]
         
@@ -364,9 +365,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
         if row is None or row < 0:
             return
 
-        # comparar datos para evaluar si hay cambios sin guardar
-        self.comparar_cambios(row)            
- 
+
 
         # Obtener combo matricula de la fila
         combo_matricula = self.tabla_area.cellWidget(row, 0)
@@ -374,6 +373,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
             return
         
         resultado, mensaje = self.validar_campos_construccion(self.fila_anterior)
+        print('Resultado validacion:', resultado,self.editando_fila, self.fila_anterior, row)
         if resultado == False and self.editando_fila and self.fila_anterior != row:
             QMessageBox.warning(self, "Advertencia", "Por favor, termine de editar la fila actual antes de cambiar a otra.")
             if resultado == False:
@@ -381,7 +381,11 @@ class PestanaCaracteristicasConstruccion(QWidget):
             
             self.tabla_area.selectRow(self.fila_anterior); self.tabla_area.setCurrentCell(self.fila_anterior, 4)
             return
+        # comparar datos para evaluar si hay cambios sin guardar
 
+        if self.tabla_area.rowCount() > 1:
+            self.comparar_cambios(row)            
+ 
         # Intentar obtener construccion_id guardado en la propiedad del combo
         construccion_id = combo_matricula.property("construccion_id")
 
@@ -447,86 +451,6 @@ class PestanaCaracteristicasConstruccion(QWidget):
             
             db.cerrar_conexion()    
             return
-
-            """ #Almacena los datos sin guardar en un arreglo temporal
-            if row in self.datos_sin_guardar:
-                datos = self.datos_sin_guardar[row]
-                self.num_pisos.setValue(datos['num_pisos'])
-                self.num_sotanos.setValue(datos['num_sotanos'])
-                self.vetustez.setValue(datos['vetustez'])
-                self.vida_util.setValue(datos['vida_util'])
-                self.vida_restante.setValue(datos['vida_restante'])
-                self.cimentacion.setCurrentText(datos['cimentacion'])
-                self.estructura_const.setCurrentText(datos['estructura'])
-                self.muros.setCurrentText(datos['muros'])
-                self.cubierta.setCurrentText(datos['cubierta'])
-                self.fachada.setCurrentText(datos['fachada'])
-                self.cielo_raso.setCurrentText(datos['cielo_raso'])
-                self.estructura.setPlainText(datos['estructura_estado'])
-                self.acabados.setPlainText(datos['acabados_estado'])
-                # Cargar croquis guardados temporalmente
-                if self.datos_sin_guardar_croquis:
-                    for imagen_path, descripcion in self.datos_sin_guardar_croquis:
-                        FuncionesImagenes.agregar_imagen(self, self.croquis_container, imagen_path, descripcion)
-
-            else:
-                
-                datos = {
-                    'num_pisos': self.num_pisos.value(),
-                    'num_sotanos': self.num_sotanos.value(),
-                    'vetustez': self.vetustez.value(),
-                    'vida_util': self.vida_util.value(),
-                    'vida_restante': self.vida_restante.value(),
-                    'cimentacion': self.cimentacion.currentText(),
-                    'estructura': self.estructura_const.currentText(),
-                    'muros': self.muros.currentText(),
-                    'cubierta': self.cubierta.currentText(),
-                    'fachada': self.fachada.currentText(),
-                    'cielo_raso': self.cielo_raso.currentText(),
-                    'estructura_estado': self.estructura.toPlainText(),
-                    'acabados_estado': self.acabados.toPlainText()
-                }
-                self.datos_sin_guardar[row] = datos            
-                self.datos_sin_guardar_croquis = []
-                for i in range(self.croquis_container.count()):
-                    item = self.croquis_container.itemAt(i)
-                    if item is None:
-                        continue
-                    widget = item.widget()
-                    if widget is None:
-                        continue
-
-                    # Buscar QLabel y QLineEdit dentro del widget
-                    label = widget.findChild(QLabel)
-                    descripcion = widget.findChild(QLineEdit)
-
-                    path_imagen = None
-                    if label is not None:
-                        try:
-                            path_imagen = label.property("path_imagen")
-                        except Exception:
-                            path_imagen = None
-
-                    texto_descripcion = descripcion.text() if descripcion else ""
-
-                    self.datos_sin_guardar_croquis.append({
-                        'path': path_imagen,
-                        'descripcion': texto_descripcion
-                    })
-                print('imagenes sin guardar:', self.datos_sin_guardar_croquis)
-            resultado, mensaje = self.validar_campos_construccion(row)
-
-            print('Validando campos antes de cambiar fila:', resultado, mensaje)
-
-            if resultado:
-                print('row:', row)
-                self.guardar_construccion(row)
-                self.datos_sin_guardar_coquis = []
-                self.datos_sin_guardar = {}
-                self.fila_anterior = 0
-                return
-            else:
-                print(mensaje) """
 
             
         if filas and len(filas) > 0:
@@ -610,6 +534,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
         
         if self.datos_actuales:
             for key in datos_comparacion:
+                print('Comparando key:', key, 'valor anterior:', datos_comparacion[key], 'valor actual:', self.datos_actuales.get(key))
                 if key in self.datos_actuales and self.fila_anterior != row:
                     if datos_comparacion[key] != self.datos_actuales[key]:
                         
@@ -632,26 +557,31 @@ class PestanaCaracteristicasConstruccion(QWidget):
                         if clicked == btn_guardar:
                             self.guardar_construccion(self.fila_anterior)
                             return True, "Se han guardado los cambios."
+
                         elif clicked == btn_descartar:
                             return False , "Se han descartado los cambios."
+        else:
+            self.guardar_construccion(self.fila_anterior)
+            self.fila_anterior = row
 
     def agregar_fila_area(self):
 
         row_count = self.tabla_area.rowCount()
         self.editando_fila = True
-        
+        print('row_count al agregar fila:', row_count)
         if row_count >= 1:
 
             result, mensaje = self.validar_campos_construccion(self.fila_anterior)
-
+            print('Validando campos antes de agregar fila:', result, mensaje)
             if result:
 
-                self.comparar_cambios(self.fila_anterior)
+                self.comparar_cambios(row_count)
                 
             else:
                 QMessageBox.warning(self, "Advertencia", mensaje)
                 return
             self.limpiar_datos()
+        
         
         self.tabla_area.insertRow(row_count)
 
@@ -668,7 +598,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
         combo_matricula.setProperty("construccion_data", row_data) """
 
         self.tabla_area.setCellWidget(row_count, 0, combo_matriculas)
-
+        
         # Identificación
 
         tipos_construccion = [
@@ -693,6 +623,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
         """ datos = self.guardar_construccion(row_count, nueva_construccion=True)
         combo_matriculas.setProperty("construccion_id", datos[0])
         combo_matriculas.setProperty("construccion_data", datos) """
+        self.tabla_area.selectRow(self.fila_anterior); self.tabla_area.setCurrentCell(row_count, 4)
 
     def eliminar_fila_area(self):
         self.datos_actuales = {}

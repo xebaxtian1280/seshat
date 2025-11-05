@@ -1105,8 +1105,8 @@ class PestanaDatosSolicitud(QWidget):
         self.cedula_catastral.setText(self.inmuebles[texto]["cedula_catastral"] if texto in self.inmuebles else "")
         self.modo_adquisicion.setCurrentText(self.inmuebles[texto]["modo_adquisicion"] if texto in self.inmuebles else "")
         self.limitaciones.setPlainText(self.inmuebles[texto]["limitaciones"] if texto in self.inmuebles else "")
-        self.longitud.setValue(self.inmuebles[texto]["longitud"] if texto in self.inmuebles else 0)
-        self.latitud.setValue(self.inmuebles[texto]["latitud"] if texto in self.inmuebles else 0)
+        self.longitud.setValue(float(self.inmuebles[texto]["longitud"]) if texto in self.inmuebles else 0)
+        self.latitud.setValue(float(self.inmuebles[texto]["latitud"]) if texto in self.inmuebles else 0)
         self.doc_propiedad.setPlainText(self.inmuebles[texto]["doc_propiedad"] if texto in self.inmuebles else "")
         self.propietario.setText(self.inmuebles[texto]["propietario"] if texto in self.inmuebles else "")
         self.id_propietario.setText(str(self.inmuebles[texto]["id_propietario"]) if texto in self.inmuebles else "")
@@ -1142,8 +1142,8 @@ class PestanaDatosSolicitud(QWidget):
                 "cedula_catastral": self.cedula_catastral.text().strip(),
                 "modo_adquisicion": self.modo_adquisicion.currentText(),
                 "limitaciones": self.limitaciones.toPlainText().strip(),
-                "longitud": self.longitud.value().toString(),
-                "latitud": self.latitud.value().toString(),
+                "longitud": str(self.longitud.value()),
+                "latitud": str(self.latitud.value()),
                 "avaluo_id": self.id_avaluo,
                 "doc_propiedad": self.doc_propiedad.toPlainText().strip(),
                 "propietario": self.propietario.text().strip(),
