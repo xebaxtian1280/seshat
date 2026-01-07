@@ -19,12 +19,13 @@ class PestanaSeguimiento(QWidget):
 
     
     
-    def __init__(self, tab_panel: QTabWidget):
+    def __init__(self, tab_panel: QTabWidget, ventana_principal=None):
         super().__init__()
         
         self.tab_panel = tab_panel
+        self.ventana_principal = ventana_principal
         # Layout principal
-        self.basededatos = 'seshat'
+        self.basededatos = 'seshat_db'
         self.layout_principal = QVBoxLayout(self)
         
         # Crear un área de desplazamiento
@@ -114,8 +115,6 @@ class PestanaSeguimiento(QWidget):
         
         tab_panel.addTab(self.scroll_area, "Seguimiento")       
     
-
-
     def limpiar_filtros(self):
         """
         Limpia todos los filtros y actualiza la información de la tabla.
@@ -137,7 +136,7 @@ class PestanaSeguimiento(QWidget):
         """
         try:
             # Crear una instancia de la clase DB
-            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
     
             # Consulta SQL para obtener los nombres de los peritos
@@ -161,7 +160,7 @@ class PestanaSeguimiento(QWidget):
         """
         try:
             # Crear una instancia de la clase DB
-            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
     
             # Consulta SQL para obtener los nombres de los peritos
@@ -184,7 +183,7 @@ class PestanaSeguimiento(QWidget):
         """
         try:
             # Crear una instancia de la clase DB
-            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
             # Consulta SQL para obtener los datos de la tabla 'Avaluos'
             consulta = """
@@ -247,7 +246,7 @@ class PestanaSeguimiento(QWidget):
         id_avaluo = boton.property("id_avaluo")  # Recuperar el id_avaluo
         print(f"Botón presionado con id_avaluo: {id_avaluo}")
         self.id_avaluo_seleccionado.emit(id_avaluo)  # Emitir la señal con el id_avaluo
-        Funciones.agregar_pestanas_avaluo(self, id_avaluo, self.tab_panel)
+        Funciones.agregar_pestanas_avaluo(self, id_avaluo, self.tab_panel, ventana_principal=self.ventana_principal)
         #self.agregar_pestanas_avaluo(id_avaluo, self.tab_panel)
     
     def buscar_seguimiento(self):
@@ -289,7 +288,7 @@ class PestanaSeguimiento(QWidget):
             
         print("Consulta SQL:", query)
         # Ejecutar la consulta
-        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+        db = self.ventana_principal.obtener_conexion_db()
         db.conectar()
         resultados = db.consultar(query, parametros)
         

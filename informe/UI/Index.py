@@ -4,7 +4,8 @@ import time
 from pathlib import Path
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                              QMessageBox, QProgressBar,
-                             QFileDialog, QMenuBar, QMenu, QTabWidget, QScrollArea)
+                             QFileDialog, QMenuBar, QMenu, QTabWidget, QScrollArea,
+                             QDialog, QLabel, QLineEdit, QPushButton, QFormLayout)
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import QSystemTrayIcon
@@ -22,21 +23,165 @@ from Funciones import Funciones
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
+usuario_global = ""
+password_global = ""
+
+class LoginDialog(QDialog):
+    """Diálogo de autenticación de usuario"""
+    
+    # Credenciales por defecto (en producción deberían estar en BD)
+    USUARIOS_VALIDOS = {
+        "admin": "admin123",
+        "usuario": "usuario123"
+    }
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Inicio de Sesión - Sistema de Gestión de Informes")
+        self.setModal(True)
+        self.setFixedSize(400, 200)
+        self.intentos_fallidos = 0
+        self.max_intentos = 3
+        self.usuario_autenticado = None
+        self.password_usuario = None  # Almacenar el password del usuario
+        self.init_ui()
+    
+    def init_ui(self):
+        layout = QVBoxLayout()
+        
+        # Título
+        titulo = QLabel("Iniciar Sesión")
+        titulo.setStyleSheet("font-size: 18px; font-weight: bold; margin-bottom: 10px;")
+        titulo.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(titulo)
+        
+        # Formulario
+        form_layout = QFormLayout()
+        
+        # Campo de usuario
+        self.usuario_input = QLineEdit()
+        self.usuario_input.setPlaceholderText("Ingrese su usuario")
+        form_layout.addRow("Usuario:", self.usuario_input)
+        
+        # Campo de contraseña
+        self.password_input = QLineEdit()
+        self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self.password_input.setPlaceholderText("Ingrese su contraseña")
+        self.password_input.returnPressed.connect(self.validar_credenciales)
+        form_layout.addRow("Contraseña:", self.password_input)
+        
+        layout.addLayout(form_layout)
+        
+        # Mensaje de error
+        self.mensaje_error = QLabel("")
+        self.mensaje_error.setStyleSheet("color: red; font-size: 12px;")
+        self.mensaje_error.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.mensaje_error)
+        
+        # Botones
+        botones_layout = QHBoxLayout()
+        
+        self.btn_ingresar = QPushButton("Ingresar")
+        self.btn_ingresar.clicked.connect(self.validar_credenciales)
+        self.btn_ingresar.setStyleSheet("background-color: #4CAF50; color: white; padding: 8px;")
+        
+        self.btn_cancelar = QPushButton("Cancelar")
+        self.btn_cancelar.clicked.connect(self.cancelar)
+        self.btn_cancelar.setStyleSheet("background-color: #f44336; color: white; padding: 8px;")
+        
+        botones_layout.addWidget(self.btn_ingresar)
+        botones_layout.addWidget(self.btn_cancelar)
+        
+        layout.addLayout(botones_layout)
+        
+        self.setLayout(layout)
+        
+        # Focus en el campo de usuario
+        self.usuario_input.setFocus()
+    
+    def validar_credenciales(self):
+        """Valida las credenciales ingresadas"""
+        usuario = self.usuario_input.text().strip()
+        password = self.password_input.text()
+
+        if not usuario or not password:
+            self.mostrar_error("Por favor ingrese usuario y contraseña")
+            return
+        
+        try:
+            # Crear una instancia de la clase DB
+            db = DB(host="192.168.0.9", database="seshat_db", user=usuario, password=password)
+            if db.conectar():
+                self.usuario_autenticado = usuario
+                self.password_usuario = password  # Almacenar password en la instancia
+                global usuario_global, password_global
+                usuario_global = usuario
+                password_global = password
+                self.accept()  # Cerrar diálogo con éxito
+            else:
+                self.intentos_fallidos += 1
+                intentos_restantes = self.max_intentos - self.intentos_fallidos
+                
+                if self.intentos_fallidos >= self.max_intentos:
+                    QMessageBox.critical(
+                        self,
+                        "Acceso Denegado",
+                        "Ha excedido el número máximo de intentos. La aplicación se cerrará."
+                    )
+                    self.reject()  # Cerrar diálogo con fallo
+                    sys.exit(1)  # Cerrar aplicación
+                else:
+                    self.mostrar_error(
+                        f"Usuario o contraseña incorrectos. "
+                        f"Intentos restantes: {intentos_restantes}"
+                    )
+                    self.password_input.clear()
+                    self.password_input.setFocus()
+            db.cerrar_conexion()
+        except Exception as e:
+            print(f"Error al intentar loguearse: {e}")
+            
+            
+    
+    def mostrar_error(self, mensaje):
+        """Muestra un mensaje de error en el diálogo"""
+        self.mensaje_error.setText(mensaje)
+        # Limpiar mensaje después de 3 segundos
+        QTimer.singleShot(3000, lambda: self.mensaje_error.setText(""))
+    
+    def cancelar(self):
+        """Cancela el login y cierra la aplicación"""
+        respuesta = QMessageBox.question(
+            self,
+            "Cancelar",
+            "¿Está seguro que desea cancelar? La aplicación se cerrará.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        
+        """ if respuesta == QMessageBox.StandardButton.Yes:
+            self.reject()
+            sys.exit(0)
+ """
 
 class ReportApp(QMainWindow):
     
-    def __init__(self):
+    def __init__(self, usuario_autenticado=None, password_usuario=None):
         super().__init__()
         
         self.setWindowTitle("Sistema de Gestión de Informes")
         self.create_tray_icon_with_file() # Asegúrate de tener un icono en la ruta especificada
         #self.setMinimumSize(1000, 700)
 
-        self.basededatos = "seshat"
+        self.basededatos = "seshat_db"
+        
+        # Almacenar credenciales del usuario autenticado
+        self.usuario_autenticado = usuario_autenticado
+        self.password_usuario = password_usuario
+        self.db_host = "192.168.0.9"  # Configurar según tu entorno
+        self.db_user = usuario_global    # Usuario de BD (puedes cambiarlo)
+        self.db_password = password_global # Password de BD (puedes cambiarlo)
 
         self.showMaximized()
-        
-
         
         self.default_save_path = ""
         self.file_path = None
@@ -60,7 +205,7 @@ class ReportApp(QMainWindow):
         generar_action.triggered.connect(lambda: self.volver_a_seguimiento())
         
         generar_action = self.file_menu.addAction("Radicar Solicitud")
-        generar_action.triggered.connect(lambda: Funciones.agregar_pestanas_avaluo(self,"",self.tab_panel))
+        generar_action.triggered.connect(lambda: Funciones.agregar_pestanas_avaluo(self,"",self.tab_panel, ventana_principal=self))
         
         generar_action = self.file_menu.addAction("Generar Informe")
         generar_action.triggered.connect(self.iniciar_generacion)
@@ -87,8 +232,11 @@ class ReportApp(QMainWindow):
         self.tab_panel.currentChanged.connect(lambda: self.on_tab_changed(self.tab_panel, self.tab_panel.currentIndex()))
         self.tab_panel.tabCloseRequested.connect(lambda: self.on_tab_changed(self.tab_panel, self.tab_panel.currentIndex()))
         
+
+
         # Crear las pestañas
-        self.pestana_seguimiento = PestanaSeguimiento(self.tab_panel)
+
+        self.pestana_seguimiento = PestanaSeguimiento(self.tab_panel, ventana_principal=self)
         
         # Conectar la señal de PestanaSeguimiento
         self.pestana_seguimiento.id_avaluo_seleccionado.connect(self.recibir_id_avaluo)
@@ -110,6 +258,36 @@ class ReportApp(QMainWindow):
         self.progress_bar = QProgressBar()
         self.progress_bar.hide()
         main_layout.addWidget(self.progress_bar)
+    
+    def obtener_conexion_db(self):
+        """
+        Retorna una instancia de DB con las credenciales del usuario autenticado.
+        Las pestañas pueden llamar este método para obtener una conexión a la base de datos.
+        
+        Ejemplo de uso desde una pestaña:
+            db = self.ventana_principal.obtener_conexion_db()
+            db.conectar()
+            # Realizar operaciones...
+            db.cerrar_conexion()
+        """
+        db = DB(
+            host=self.db_host,
+            database=self.basededatos,
+            user=self.usuario_autenticado,
+            password=self.password_usuario
+        )
+        return db
+    
+    def get_usuario_info(self):
+        """
+        Retorna información del usuario autenticado.
+        Útil para mostrar en la interfaz o para auditoría.
+        """
+        return {
+            'usuario': self.usuario_autenticado,
+            'base_datos': self.basededatos,
+            'host': self.db_host
+        }
 
     def on_tab_changed(self, tab_panel, index):
         print(f"Cambio a la pestaña con índice: {index}")
@@ -156,7 +334,7 @@ class ReportApp(QMainWindow):
                 
             
             # Crear las pestaña seguimiento
-            self.pestana_seguimiento = PestanaSeguimiento(self.tab_panel)
+            self.pestana_seguimiento = PestanaSeguimiento(self.tab_panel, ventana_principal=self)
             
             # Conectar la señal de Pestaña Seguimiento
             self.pestana_seguimiento.id_avaluo_seleccionado.connect(self.recibir_id_avaluo)
@@ -232,7 +410,7 @@ class ReportApp(QMainWindow):
         self.id_avaluo = getattr(self, 'id_avaluo', None)
         
         # Conectar a la base de datos
-        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+        db = DB(host="localhost", database=self.basededatos, user=usuario_global, password=password_global)
         db.conectar()           
         
         
@@ -379,6 +557,20 @@ class ReportApp(QMainWindow):
         
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = ReportApp()
-    window.show()
-    sys.exit(app.exec())
+    
+    # Mostrar diálogo de login
+    login_dialog = LoginDialog()
+    
+    if login_dialog.exec() == QDialog.DialogCode.Accepted:
+        # Si el login es exitoso, mostrar ventana principal
+        print(f"Usuario autenticado: {login_dialog.usuario_autenticado}")
+        window = ReportApp(
+            usuario_autenticado=login_dialog.usuario_autenticado,
+            password_usuario=login_dialog.password_usuario
+        )
+        window.show()
+        sys.exit(app.exec())
+    else:
+        # Si el login falla o se cancela, cerrar la aplicación
+        print("Acceso denegado o cancelado")
+        sys.exit(0)

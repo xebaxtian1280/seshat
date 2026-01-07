@@ -30,12 +30,13 @@ class Backend(QObject):
         self.ventana.longitud.setValue(lon)
 
 class PestanaDatosSolicitud(QWidget):
-    def __init__(self,  tab_panel: QTabWidget, id_avaluo=None):
+    def __init__(self,  tab_panel: QTabWidget, id_avaluo=None, ventana_principal=None):
         super().__init__()
 
         
         self.tab_panel = tab_panel
         self.id_avaluo = id_avaluo
+        self.ventana_principal = ventana_principal  # Referencia a la ventana principal
         self.group_style = Estilos.cargar_estilos(self, "styles.css")
         self.basededatos = "seshat"
         self.inmuebles = {}  # Lista para almacenar los inmuebles asociados a la matricula
@@ -281,7 +282,13 @@ class PestanaDatosSolicitud(QWidget):
             QMessageBox.warning(self, "Campos incompletos", "Por favor complete todos los campos requeridos.")
             return
 
-        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+        # Usar credenciales del usuario autenticado
+        db = None
+        #if self.ventana_principal:
+        db = self.ventana_principal.obtener_conexion_db()
+        #else:
+            # Fallback para desarrollo
+            #db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
         db.conectar()
 
         # Actualizar la solicitud en la base de datos
@@ -323,7 +330,7 @@ class PestanaDatosSolicitud(QWidget):
         """
         try:
             # Crear una instancia de la clase DB
-            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
             
             print(f"Cargando datos para el avalúo con ID: {self.id_avaluo}")
@@ -406,7 +413,7 @@ class PestanaDatosSolicitud(QWidget):
         """
         try:
             # Crear una instancia de la clase DB
-            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
     
             # Consulta SQL para obtener los nombres de los peritos
@@ -434,7 +441,7 @@ class PestanaDatosSolicitud(QWidget):
         """
         try:
             # Crear una instancia de la clase DB
-            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
     
             # Consulta SQL para obtener los nombres de los peritos
@@ -459,7 +466,7 @@ class PestanaDatosSolicitud(QWidget):
         """
         try:
             # Consulta para obtener los municipios
-            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
             query = "SELECT id, nombre, departamento_id FROM municipios ORDER BY nombre"
             resultados = db.consultar(query)  # Ejecutar la consulta en la base de datos
@@ -485,7 +492,7 @@ class PestanaDatosSolicitud(QWidget):
         """
         try:
             # Consulta para obtener los municipios
-            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
             query = "SELECT id, nombre FROM departamentos ORDER BY nombre"
             resultados = db.consultar(query)  # Ejecutar la consulta en la base de datos
@@ -519,7 +526,7 @@ class PestanaDatosSolicitud(QWidget):
         if indice is not None:
             # Asignar el valor recuperado al QComboBox de departamentos
             self.departamento_inmueble.setCurrentIndex(indice)
-            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
 
             if id_municipio < 10000:
@@ -570,7 +577,7 @@ class PestanaDatosSolicitud(QWidget):
             return
         
         # Guardar los datos en una base de datos o archivo
-        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+        db = self.ventana_principal.obtener_conexion_db()
         db.conectar()
         id_avaluo = db.insertar(
            """INSERT INTO "Avaluos" (nombre_cliente, id_cliente, destinatario, fecha_visita, tipo_avaluo, fecha_avaluo, id_peritos, id_revisor, zona) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) returning "Avaluo_id" """
@@ -970,7 +977,7 @@ class PestanaDatosSolicitud(QWidget):
 
                 self.guardar_informacion_inmueble(self.matricula_actual)
                 
-                db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+                db = self.ventana_principal.obtener_conexion_db()
                 db.conectar()
                 
                 query = """insert into inmuebles (matricula_inmobiliaria, tipo_inmueble, direccion, barrio, municipio, departamento, cedula_catastral, modo_adquicision, limitaciones, longitud, latitud, avaluo_id, doc_propiedad, propietario, id_propietario) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) returning id_inmueble """
@@ -1040,7 +1047,7 @@ class PestanaDatosSolicitud(QWidget):
                 if self.id_avaluo != "":
                     
                     # Crear una instancia de la clase DB
-                    db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+                    db = self.ventana_principal.obtener_conexion_db()
                     db.conectar()
                     
                     query = "DELETE FROM inmuebles WHERE matricula_inmobiliaria = %s AND avaluo_id = %s"
@@ -1194,7 +1201,7 @@ class PestanaDatosSolicitud(QWidget):
                 
                     self.inmuebles[matricula].update(inmueble_data)
 
-                    db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+                    db = self.ventana_principal.obtener_conexion_db()
                     db.conectar()
                     
                     query = """ UPDATE inmuebles SET tipo_inmueble=%s, direccion=%s, barrio=%s, municipio=%s, departamento=%s, cedula_catastral=%s, modo_adquicision=%s, limitaciones=%s, longitud=%s, latitud=%s, doc_propiedad=%s, propietario=%s, id_propietario=%s WHERE matricula_inmobiliaria=%s AND avaluo_id=%s """
@@ -1236,7 +1243,7 @@ class PestanaDatosSolicitud(QWidget):
         
         try:
             # Ejecutar la consulta para obtener todos los registros de la tabla inmuebles
-            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db = self.ventana_principal.obtener_conexion_db()
             db.conectar()            
             
             registros = db.consultar(query)
@@ -1368,7 +1375,7 @@ class PestanaDatosSolicitud(QWidget):
                 if texto_documento:  # Verificar que no esté vacío
                     
                     campo.setText(texto_documento)
-                    db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+                    db = self.ventana_principal.obtener_conexion_db()
                     db.conectar()
                     
                     resultado_documento = db.insertar(""" insert into documentacion_aportada ("Avaluo_id", documento) values (%s, %s) returning id_documentacin """, (self.id_avaluo, texto_documento))
@@ -1431,7 +1438,7 @@ class PestanaDatosSolicitud(QWidget):
                 
                 if respuesta == QMessageBox.StandardButton.Yes:
 
-                    db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+                    db = self.ventana_principal.obtener_conexion_db()
                     db.conectar()
                     
                     if campo:

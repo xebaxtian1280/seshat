@@ -24,9 +24,11 @@ class DB:
                 password=self.password
             )
             print("Conexión exitosa a la base de datos.")
+            return True
         except psycopg2.Error as e:
             print(f"Error al conectar a la base de datos: {e}")
             self.connection = None
+            return False
 
     def cerrar_conexion(self):
         """

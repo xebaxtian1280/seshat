@@ -18,7 +18,7 @@ from DB import DB
 
 class PestanaCaracteristicasConstruccion(QWidget):
 
-    def __init__(self, tab_panel: QTabWidget, id_avaluo= ""):
+    def __init__(self, tab_panel: QTabWidget, id_avaluo= "", ventana_principal=None):
         super().__init__()
     # Widget principal para la pestaña
 
@@ -30,7 +30,9 @@ class PestanaCaracteristicasConstruccion(QWidget):
         self.editando_fila = False
         self.datos_actuales = {}
 
-        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+        self.ventana_principal = ventana_principal
+
+        db = self.ventana_principal.obtener_conexion_db()
         db.conectar()
         query = "SELECT matricula_inmobiliaria, id_inmueble FROM inmuebles WHERE avaluo_id = %s"
         # Pasar el parámetro como tupla de un elemento para evitar errores de formateo
@@ -389,7 +391,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
         # Intentar obtener construccion_id guardado en la propiedad del combo
         construccion_id = combo_matricula.property("construccion_id")
 
-        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+        db = self.ventana_principal.obtener_conexion_db()
         db.conectar()
         filas = []
         # Si tenemos construccion_id, cargar directamente
@@ -654,7 +656,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
         if respuesta != QMessageBox.StandardButton.Yes:
             return False
 
-        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+        db = self.ventana_principal.obtener_conexion_db()
         try:
             db.conectar()
 
@@ -748,7 +750,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
 
              # Conectar a la base de datos
             print("Guardando construcción para la fila:", row)
-            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
         
             # Obtén los datos de la fila
@@ -880,7 +882,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
 
     def cargar_datos_construccion(self):
 
-        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+        db = self.ventana_principal.obtener_conexion_db()
         db.conectar()
 
         # Consulta construcciones asociadas al avaluo

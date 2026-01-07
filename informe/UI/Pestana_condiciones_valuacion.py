@@ -17,12 +17,13 @@ from Funciones_imagenes import FuncionesImagenes
 from DB import DB
 
 class PestanaCondicionesValuacion(QWidget):
-    def __init__(self, tab_panel: QTabWidget, id_avaluo=None):
+    def __init__(self, tab_panel: QTabWidget, id_avaluo=None, ventana_principal=None):
         super().__init__()
 
         self.id_avaluo = id_avaluo
         self.basededatos = "seshat"  # Nombre de la base de
         self.id_valuacion = None  # Inicializar id_valoracion
+        self.ventana_principal = ventana_principal
         
         # Aplicar estilos desde el archivo CSS
         self.group_style = Estilos.cargar_estilos(self, "styles.css")
@@ -198,7 +199,7 @@ class PestanaCondicionesValuacion(QWidget):
             # Eliminar el contenedor del layout de condiciones
             self.lista_condiciones.removeWidget(contenedor)
             contenedor.deleteLater()  # Eliminar el widget de forma segura
-            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
             id_condicion = campo_condicion.property("id_condicion")
             if id_condicion:
@@ -343,7 +344,7 @@ class PestanaCondicionesValuacion(QWidget):
     def guardar_datos(self):
         # Aquí se implementaría la lógica para guardar los datos ingresados en la pestaña
         try:
-            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
 
             valores_checkboxes = {cb.text(): cb.isChecked() for cb in self.layout_metodologias.parentWidget().findChildren(QCheckBox)}            
@@ -517,7 +518,7 @@ class PestanaCondicionesValuacion(QWidget):
             return False, "No hay avaluo_id para cargar datos"
 
         try:
-            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
 
             # 1) Cargar fila de valoracion

@@ -7,12 +7,12 @@ from Estilos import Estilos
 from DB import DB
 
 class PestañaImagenes(QWidget):
-    def __init__(self, id_avaluo):
+    def __init__(self, id_avaluo, ventana_principal=None):
         super().__init__()
         
         self.id_avaluo = id_avaluo
         self.layout_principal = QVBoxLayout(self)
-        
+        self.ventana_principal = ventana_principal
         self.group_style = Estilos.cargar_estilos(self, "styles.css")
         
         # Crear un área de desplazamiento
@@ -135,7 +135,7 @@ class PestañaImagenes(QWidget):
                     id_imagen = contenedor.property("id_imagen")
 
                     if id_imagen is not None:
-                        db = DB(host="localhost", database="seshat", user="postgres", password="ironmaiden")
+                        db = self.ventana_principal.obtener_conexion_db()
                         db.conectar()
                         query = "DELETE FROM imagenes_avaluo WHERE id_imagen = %s;"
                         db.actualizar(query, (id_imagen,))
@@ -186,7 +186,7 @@ class PestañaImagenes(QWidget):
 
             try:
                 from DB import DB
-                db = DB(host="localhost", database="seshat", user="postgres", password="ironmaiden")
+                db = self.ventana_principal.obtener_conexion_db()
                 db.conectar()
 
                 if id_imagen:
@@ -237,7 +237,7 @@ class PestañaImagenes(QWidget):
 
         try:
             
-            db = DB(host="localhost", database="seshat", user="postgres", password="ironmaiden")
+            db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
 
             clear_grid(self.grid_layout)
@@ -292,7 +292,7 @@ class PestañaImagenes(QWidget):
             if self.id_avaluo != "":
                 self.guardar_imagenes()
 # Agregar la pestaña al QTabWidget
-def agregar_pestana_imagenes(tab_widget, id_avaluo):
-    pestaña_imagenes = PestañaImagenes(id_avaluo)
+def agregar_pestana_imagenes(tab_widget, id_avaluo, ventana_principal=None):
+    pestaña_imagenes = PestañaImagenes(id_avaluo, ventana_principal=ventana_principal)
     pestaña_imagenes.mi_pestana = pestaña_imagenes
     tab_widget.addTab(pestaña_imagenes, "Cargar Imágenes")

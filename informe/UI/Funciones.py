@@ -26,15 +26,17 @@ import os
 
 class Funciones:
 
-    def agregar_pestanas_avaluo(self, id_avaluo, tab_panel):
+    def agregar_pestanas_avaluo(self, id_avaluo, tab_panel, ventana_principal=None):
         
         """
         Agrega las pestañas relacionadas con el avalúo al accionar el botón 'boton_accion'.
         Pasa el id_avaluo a cada pestaña para cargar la información correspondiente.
         
         :param id_avaluo: ID del avalúo seleccionado.
+        :param ventana_principal: Referencia a la ventana principal para acceder a credenciales.
         """
-        
+        self.ventana_principal = ventana_principal
+
         try:
             # Crear las pestañas con el id_avaluo
             
@@ -60,15 +62,15 @@ class Funciones:
                         print("Pestaña de seguimiento cerrada.")
                     return  # Salir de la función para evitar agregar pestañas duplicadas
                 
-            # Agregar las pestañas al QTabWidget
-            PestanaDatosSolicitud(tab_panel, id_avaluo)   
+            # Agregar las pestañas al QTabWidget (pasando ventana_principal)
+            PestanaDatosSolicitud(tab_panel, id_avaluo, ventana_principal=self.ventana_principal)   
             
             if id_avaluo != "":
             
-                PestanaCaracteristicasSector(tab_panel, id_avaluo)
-                PestanaCaracteristicasConstruccion(tab_panel, id_avaluo)
-                PestanaCondicionesValuacion(tab_panel, id_avaluo)
-                agregar_pestana_imagenes(tab_panel, id_avaluo)
+                PestanaCaracteristicasSector(tab_panel, id_avaluo, ventana_principal=self.ventana_principal)
+                PestanaCaracteristicasConstruccion(tab_panel, id_avaluo, ventana_principal=self.ventana_principal)
+                PestanaCondicionesValuacion(tab_panel, id_avaluo, ventana_principal=ventana_principal)
+                agregar_pestana_imagenes(tab_panel, id_avaluo, ventana_principal=self.ventana_principal)
                 
             print(f"Movido a la pestaña existente 'PestanaDatosSolicitud' con id_avaluo: {id_avaluo}")
             """ PestanaCaracteristicasSector(self.tab_panel)

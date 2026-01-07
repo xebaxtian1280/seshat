@@ -15,13 +15,14 @@ from Funciones_imagenes import FuncionesImagenes
 from DB import DB
 
 class PestanaCaracteristicasSector(QWidget):
-    def __init__(self, tab_panel: QTabWidget, id_avaluo = None):
+    def __init__(self, tab_panel: QTabWidget, id_avaluo = None, ventana_principal=None):
         super().__init__()
         
         self.basededatos = 'seshat'
         self.id_avaluo = id_avaluo
         self.pestana_activa = False  # Estado para rastrear si la pestaña está activa
         self.caracteristicas_sector_id = None  # ID del registro en la tabla caracteristicas_sector
+        self.ventana_principal = ventana_principal
         
         # Aquí va el contenido de la función crear_pestana_caracteristicas_sector
         self.group_style = Estilos.cargar_estilos(self, "styles.css")
@@ -274,7 +275,7 @@ class PestanaCaracteristicasSector(QWidget):
     def guardar_datos(self):
         try:
 
-            db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+            db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
 
             valores_checkbox = {cb.text(): cb.isChecked() for cb in self.col1.parentWidget().findChildren(QCheckBox) + self.col2.parentWidget().findChildren(QCheckBox)}
@@ -496,7 +497,7 @@ class PestanaCaracteristicasSector(QWidget):
             self.pestana_activa = False  # Resetear el estado
 
     def cargar_datos_sector(self, id_avaluo):
-        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+        db = self.ventana_principal.obtener_conexion_db()
         db.conectar()
         try:
             # Consulta principal
@@ -556,7 +557,7 @@ class PestanaCaracteristicasSector(QWidget):
     
     def cargar_tratamientos_sector(self, caracteristicas_sector_id):
 
-        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+        db = self.ventana_principal.obtener_conexion_db()
         db.conectar()
 
         try:
@@ -578,7 +579,7 @@ class PestanaCaracteristicasSector(QWidget):
     
     def cargar_usos_sector(self, caracteristicas_sector_id):
 
-        db = DB(host="localhost", database=self.basededatos, user="postgres", password="ironmaiden")
+        db = self.ventana_principal.obtener_conexion_db()
         db.conectar()
 
         try:
