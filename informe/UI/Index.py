@@ -104,6 +104,7 @@ class LoginDialog(QDialog):
         usuario = self.usuario_input.text().strip()
         password = self.password_input.text()
 
+        print( not usuario or not password)
         if not usuario or not password:
             self.mostrar_error("Por favor ingrese usuario y contraseña")
             return
@@ -139,15 +140,14 @@ class LoginDialog(QDialog):
                     self.password_input.setFocus()
             db.cerrar_conexion()
         except Exception as e:
+            self.mostrar_error("Error al intentar conectarse con la base de datos")
             print(f"Error al intentar loguearse: {e}")
             
-            
-    
     def mostrar_error(self, mensaje):
         """Muestra un mensaje de error en el diálogo"""
         self.mensaje_error.setText(mensaje)
         # Limpiar mensaje después de 3 segundos
-        QTimer.singleShot(3000, lambda: self.mensaje_error.setText(""))
+        QTimer.singleShot(5000, lambda: self.mensaje_error.setText(""))
     
     def cancelar(self):
         """Cancela el login y cierra la aplicación"""
@@ -207,25 +207,35 @@ class ReportApp(QMainWindow):
         generar_action = self.file_menu.addAction("Radicar Solicitud")
         generar_action.triggered.connect(lambda: Funciones.agregar_pestanas_avaluo(self,"",self.tab_panel, ventana_principal=self))
         
-        generar_action = self.file_menu.addAction("Generar Informe")
-        generar_action.triggered.connect(self.iniciar_generacion)
-        
         ubicacion_action = self.file_menu.addAction("Guardar Como")
         ubicacion_action.triggered.connect(self.seleccionar_ubicacion)
         
         crear_proyecto = self.file_menu.addAction("Crear Proyecto")
         crear_proyecto.triggered.connect(self.crea_proyecto)
         
-        abrir_proyecto = self.file_menu.addAction("Abrir proyecto")
-        abrir_proyecto.triggered.connect(self.carga_proyecto)
-        
         self.file_menu.addSeparator()
         exit_action = self.file_menu.addAction("Salir")
         exit_action.triggered.connect(self.close)
         
         menu_bar.addMenu(self.file_menu)
-        main_layout.addWidget(menu_bar)
+
         
+
+        # Barra de proyecto integrada en el panel
+
+        self.file_proyecto = QMenu("&Proyecto", self)
+
+        abrir_proyecto = self.file_proyecto.addAction("Directorio del proyecto")
+        abrir_proyecto.triggered.connect(self.carga_proyecto)
+
+        generar_action = self.file_proyecto.addAction("Generar Informe")
+        generar_action.triggered.connect(self.iniciar_generacion)
+
+        menu_bar.addMenu(self.file_proyecto)
+        self.file_proyecto.menuAction().setVisible(False)  # Oculto por defecto
+
+        main_layout.addWidget(menu_bar)
+
         # Panel de pestañas
         self.tab_panel = QTabWidget()
 
@@ -240,15 +250,6 @@ class ReportApp(QMainWindow):
         
         # Conectar la señal de PestanaSeguimiento
         self.pestana_seguimiento.id_avaluo_seleccionado.connect(self.recibir_id_avaluo)
-        
-        
-        # Crear pestañas
-        #PestanaSeguimiento(self.tab_panel)
-        """ PestanaDatosSolicitud(self.tab_panel)        
-        PestanaCaracteristicasSector(self.tab_panel)
-        PestanaCaracteristicasConstruccion(self.tab_panel)
-        PestanaCondicionesValuacion(self.tab_panel)
-        agregar_pestana_imagenes(self.tab_panel)  """      
         
         
         main_layout.addWidget(self.tab_panel)
@@ -320,6 +321,7 @@ class ReportApp(QMainWindow):
         """
         Vuelve a la pestaña de seguimiento y cierra las demás pestañas.
         """
+        self.file_proyecto.menuAction().setVisible(False)  # Ocultar menú Proyecto
         
         try:
             # Crear las pestañas con el id_avaluo            
@@ -351,6 +353,7 @@ class ReportApp(QMainWindow):
         print(f"ID Avaluo recibido en Index: {id_avaluo}")
         # Pasar el id_avaluo a la pestaña Datos de Solicitud
         self.id_avaluo = id_avaluo
+        self.file_proyecto.menuAction().setVisible(True)  # Mostrar menú Proyecto al abrir avalúo
     
     def seleccionar_ubicacion(self):
         directory = QFileDialog.getExistingDirectory(
@@ -377,15 +380,45 @@ class ReportApp(QMainWindow):
                                    f"Los informes se guardarán en:\n{self.default_save_path}")
             
     def carga_proyecto(self):
-        directory = QFileDialog.getExistingDirectory(
-            self,
-            "Seleccionar ubicación de guardado",
-            self.default_save_path
-        )
-        if directory:
-            self.default_save_path = directory
-            QMessageBox.information(self, "Ubicación actualizada", 
-                                   f"Los informes se guardarán en:\n{self.default_save_path}")
+        """Abre el directorio del proyecto desde path_trabajo en la base de datos"""
+        try:
+            # Verificar que hay un avalúo seleccionado
+            if not hasattr(self, 'id_avaluo') or self.id_avaluo is None:
+                QMessageBox.warning(self, "Advertencia", "No hay ningún avalúo seleccionado")
+                return
+            
+            # Conectar a la base de datos
+            db = self.obtener_conexion_db()
+            db.conectar()
+            
+            # Consultar el path_trabajo
+            consulta = """
+                SELECT path_trabajo 
+                FROM "Avaluos" 
+                WHERE "Avaluo_id" = %s
+            """
+            resultado = db.consultar(consulta, (self.id_avaluo,))
+            
+            if resultado and resultado[0][0]:
+                path_trabajo = resultado[0][0]
+                
+                # Verificar que el directorio existe
+                if os.path.exists(path_trabajo):
+                    # Abrir el explorador de archivos en el directorio
+                    subprocess.run(['xdg-open', path_trabajo])
+                else:
+                    QMessageBox.warning(self, "Directorio no encontrado", 
+                                      f"El directorio no existe:\n{path_trabajo}")
+            else:
+                QMessageBox.information(self, "Sin directorio", 
+                                       "No se ha configurado un directorio de trabajo para este avalúo")
+            
+            db.cerrar_conexion()
+            
+        except Exception as e:
+            print(f"Error al abrir el directorio del proyecto: {e}")
+            QMessageBox.critical(self, "Error", f"Error al abrir el directorio: {str(e)}")
+        
     
     def iniciar_generacion(self):
         self.progress_bar.show()

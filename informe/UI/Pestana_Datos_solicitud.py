@@ -10,7 +10,8 @@ from Estilos import Estilos
 from DB import DB
 
 
-import enchant, re, json
+import enchant, re, json, os, subprocess
+from datetime import datetime
 from PyQt6.QtGui import QTextCharFormat, QColor
 
 import webview
@@ -149,10 +150,11 @@ class PestanaDatosSolicitud(QWidget):
         self.modo_adquisicion = QComboBox()
         self.modo_adquisicion.addItems([
             "",
-            "Compraventa", 
             "Adjudicación en Sucesión", 
+            "Compraventa", 
+            "Compra parcial",
+            "Donación",
             "Transferencia a título de fiducia mercantil", 
-            "Compra parcial"
         ])
         
         self.tipo_inmueble = QComboBox()
@@ -262,6 +264,112 @@ class PestanaDatosSolicitud(QWidget):
 
                 if self.id_avaluo != "":
                     self.actualizar_solicitud()
+
+    def validar_y_crear_carpeta_avaluo(self, codigo_radicado):
+        """
+        Valida la conexión a /mnt/interval y crea la estructura de carpetas para avalúos.
+        
+        Estructura creada:
+        /mnt/interval/Avaluos/AAAA/MM/codigo_radicado/
+        
+        :param codigo_radicado: Código de radicado del avalúo
+        :return: dict con 'exito' (bool), 'mensaje' (str) y 'ruta' (str o None)
+        """
+        try:
+            # 1. Validar que /mnt/interval existe y es accesible
+            base_path = "/mnt/interval"
+            if not os.path.exists(base_path):
+                return {
+                    "exito": False,
+                    "mensaje": f"La carpeta {base_path} no existe o no es accesible",
+                    "ruta": None
+                }
+            
+            if not os.path.isdir(base_path):
+                return {
+                    "exito": False,
+                    "mensaje": f"{base_path} existe pero no es un directorio",
+                    "ruta": None
+                }
+            
+            # Verificar permisos de escritura
+            if not os.access(base_path, os.W_OK):
+                return {
+                    "exito": False,
+                    "mensaje": f"No hay permisos de escritura en {base_path}",
+                    "ruta": None
+                }
+            
+            # 2. Obtener año y mes actuales
+            fecha_actual = datetime.now()
+            anio = fecha_actual.strftime("%Y")
+            mes = fecha_actual.strftime("%m")
+            
+            # 3. Construir la ruta completa
+            ruta_avaluos = os.path.join(base_path, "Avaluos")
+            ruta_anio = os.path.join(ruta_avaluos, anio)
+            ruta_mes = os.path.join(ruta_anio, mes)
+            ruta_radicado = os.path.join(ruta_mes, str(codigo_radicado))
+            
+            # 4. Crear estructura de carpetas si no existe
+            # Crear /mnt/interval/Avaluos
+            if not os.path.exists(ruta_avaluos):
+                os.makedirs(ruta_avaluos, exist_ok=True)
+                print(f"Carpeta creada: {ruta_avaluos}")
+            
+            # Crear /mnt/interval/Avaluos/AAAA
+            if not os.path.exists(ruta_anio):
+                os.makedirs(ruta_anio, exist_ok=True)
+                print(f"Carpeta creada: {ruta_anio}")
+            
+            # Crear /mnt/interval/Avaluos/AAAA/MM
+            if not os.path.exists(ruta_mes):
+                os.makedirs(ruta_mes, exist_ok=True)
+                print(f"Carpeta creada: {ruta_mes}")
+            
+            # 5. Crear carpeta con código de radicado
+            if os.path.exists(ruta_radicado):
+                return {
+                    "exito": False,
+                    "mensaje": f"La carpeta para el radicado {codigo_radicado} ya existe",
+                    "ruta": ruta_radicado
+                }
+            
+            os.makedirs(ruta_radicado, exist_ok=True)
+            os.makedirs(os.path.join(ruta_radicado, "Documentos"), exist_ok=True)
+            os.makedirs(os.path.join(ruta_radicado, "Registro_Fotografico"), exist_ok=True)
+            os.makedirs(os.path.join(ruta_radicado, "Cartografia"), exist_ok=True)
+            os.makedirs(os.path.join(ruta_radicado,"Norma"), exist_ok=True)
+            os.makedirs(os.path.join(ruta_radicado,"Ofertas"), exist_ok=True)
+            print(f"Carpeta de radicado creada: {ruta_radicado}")
+            
+            # Abrir la carpeta en el visor de archivos
+            subprocess.Popen(["xdg-open", ruta_radicado])
+            
+            return {
+                "exito": True,
+                "mensaje": f"Carpeta creada exitosamente en {ruta_radicado}",
+                "ruta": ruta_radicado
+            }
+            
+        except PermissionError as e:
+            return {
+                "exito": False,
+                "mensaje": f"Error de permisos: {str(e)}",
+                "ruta": None
+            }
+        except OSError as e:
+            return {
+                "exito": False,
+                "mensaje": f"Error del sistema operativo: {str(e)}",
+                "ruta": None
+            }
+        except Exception as e:
+            return {
+                "exito": False,
+                "mensaje": f"Error inesperado: {str(e)}",
+                "ruta": None
+            }
                     
     def actualizar_solicitud(self):
         # Obtener datos actualizados de la solicitud
@@ -567,7 +675,8 @@ class PestanaDatosSolicitud(QWidget):
             "tipo_avaluo": self.tipo_avaluo.currentText(),
             "id_peritos": self.nombre_perito.currentData(role=Qt.ItemDataRole.UserRole),
             "id_revisor": self.nombre_revisor.currentData(role=Qt.ItemDataRole.UserRole),
-            "zona": self.zona.currentText()
+            "zona": self.zona.currentText(),
+            "proceso_estado": "Visita Tecnica"
         }
         
         # Validar campos requeridos
@@ -576,13 +685,25 @@ class PestanaDatosSolicitud(QWidget):
             QMessageBox.warning(self, "Campos incompletos", "Por favor complete todos los campos requeridos.")
             return
         
+         
+        
         # Guardar los datos en una base de datos o archivo
         db = self.ventana_principal.obtener_conexion_db()
         db.conectar()
         id_avaluo = db.insertar(
-           """INSERT INTO "Avaluos" (nombre_cliente, id_cliente, destinatario, fecha_visita, tipo_avaluo, fecha_avaluo, id_peritos, id_revisor, zona) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) returning "Avaluo_id" """
-            , (solicitud_data["cliente"], solicitud_data["doc_identidad"], solicitud_data["destinatario"], solicitud_data["fecha_visita"],solicitud_data["tipo_avaluo"], solicitud_data["fecha_informe"], solicitud_data["id_peritos"], solicitud_data["id_revisor"], solicitud_data["zona"]))
+           """INSERT INTO "Avaluos" (nombre_cliente, id_cliente, destinatario, fecha_visita, tipo_avaluo, fecha_avaluo, id_peritos, id_revisor, zona, estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) returning "Avaluo_id" """
+            , (solicitud_data["cliente"], solicitud_data["doc_identidad"], solicitud_data["destinatario"], solicitud_data["fecha_visita"],solicitud_data["tipo_avaluo"], solicitud_data["fecha_informe"], solicitud_data["id_peritos"], solicitud_data["id_revisor"], solicitud_data["zona"], solicitud_data["proceso_estado"]))
 
+        rutaTrabajo = self.validar_y_crear_carpeta_avaluo(codigo_radicado=id_avaluo)
+
+        if not rutaTrabajo["exito"]:
+            QMessageBox.critical(self, "Error al crear carpeta", rutaTrabajo["mensaje"])
+            db.eliminar(""" delete from "Avaluos" where "Avaluo_id" = %s """, (id_avaluo,))
+            db.cerrar_conexion()
+            return
+        
+        db.actualizar(""" update "Avaluos" set path_trabajo = %s where "Avaluo_id" = %s """, (rutaTrabajo["ruta"], id_avaluo))
+        
         
         # Recorrer los elementos de matricula_layout y obtener los textos de los QLineEdit
         
@@ -598,9 +719,6 @@ class PestanaDatosSolicitud(QWidget):
                     db.insertar(
                         """insert into inmuebles (matricula_inmobiliaria, tipo_inmueble, direccion, barrio, municipio, departamento, cedula_catastral, modo_adquicision, limitaciones, longitud, latitud, avaluo_id, doc_propiedad, propietario, id_propietario) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) returning id_inmueble """,(texto_matricula, self.inmuebles[texto_matricula]["tipo_inmueble"], self.inmuebles[texto_matricula]["direccion"], self.inmuebles[texto_matricula]["barrio"], self.inmuebles[texto_matricula]["municipio"], self.inmuebles[texto_matricula]["departamento"], self.inmuebles[texto_matricula]["cedula_catastral"], self.inmuebles[texto_matricula]["modo_adquisicion"], self.inmuebles[texto_matricula]["limitaciones"], self.inmuebles[texto_matricula]["longitud"], self.inmuebles[texto_matricula]["latitud"], id_avaluo, self.inmuebles[texto_matricula]["doc_propiedad"], self.inmuebles[texto_matricula]["propietario"], self.inmuebles[texto_matricula]["id_propietario"]))
                     
-
-        # Lista para almacenar los textos de la documentación
-        documentacion = []
         
         # Recorrer los widgets en el contenedor correspondiente
         for i in range(self.documentacion_layout.count()):
@@ -636,7 +754,7 @@ class PestanaDatosSolicitud(QWidget):
                 
             
             # Crear las pestaña seguimiento
-            self.pestana_seguimiento = PestanaSeguimiento(self.tab_panel)
+            self.pestana_seguimiento = PestanaSeguimiento(self.tab_panel, ventana_principal=self.ventana_principal)
                    
     
         except Exception as e:

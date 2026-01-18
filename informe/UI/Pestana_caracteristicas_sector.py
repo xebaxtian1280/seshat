@@ -23,6 +23,7 @@ class PestanaCaracteristicasSector(QWidget):
         self.pestana_activa = False  # Estado para rastrear si la pestaña está activa
         self.caracteristicas_sector_id = None  # ID del registro en la tabla caracteristicas_sector
         self.ventana_principal = ventana_principal
+        self.path_trabajo = ""
         
         # Aquí va el contenido de la función crear_pestana_caracteristicas_sector
         self.group_style = Estilos.cargar_estilos(self, "styles.css")
@@ -184,7 +185,10 @@ class PestanaCaracteristicasSector(QWidget):
         self.imagenes_usos_layout = QVBoxLayout()
         btn_agregar_imagen = QPushButton("Agregar imagen")
         btn_agregar_imagen.setStyleSheet(self.group_style)
-        btn_agregar_imagen.clicked.connect(lambda: FuncionesImagenes.agregar_imagen(self, self.imagenes_usos_layout))
+
+        # Conectar botón agregar imagenes usos
+        btn_agregar_imagen.clicked.connect(lambda: FuncionesImagenes.agregar_imagen(self, self.imagenes_usos_layout, path_trabajo=self.path_trabajo+"/Norma"))
+        
         form_usos.addRow(btn_agregar_imagen)
         form_usos.addRow(self.imagenes_usos_layout)
         
@@ -219,7 +223,7 @@ class PestanaCaracteristicasSector(QWidget):
         # Imágenes tratamientos
         self.imagenes_tratamientos_layout = QVBoxLayout()
         btn_agregar_imagen_trat = QPushButton("Agregar imagen")
-        btn_agregar_imagen_trat.clicked.connect(lambda : FuncionesImagenes.agregar_imagen(self, self.imagenes_tratamientos_layout))
+        btn_agregar_imagen_trat.clicked.connect(lambda : FuncionesImagenes.agregar_imagen(self, self.imagenes_tratamientos_layout, path_trabajo=self.path_trabajo+"/Norma"))
         form_tratamientos.addRow(btn_agregar_imagen_trat)
         form_tratamientos.addRow(self.imagenes_tratamientos_layout)
         
@@ -271,6 +275,8 @@ class PestanaCaracteristicasSector(QWidget):
         tab_panel.addTab(pestana, "Características del Sector")
 
         self.cargar_datos_sector(self.id_avaluo)
+
+        
 
     def guardar_datos(self):
         try:
@@ -509,11 +515,22 @@ class PestanaCaracteristicasSector(QWidget):
             FROM caracteristicas_sector
             WHERE id_avaluo = %s
             """
+             # Obtener path_trabajo
+
+            query_path_trabajo = """
+            select a.path_trabajo 
+            from "Avaluos" a 
+            where a."Avaluo_id" = %s
+            """
+           
+
             print(f"Ejecutando consulta para id_avaluo: {id_avaluo}")
             # IMPORTANTE: pasar los parámetros como tupla (incluso si es 1) -> (id_avaluo,)
             # Pasar (id_avaluo) no crea una tupla y puede provocar errores de formateo
             resultado = db.consultar(query, (id_avaluo,))
-            print(f"Resultado de la consulta: {resultado}")
+            
+            self.path_trabajo = db.consultar(query_path_trabajo, (id_avaluo,))[0][0]
+
             if resultado:
                 datos = resultado[0]
                 self.transporte_texto.setPlainText(datos[0])

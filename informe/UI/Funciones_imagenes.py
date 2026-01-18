@@ -21,14 +21,15 @@ import os
 
 class FuncionesImagenes:
     
-    def agregar_imagen(self,layout_destino=None, path_imagen=None, leyenda="", id_imagen=None, tabla=None):
+    def agregar_imagen(self,layout_destino=None, path_imagen=None, leyenda="", id_imagen=None, tabla=None, path_trabajo=None):
         # Abrir un cuadro de diálogo para seleccionar una imagen
 
         if path_imagen is None:
+            print("Path trabajo:", path_trabajo)
             ruta_imagen, _ = QFileDialog.getOpenFileName(
                 self, 
                 "Seleccionar imagen", 
-                "./Resultados/Imagenes",  # Carpeta actual
+                path_trabajo,  # Carpeta actual
                 "Imágenes (*.png *.jpg *.jpeg *.bmp *.gif)"
             )
         else:

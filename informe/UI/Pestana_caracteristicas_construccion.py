@@ -29,6 +29,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
         self.fila_anterior = 0
         self.editando_fila = False
         self.datos_actuales = {}
+        self.path_trabajo = ""
 
         self.ventana_principal = ventana_principal
 
@@ -113,7 +114,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
         
         # Botón para agregar croquis
         btn_agregar_croquis = QPushButton("Agregar Croquis")
-        btn_agregar_croquis.clicked.connect(lambda: FuncionesImagenes.agregar_imagen(self, self.croquis_container))
+        btn_agregar_croquis.clicked.connect(lambda: FuncionesImagenes.agregar_imagen(self, self.croquis_container, path_trabajo=self.path_trabajo+"/Cartografia"))
         
         layout_croquis.addWidget(btn_agregar_croquis)
         layout_croquis.addLayout(self.croquis_container)
@@ -139,8 +140,8 @@ class PestanaCaracteristicasConstruccion(QWidget):
         # Botones para tabla
         btn_frame = QWidget()
         btn_layout = QHBoxLayout(btn_frame)
-        btn_agregar_fila = QPushButton("Agregar Fila")
-        btn_eliminar_fila = QPushButton("Eliminar Fila")
+        btn_agregar_fila = QPushButton("Agregar Construcción")
+        btn_eliminar_fila = QPushButton("Eliminar Construcción")
         btn_guardar_fila = QPushButton("Guardar Cambios")
         
         btn_agregar_fila.clicked.connect(self.agregar_fila_area)
@@ -211,6 +212,7 @@ class PestanaCaracteristicasConstruccion(QWidget):
             "Madera", 
             "Policarbonato", 
             "Placa en Concreto",
+            "Paneles en aluminio e icopor.",
             "Sin Cubierta"
         ]
         
@@ -894,8 +896,18 @@ class PestanaCaracteristicasConstruccion(QWidget):
             JOIN inmuebles i ON c.inmueble_id = i.id_inmueble
             WHERE i.avaluo_id =  %s ORDER BY c.id ASC
         """
+
+        # Obtener path_trabajo
+             
+        query_path_trabajo = """
+            select a.path_trabajo 
+            from "Avaluos" a 
+            where a."Avaluo_id" = %s
+            """
+
         construcciones = db.consultar(query, (self.id_avaluo,))
-        print("Construcciones encontradas:", len(construcciones))
+        self.path_trabajo = db.consultar(query_path_trabajo, (self.id_avaluo,))[0][0]
+
         self.tabla_area.setRowCount(0)
         self.fila_anterior = len(construcciones) -1 if len(construcciones) >0 else 0
 
