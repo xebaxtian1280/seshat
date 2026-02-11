@@ -91,7 +91,7 @@ class PestañaImagenes(QWidget):
         rotacion = 0
         ancho = pixmap.width()
         alto = pixmap.height()
-        print("Agregando imagen:" , ruta_imagen)
+        
         self.lista_imagenes.append({
             "numero": numero_imagen,
             "ruta": ruta_imagen,
@@ -252,8 +252,7 @@ class PestañaImagenes(QWidget):
             if not filas:
                 db.cerrar_conexion()
                 return True, []
-            print(f"Se encontraron {len(filas)} imágenes para avaluo_id {aid}")
-            print("comparando filas:", filas)
+            
             for fila in filas:
                 
                 datos_imagen = {
@@ -287,7 +286,7 @@ class PestañaImagenes(QWidget):
         :param index: El índice de la pestaña actualmente activa.
         """
         print(f"Pestaña cambiada a índice: {index}, Título: {tab_panel.tabText(index)}")
-        print("comparando con 'Cargar Imágenes'", tab_panel.tabText(index) == "Cargar Imágenes")
+        
         if tab_panel.tabText(index) == "Cargar Imágenes":
             if self.id_avaluo != "":
                 self.guardar_imagenes()

@@ -26,7 +26,7 @@ class Backend(QObject):
         """
         Método expuesto al frontend para capturar las coordenadas.
         """
-        print(f"Latitud: {lat}, Longitud: {lon}")
+        
         self.ventana.latitud.setValue(lat)
         self.ventana.longitud.setValue(lon)
 
@@ -259,7 +259,7 @@ class PestanaDatosSolicitud(QWidget):
             :param tab_panel: El QTabWidget que contiene las pestañas.
             :param index: El índice de la pestaña actualmente activa.
             """
-            print(f"Pestaña cambiada a índice: {index}, Título: {tab_panel.tabText(index)}")
+            
             if tab_panel.tabText(index) == "Datos de la Solicitud":
 
                 if self.id_avaluo != "":
@@ -441,7 +441,7 @@ class PestanaDatosSolicitud(QWidget):
             db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
             
-            print(f"Cargando datos para el avalúo con ID: {self.id_avaluo}")
+            
     
             # Consulta SQL para obtener los datos de la solicitud
             consulta = """
@@ -469,7 +469,7 @@ class PestanaDatosSolicitud(QWidget):
                 a."Avaluo_id" = 2;
             """.replace("2", str(id_avaluo))
             resultado = db.consultar(consulta)
-            print(resultado)
+            
             # Verificar si se encontraron datos
             if resultado:
                 
@@ -505,7 +505,7 @@ class PestanaDatosSolicitud(QWidget):
             consulta_documentacion = """ select documento, id_documentacin from documentacion_aportada where "Avaluo_id" = %s""".replace("%s", str(id_avaluo))
             
             resultado_documentacion = db.consultar(consulta_documentacion)
-            print(resultado_documentacion)
+            
             if resultado_documentacion:
                 for doc in resultado_documentacion:
                     self.agregar_campo_documento(doc)
@@ -630,7 +630,7 @@ class PestanaDatosSolicitud(QWidget):
         id_municipio = self.municipio_inmueble.currentData(role=Qt.ItemDataRole.UserRole)
         id_departamento = self.municipio_inmueble.currentData(role=Qt.ItemDataRole.UserRole + 1)
         indice = self.departamento_inmueble.findData(id_departamento, role=Qt.ItemDataRole.UserRole)
-        print("ID Departamento recuperado:", id_departamento)
+        
         if indice is not None:
             # Asignar el valor recuperado al QComboBox de departamentos
             self.departamento_inmueble.setCurrentIndex(indice)
@@ -647,7 +647,7 @@ class PestanaDatosSolicitud(QWidget):
                 where mc."MpCodigo" = %s
                 GROUP BY mc.geom
             """
-            print(query, (str(id_municipio),))
+            
             resultado = db.consultar(query, (id_municipio,))
             
             db.cerrar_conexion()
@@ -740,7 +740,7 @@ class PestanaDatosSolicitud(QWidget):
                     except Exception as e:
                         print(f"Error al insertar el documento '{texto_documento}': {e}")
         
-        print(f"Números de matrícula obtenidos: {matriculas}")
+        
         try:
             # Crear las pestañas con el id_avaluo            
             
@@ -748,7 +748,7 @@ class PestanaDatosSolicitud(QWidget):
                 
                 """ widget = self.tab_panel.widget(index)
                 validacion=(self.tab_panel.tabText(index) == "PestanaDatosSolicitud") """
-                print(f"Cerrando pestaña: {self.tab_panel.tabText(index)} con idex {index}")
+                
                 
                 self.tab_panel.removeTab(0)
                 
@@ -897,7 +897,7 @@ class PestanaDatosSolicitud(QWidget):
         </body>
         </html>
         """
-        print("Mapa HTML generado.", mapa_html)
+        
         
         # Agregar el QWebEngineView al contenedor en la interfaz
          
@@ -909,7 +909,7 @@ class PestanaDatosSolicitud(QWidget):
         """
         self.latitud.setValue(lat)  # Actualizar el campo de latitud
         self.longitud.setValue(lon)  # Actualizar el campo de longitud
-        print(f"Coordenadas actualizadas: Latitud={lat}, Longitud={lon}")
+        
         
     def agregar_campo_matricula(self):
 
@@ -941,8 +941,7 @@ class PestanaDatosSolicitud(QWidget):
                     QMessageBox.StandardButton.Ok
                 )
                 return
-            print("resultado:", resultado!='')
-            print("matricula actual:", self.matricula_actual)
+            
             if resultado != '' and self.matricula_actual:
                 campo = QPushButton()
                 campo.setText(self.matricula_actual)
@@ -1001,15 +1000,14 @@ class PestanaDatosSolicitud(QWidget):
                 }   
         
         auxiliar_comparar = False
-        print("Comparando datos del inmueble para la matrícula:", self.matricula_actual)
-        print("Datos actuales del inmueble:", self.inmuebles)
+        
         for clave, valor in inmueble_data.items():
             valor_actual = self.inmuebles[self.matricula_actual][clave]
-            print(f"Comparando clave: {clave}, valor actual: {valor_actual}, nuevo valor: {valor}, resultado: {str(valor_actual) != str(valor)}")
+            
             if str(valor_actual) != str(valor):
                 auxiliar_comparar = True 
-                print("Se detectó un cambio en la clave:", clave)                   
-        print(auxiliar_comparar)
+                                  
+        
         if auxiliar_comparar:
             ## Crear el cuadro de diálogo
             dialogo = QMessageBox(self)
@@ -1348,7 +1346,7 @@ class PestanaDatosSolicitud(QWidget):
             print(f"Agregando nuevo inmueble con matrícula: {matricula}")
             self.inmuebles[matricula] = inmueble_data
     
-        print(f"Inmueble actualizado/agregado: {self.inmuebles[matricula]}")
+        
     
     def cargar_inmuebles(self):
         """
@@ -1357,7 +1355,7 @@ class PestanaDatosSolicitud(QWidget):
         """
                     
         query = """ SELECT * FROM inmuebles WHERE avaluo_id = x; """.replace("x", str(self.id_avaluo))
-        print(f"Cargando inmuebles con la consulta: {query}")
+        
         
         try:
             # Ejecutar la consulta para obtener todos los registros de la tabla inmuebles
@@ -1366,7 +1364,7 @@ class PestanaDatosSolicitud(QWidget):
             
             registros = db.consultar(query)
             
-            print(f"Registros obtenidos: {registros}")
+            
     
             # Limpiar el diccionario self.inmuebles antes de cargar nuevos datos
             self.inmuebles = {}
@@ -1374,7 +1372,7 @@ class PestanaDatosSolicitud(QWidget):
             # Recorrer los registros y agregarlos al diccionario
             for registro in registros:
                 matricula = registro[1]  # Suponiendo que esta es la clave única
-                print(f"Cargando inmueble con matrícula: {matricula}")
+                
                 self.inmuebles[matricula] = {
                     "tipo_inmueble": registro[2],
                     "direccion": registro[3],
@@ -1391,7 +1389,7 @@ class PestanaDatosSolicitud(QWidget):
                     "propietario": registro[14],
                     "id_propietario": registro[15]
                 }
-                print(f"Inmueble agregado al diccionario: {self.inmuebles[matricula]}")
+                
                 
                 # Crear el campo de texto para la matrícula
                 campo = QPushButton()
@@ -1422,7 +1420,7 @@ class PestanaDatosSolicitud(QWidget):
             if not self.matricula_layout.count():
                 self.actualizar_mapa()
             db.cerrar_conexion()
-            print(f"Inmuebles cargados correctamente en el diccionario self.inmuebles: {self.inmuebles}")
+            
         except Exception as e:
             print(f"Error al cargar los inmuebles desde la base de datos: {e}")
     
@@ -1468,9 +1466,9 @@ class PestanaDatosSolicitud(QWidget):
 
     def agregar_campo_documento(self, documento = None):
         campo = QLineEdit()
-        print(f"agregar campo segun {self.id_avaluo}")
+        
         if documento:
-            print( documento[0])
+            
             campo.setText(documento[0])
             campo.setProperty("id_documento", documento[1])
             

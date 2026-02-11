@@ -228,23 +228,22 @@ class PestanaSeguimiento(QWidget):
                 query = """ SELECT COUNT(*) FROM inmuebles WHERE avaluo_id = x; """.replace("x", str(resultado[0]))
                 id_avaluo = resultado[0]
                 numero_inmuebles = db.consultar(query, (id_avaluo,))
-                print(f"ID Avaluo: {resultado[0]}, Número de inmuebles: {numero_inmuebles[0][0]}")
+                
                 self.tabla_resultados.setItem(fila, 6, QTableWidgetItem(str(numero_inmuebles[0][0])))
                 
                 # Agregar un botón de acción en la última columna
                 boton_accion = QPushButton("Ver")
                 id_avaluo=str(resultado[0])
-                print("ID Avaluo:", id_avaluo)
+                
                 boton_accion.setProperty("id_avaluo", id_avaluo)  # Asignar el id_avaluo como propiedad
                 boton_accion.clicked.connect(lambda:self.manejar_click_boton())
-                # boton_accion.clicked.connect(lambda id_avaluo=id_avaluo: print(f"Botón presionado con id_avaluo: {id_avaluo}") or self.agregar_pestanas_avaluo(id_avaluo, tab_panel))
-                # Pasar el ID del avalúo al método agregar_pestanas_avaluo
+                
                 self.tabla_resultados.setCellWidget(fila, 7, boton_accion)
     
     def manejar_click_boton(self):
         boton = self.sender()  # Obtener el botón que disparó la señal
         id_avaluo = boton.property("id_avaluo")  # Recuperar el id_avaluo
-        print(f"Botón presionado con id_avaluo: {id_avaluo}")
+        
         self.id_avaluo_seleccionado.emit(id_avaluo)  # Emitir la señal con el id_avaluo
         Funciones.agregar_pestanas_avaluo(self, id_avaluo, self.tab_panel, ventana_principal=self.ventana_principal)
         #self.agregar_pestanas_avaluo(id_avaluo, self.tab_panel)
@@ -286,7 +285,7 @@ class PestanaSeguimiento(QWidget):
             query += " AND r.nombre ILIKE %s"
             parametros.append(f"%{self.filtro_nombre_revisor.currentText()}%")
             
-        print("Consulta SQL:", query)
+        
         # Ejecutar la consulta
         db = self.ventana_principal.obtener_conexion_db()
         db.conectar()

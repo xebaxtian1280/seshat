@@ -586,7 +586,7 @@ class PestanaCaracteristicasSector(QWidget):
             resultados = db.consultar(query, (caracteristicas_sector_id,))
             for tratamiento, path_imagen, id_imagen in resultados:
                 # Aquí puedes crear el widget para mostrar el tratamiento y la imagen
-                FuncionesImagenes.agregar_imagen(self, self.imagenes_tratamientos_layout, path_imagen, tratamiento, id_imagen,'tratamientos_sector')
+                FuncionesImagenes.agregar_imagen(self, self.imagenes_tratamientos_layout, path_imagen, tratamiento, id_imagen,'tratamientos_sector', ventana_principal=self.ventana_principal)
 
                 
         except Exception as e:
@@ -608,7 +608,7 @@ class PestanaCaracteristicasSector(QWidget):
             resultados = db.consultar(query, (caracteristicas_sector_id,))
             for uso, path_imagen, id_imagen in resultados:
                 print(f"Cargando uso: {uso}, imagen: {path_imagen}, id: {id_imagen}")
-                FuncionesImagenes.agregar_imagen(self, self.imagenes_usos_layout, path_imagen, uso, id_imagen, 'usos_sector')
+                FuncionesImagenes.agregar_imagen(self, self.imagenes_usos_layout, path_imagen, uso, id_imagen, 'usos_sector', ventana_principal=self.ventana_principal)
 
                 
         except Exception as e:

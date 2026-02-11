@@ -20,12 +20,12 @@ import subprocess
 import os
 
 class FuncionesImagenes:
-    
-    def agregar_imagen(self,layout_destino=None, path_imagen=None, leyenda="", id_imagen=None, tabla=None, path_trabajo=None):
-        # Abrir un cuadro de diálogo para seleccionar una imagen
 
+    def agregar_imagen(self,layout_destino=None, path_imagen=None, leyenda="", id_imagen=None, tabla=None, path_trabajo=None, db=None):
+        # Abrir un cuadro de diálogo para seleccionar una imagen
+    
         if path_imagen is None:
-            print("Path trabajo:", path_trabajo)
+
             ruta_imagen, _ = QFileDialog.getOpenFileName(
                 self, 
                 "Seleccionar imagen", 
@@ -40,6 +40,8 @@ class FuncionesImagenes:
 
             if id_imagen:
                 contenedor.setProperty("id_imagen", id_imagen)
+            if tabla:
+                contenedor.setProperty("tabla", tabla)
 
             layout = QVBoxLayout(contenedor)
             
@@ -100,7 +102,9 @@ class FuncionesImagenes:
         def eliminar_imagen(self, widget):
             #self.lista_imagenes.removeWidget(widget)
             if id_imagen:
-                db = DB(host="localhost", database='seshat', user="postgres", password="ironmaiden")
+                #db = ventana_principal.obtener_conexion_db()
+                
+                #db = DB(host="localhost", database='seshat', user="postgres", password="ironmaiden")
                 db.conectar()
                 db.eliminar(f"DELETE FROM {tabla} WHERE id = %s", (id_imagen,))
                 print(f"Imagen con ID {id_imagen} eliminada de la base de datos.")
