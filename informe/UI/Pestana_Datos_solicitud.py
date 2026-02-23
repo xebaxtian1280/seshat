@@ -143,7 +143,9 @@ class PestanaDatosSolicitud(QWidget):
         self.barrio_inmueble = QLineEdit()
         
         self.cedula_catastral = QLineEdit()
+        self.numpre = QLineEdit()
         self.limitaciones = QTextEdit()
+        self.limitaciones.setFixedHeight(80)
         
         #self.limitaciones.textChanged.connect(lambda : self.resaltar_errores(self.limitaciones))
         
@@ -171,6 +173,7 @@ class PestanaDatosSolicitud(QWidget):
         self.longitud.setValue(-74.0817)
 
         self.doc_propiedad = QTextEdit()
+        self.doc_propiedad.setFixedHeight(80)
         self.doc_propiedad.setPlainText("Copia simple de la Escritura Pública No. 4126 del 26 de Noviembre de 1997, otorgada en la Notaria 2 de Bucaramanga.")
         
         self.btn_guardar_inmueble = QPushButton("Guardar informacion del Inmueble")
@@ -180,7 +183,34 @@ class PestanaDatosSolicitud(QWidget):
         # Campos jurídicos
         self.propietario = QLineEdit()
         self.id_propietario = QLineEdit()
-        
+
+        self.area_catastro = QDoubleSpinBox()
+        self.area_catastro.setRange(0, 1000000000000)
+        self.area_catastro.setDecimals(2)
+
+        self.area_documentos_juridicos = QDoubleSpinBox()
+        self.area_documentos_juridicos.setRange(0, 1000000000000)
+        self.area_documentos_juridicos.setDecimals(2)
+
+        self.area_levantamiento_topografico = QDoubleSpinBox()
+        self.area_levantamiento_topografico.setRange(0, 1000000000000)
+        self.area_levantamiento_topografico.setDecimals(2)
+
+        #Linderos
+
+        self.lindero_norte = QTextEdit()
+        self.lindero_norte.setFixedHeight(60)
+        self.lindero_sur = QTextEdit()
+        self.lindero_sur.setFixedHeight(60)
+        self.lindero_Oriental = QTextEdit()
+        self.lindero_Oriental.setFixedHeight(60)
+        self.lindero_Occidental = QTextEdit()
+        self.lindero_Occidental.setFixedHeight(60)
+
+        #Topografía
+        self.topografia = QComboBox()
+        self.topografia.addItems(["","Plana", "Ligeramente Inclinada", "Moderadamente Inclinada", "Fuertemente Inclinada", "Ligeramente Escarpada", "Moderadamente Escarpada", "Fuertemente Escarpada"])
+
         # Campos iniciales
         if id_avaluo == "":
             self.agregar_campo_documento()  # Primer campo por defecto
@@ -192,6 +222,7 @@ class PestanaDatosSolicitud(QWidget):
         right_layout.addRow("Barrio / Vereda:", self.barrio_inmueble)
         
         right_layout.addRow("Cédula Catastral:", self.cedula_catastral)
+        right_layout.addRow("Número de predial (NUMPRE):", self.numpre)
         right_layout.addRow("Modo de adquisición:", self.modo_adquisicion)
         right_layout.addRow("Limitaciones y gravámenes:", self.limitaciones)
         
@@ -199,14 +230,35 @@ class PestanaDatosSolicitud(QWidget):
         right_layout.addWidget(self.doc_propiedad)
         right_layout.addRow("Propietario:", self.propietario)
         right_layout.addRow("ID Propietario:", self.id_propietario)
+
         right_layout.addWidget(self.btn_guardar_inmueble)
         #right_layout.addWidget(self.btn_agregar_doc)
         
-        # Columna izquierda - Contenedor vertical
+        # Columna central - Datos del inmueble
+        middle_column = QVBoxLayout()
+        middle_column.addWidget(self.grupo_inmueble)
+        middle_column.addStretch()
+        
+        # Columna derecha - Áreas, linderos y mapa
         right_column = QVBoxLayout()
         
         main_layout.addLayout(left_column)
-        main_layout.addLayout(right_column) 
+        main_layout.addLayout(middle_column)
+        main_layout.addLayout(right_column)
+        
+        # Grupo para Áreas y Linderos (encima del mapa)
+        grupo_areas_linderos = QGroupBox("Áreas y Linderos")
+        grupo_areas_linderos.setStyleSheet(self.group_style)
+        areas_layout = QFormLayout(grupo_areas_linderos)
+        
+        areas_layout.addRow("Área Catastro:", self.area_catastro)
+        areas_layout.addRow("Área según documentos jurídicos:", self.area_documentos_juridicos)
+        areas_layout.addRow("Área según levantamiento topográfico:", self.area_levantamiento_topografico)
+        areas_layout.addRow("Lindero Norte:", self.lindero_norte)
+        areas_layout.addRow("Lindero Sur:", self.lindero_sur)
+        areas_layout.addRow("Lindero Oriental:", self.lindero_Oriental)
+        areas_layout.addRow("Lindero Occidental:", self.lindero_Occidental)
+        areas_layout.addRow("Topografía:", self.topografia)
                 
         # Grupo para el mapa
         grupo_mapa = QGroupBox("Ubicación Geográfica")
@@ -215,7 +267,7 @@ class PestanaDatosSolicitud(QWidget):
         
         # Widget para el mapa
         self.web_view = QWebEngineView()
-        self.web_view.setMinimumHeight(620)
+        self.web_view.setMinimumHeight(300)
         
         #Crea el Backend para la comunicación de las coodenadas
         self.backend = Backend(self)
@@ -230,11 +282,9 @@ class PestanaDatosSolicitud(QWidget):
         mapa_layout.addWidget(self.web_view)
         mapa_layout.addWidget(btn_actualizar)
         
-        # Agregar el mapa debajo del grupo del inmueble
-        main_layout.addWidget(grupo_mapa)
-        
-        # Agregar grupos a la columna izquierda
-        right_column.addWidget(self.grupo_inmueble)
+        # Agregar grupos a la columna derecha (tercera columna)
+        right_column.addWidget(grupo_areas_linderos)
+        right_column.addWidget(grupo_mapa)
         right_column.addStretch()
         
         #Agregar pestaña al Panel con barra de desplazamiento
@@ -277,7 +327,7 @@ class PestanaDatosSolicitud(QWidget):
         """
         try:
             # 1. Validar que /mnt/interval existe y es accesible
-            base_path = "/mnt/interval"
+            base_path = "/media/interval"
             if not os.path.exists(base_path):
                 return {
                     "exito": False,
@@ -341,6 +391,7 @@ class PestanaDatosSolicitud(QWidget):
             os.makedirs(os.path.join(ruta_radicado, "Cartografia"), exist_ok=True)
             os.makedirs(os.path.join(ruta_radicado,"Norma"), exist_ok=True)
             os.makedirs(os.path.join(ruta_radicado,"Ofertas"), exist_ok=True)
+            os.makedirs(os.path.join(ruta_radicado,"Ficha_Predial"), exist_ok=True)
             print(f"Carpeta de radicado creada: {ruta_radicado}")
             
             # Abrir la carpeta en el visor de archivos
@@ -413,8 +464,8 @@ class PestanaDatosSolicitud(QWidget):
                 id_matricula = widget.property("id_matricula")
                 if id_matricula:
                     db.actualizar(
-                        """UPDATE inmuebles SET tipo_inmueble=%s, direccion=%s, barrio=%s, municipio=%s, departamento=%s, cedula_catastral=%s, modo_adquicision=%s, limitaciones=%s, longitud=%s, latitud=%s, doc_propiedad=%s, propietario=%s, id_propietario=%s WHERE id_inmueble=%s """,
-                        (self.inmuebles[texto_matricula]["tipo_inmueble"], self.inmuebles[texto_matricula]["direccion"], self.inmuebles[texto_matricula]["barrio"], self.inmuebles[texto_matricula]["municipio"], self.inmuebles[texto_matricula]["departamento"], self.inmuebles[texto_matricula]["cedula_catastral"], self.inmuebles[texto_matricula]["modo_adquisicion"], self.inmuebles[texto_matricula]["limitaciones"], self.inmuebles[texto_matricula]["longitud"], self.inmuebles[texto_matricula]["latitud"], self.inmuebles[texto_matricula]["doc_propiedad"], self.inmuebles[texto_matricula]["propietario"], self.inmuebles[texto_matricula]["id_propietario"], id_matricula)
+                        """UPDATE inmuebles SET tipo_inmueble=%s, direccion=%s, barrio=%s, municipio=%s, departamento=%s, cedula_catastral=%s, modo_adquicision=%s, limitaciones=%s, longitud=%s, latitud=%s, doc_propiedad=%s, propietario=%s, id_propietario=%s, area_catastro=%s, area_documentos_juridicos=%s, area_levantamiento_topografico=%s, lindero_norte=%s, lindero_sur=%s, lindero_Oriental=%s, lindero_Occidental=%s, topografia=%s, numpre=%s WHERE id_inmueble=%s """,
+                        (self.inmuebles[texto_matricula]["tipo_inmueble"], self.inmuebles[texto_matricula]["direccion"], self.inmuebles[texto_matricula]["barrio"], self.inmuebles[texto_matricula]["municipio"], self.inmuebles[texto_matricula]["departamento"], self.inmuebles[texto_matricula]["cedula_catastral"], self.inmuebles[texto_matricula]["modo_adquisicion"], self.inmuebles[texto_matricula]["limitaciones"], self.inmuebles[texto_matricula]["longitud"], self.inmuebles[texto_matricula]["latitud"], self.inmuebles[texto_matricula]["doc_propiedad"], self.inmuebles[texto_matricula]["propietario"], self.inmuebles[texto_matricula]["id_propietario"], self.inmuebles[texto_matricula]["area_catastro"], self.inmuebles[texto_matricula]["area_documentos_juridicos"], self.inmuebles[texto_matricula]["area_levantamiento_topografico"], self.inmuebles[texto_matricula]["lindero_norte"], self.inmuebles[texto_matricula]["lindero_sur"], self.inmuebles[texto_matricula]["lindero_Oriental"], self.inmuebles[texto_matricula]["lindero_Occidental"], self.inmuebles[texto_matricula]["topografia"], self.inmuebles[texto_matricula]["numpre"], id_matricula)
                     )
 
         # Actualizar documentación aportada
@@ -440,8 +491,6 @@ class PestanaDatosSolicitud(QWidget):
             # Crear una instancia de la clase DB
             db = self.ventana_principal.obtener_conexion_db()
             db.conectar()
-            
-            
     
             # Consulta SQL para obtener los datos de la solicitud
             consulta = """
@@ -676,7 +725,7 @@ class PestanaDatosSolicitud(QWidget):
             "id_peritos": self.nombre_perito.currentData(role=Qt.ItemDataRole.UserRole),
             "id_revisor": self.nombre_revisor.currentData(role=Qt.ItemDataRole.UserRole),
             "zona": self.zona.currentText(),
-            "proceso_estado": "Visita Tecnica"
+            "proceso_estado": "Visita Tecnica",
         }
         
         # Validar campos requeridos
@@ -717,7 +766,7 @@ class PestanaDatosSolicitud(QWidget):
                     matriculas.append(texto_matricula) 
                     
                     db.insertar(
-                        """insert into inmuebles (matricula_inmobiliaria, tipo_inmueble, direccion, barrio, municipio, departamento, cedula_catastral, modo_adquicision, limitaciones, longitud, latitud, avaluo_id, doc_propiedad, propietario, id_propietario) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) returning id_inmueble """,(texto_matricula, self.inmuebles[texto_matricula]["tipo_inmueble"], self.inmuebles[texto_matricula]["direccion"], self.inmuebles[texto_matricula]["barrio"], self.inmuebles[texto_matricula]["municipio"], self.inmuebles[texto_matricula]["departamento"], self.inmuebles[texto_matricula]["cedula_catastral"], self.inmuebles[texto_matricula]["modo_adquisicion"], self.inmuebles[texto_matricula]["limitaciones"], self.inmuebles[texto_matricula]["longitud"], self.inmuebles[texto_matricula]["latitud"], id_avaluo, self.inmuebles[texto_matricula]["doc_propiedad"], self.inmuebles[texto_matricula]["propietario"], self.inmuebles[texto_matricula]["id_propietario"]))
+                        """insert into inmuebles (matricula_inmobiliaria, tipo_inmueble, direccion, barrio, municipio, departamento, cedula_catastral, modo_adquicision, limitaciones, longitud, latitud, avaluo_id, doc_propiedad, propietario, id_propietario, area_catastro, area_documentos_juridicos, area_levantamiento_topografico, lindero_norte, lindero_sur, lindero_Oriental, lindero_Occidental, topografia, numpre) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) returning id_inmueble """,(texto_matricula, self.inmuebles[texto_matricula]["tipo_inmueble"], self.inmuebles[texto_matricula]["direccion"], self.inmuebles[texto_matricula]["barrio"], self.inmuebles[texto_matricula]["municipio"], self.inmuebles[texto_matricula]["departamento"], self.inmuebles[texto_matricula]["cedula_catastral"], self.inmuebles[texto_matricula]["modo_adquisicion"], self.inmuebles[texto_matricula]["limitaciones"], self.inmuebles[texto_matricula]["longitud"], self.inmuebles[texto_matricula]["latitud"], id_avaluo, self.inmuebles[texto_matricula]["doc_propiedad"], self.inmuebles[texto_matricula]["propietario"], self.inmuebles[texto_matricula]["id_propietario"], self.inmuebles[texto_matricula]["area_catastro"], self.inmuebles[texto_matricula]["area_documentos_juridicos"], self.inmuebles[texto_matricula]["area_levantamiento_topografico"], self.inmuebles[texto_matricula]["lindero_norte"], self.inmuebles[texto_matricula]["lindero_sur"], self.inmuebles[texto_matricula]["lindero_Oriental"], self.inmuebles[texto_matricula]["lindero_Occidental"], self.inmuebles[texto_matricula]["topografia"], self.inmuebles[texto_matricula]["numpre"]))
                     
         
         # Recorrer los widgets en el contenedor correspondiente
@@ -804,7 +853,16 @@ class PestanaDatosSolicitud(QWidget):
             "avaluo_id": self.id_avaluo,
             "doc_propiedad": self.doc_propiedad.toPlainText().strip(),
             "propietario": self.propietario.text().strip(),
-            "id_propietario": self.id_propietario.text().strip()
+            "id_propietario": self.id_propietario.text().strip(),
+            "area_catastro": str(self.area_catastro.value()),
+            "area_documentos_juridicos": str(self.area_documentos_juridicos.value()),
+            "area_levantamiento_topografico": str(self.area_levantamiento_topografico.value()),
+            "lindero_norte": self.lindero_norte.toPlainText().strip(),
+            "lindero_sur": self.lindero_sur.toPlainText().strip(),
+            "lindero_Oriental": self.lindero_Oriental.toPlainText().strip(),
+            "lindero_Occidental": self.lindero_Occidental.toPlainText().strip(),
+            "topografia": self.topografia.currentText(),
+            "numpre": self.numpre.text().strip()
             }     
             
             self.inmuebles[self.matricula_actual]=inmueble_data
@@ -996,7 +1054,16 @@ class PestanaDatosSolicitud(QWidget):
                 "avaluo_id": self.id_avaluo,
                 "doc_propiedad": self.doc_propiedad.toPlainText().strip(),
                 "propietario": self.propietario.text().strip(),
-                "id_propietario": self.id_propietario.text().strip()
+                "id_propietario": self.id_propietario.text().strip(),
+                "area_catastro": str(self.area_catastro.value()),
+                "area_documentos_juridicos": str(self.area_documentos_juridicos.value()),
+                "area_levantamiento_topografico": str(self.area_levantamiento_topografico.value()),
+                "lindero_norte": self.lindero_norte.toPlainText().strip(),
+                "lindero_sur": self.lindero_sur.toPlainText().strip(),
+                "lindero_Oriental": self.lindero_Oriental.toPlainText().strip(),
+                "lindero_Occidental": self.lindero_Occidental.toPlainText().strip(),
+                "topografia": self.topografia.currentText(),
+                "numpre": self.numpre.text().strip()
                 }   
         
         auxiliar_comparar = False
@@ -1088,7 +1155,16 @@ class PestanaDatosSolicitud(QWidget):
                 "avaluo_id": self.id_avaluo,
                 "doc_propiedad": self.doc_propiedad.toPlainText().strip(),
                 "propietario": self.propietario.text().strip(),
-                "id_propietario": self.id_propietario.text().strip()
+                "id_propietario": self.id_propietario.text().strip(),
+                "area_catastro": str(self.area_catastro.value()),
+                "area_documentos_juridicos": str(self.area_documentos_juridicos.value()),
+                "area_levantamiento_topografico": str(self.area_levantamiento_topografico.value()),
+                "lindero_norte": self.lindero_norte.toPlainText().strip(),
+                "lindero_sur": self.lindero_sur.toPlainText().strip(),
+                "lindero_Oriental": self.lindero_Oriental.toPlainText().strip(),
+                "lindero_Occidental": self.lindero_Occidental.toPlainText().strip(),
+                "topografia": self.topografia.currentText(),
+                "numpre": self.numpre.text().strip()
                 }   
 
                 self.guardar_informacion_inmueble(self.matricula_actual)
@@ -1096,9 +1172,9 @@ class PestanaDatosSolicitud(QWidget):
                 db = self.ventana_principal.obtener_conexion_db()
                 db.conectar()
                 
-                query = """insert into inmuebles (matricula_inmobiliaria, tipo_inmueble, direccion, barrio, municipio, departamento, cedula_catastral, modo_adquicision, limitaciones, longitud, latitud, avaluo_id, doc_propiedad, propietario, id_propietario) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) returning id_inmueble """
+                query = """insert into inmuebles (matricula_inmobiliaria, tipo_inmueble, direccion, barrio, municipio, departamento, cedula_catastral, modo_adquicision, limitaciones, longitud, latitud, avaluo_id, doc_propiedad, propietario, id_propietario, area_catastro, area_documentos_juridicos, area_levantamiento_topografico, lindero_norte, lindero_sur, lindero_Oriental, lindero_Occidental, topografia, numpre) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) returning id_inmueble """
                     
-                id_matricula = db.insertar(query, (texto_matricula, inmueble_data["tipo_inmueble"], inmueble_data["direccion"], inmueble_data["barrio"], inmueble_data["municipio"], inmueble_data["departamento"], inmueble_data["cedula_catastral"], inmueble_data["modo_adquisicion"], inmueble_data["limitaciones"], 4.6097, -74.0817, self.id_avaluo, inmueble_data["doc_propiedad"], inmueble_data["propietario"], inmueble_data["id_propietario"]))
+                id_matricula = db.insertar(query, (texto_matricula, inmueble_data["tipo_inmueble"], inmueble_data["direccion"], inmueble_data["barrio"], inmueble_data["municipio"], inmueble_data["departamento"], inmueble_data["cedula_catastral"], inmueble_data["modo_adquisicion"], inmueble_data["limitaciones"], 4.6097, -74.0817, self.id_avaluo, inmueble_data["doc_propiedad"], inmueble_data["propietario"], inmueble_data["id_propietario"], inmueble_data["area_catastro"], inmueble_data["area_documentos_juridicos"], inmueble_data["area_levantamiento_topografico"], inmueble_data["lindero_norte"], inmueble_data["lindero_sur"], inmueble_data["lindero_Oriental"], inmueble_data["lindero_Occidental"], inmueble_data["topografia"]))
                 campo_container.setProperty("id_matricula", id_matricula)
                 
                 db.cerrar_conexion()
@@ -1226,6 +1302,7 @@ class PestanaDatosSolicitud(QWidget):
 
         
         self.cedula_catastral.setText(self.inmuebles[texto]["cedula_catastral"] if texto in self.inmuebles else "")
+        self.numpre.setText(self.inmuebles[texto]["numpre"] if texto in self.inmuebles else "")
         self.modo_adquisicion.setCurrentText(self.inmuebles[texto]["modo_adquisicion"] if texto in self.inmuebles else "")
         self.limitaciones.setPlainText(self.inmuebles[texto]["limitaciones"] if texto in self.inmuebles else "")
         self.longitud.setValue(float(self.inmuebles[texto]["longitud"]) if texto in self.inmuebles else 0)
@@ -1233,6 +1310,14 @@ class PestanaDatosSolicitud(QWidget):
         self.doc_propiedad.setPlainText(self.inmuebles[texto]["doc_propiedad"] if texto in self.inmuebles else "")
         self.propietario.setText(self.inmuebles[texto]["propietario"] if texto in self.inmuebles else "")
         self.id_propietario.setText(str(self.inmuebles[texto]["id_propietario"]) if texto in self.inmuebles else "")
+        self.area_catastro.setValue(float(self.inmuebles[texto]["area_catastro"]) if texto in self.inmuebles else 0)
+        self.area_documentos_juridicos.setValue(float(self.inmuebles[texto]["area_documentos_juridicos"]) if texto in self.inmuebles else 0)
+        self.area_levantamiento_topografico.setValue(float(self.inmuebles[texto]["area_levantamiento_topografico"]) if texto in self.inmuebles else 0)
+        self.lindero_norte.setText(self.inmuebles[texto]["lindero_norte"] if texto in self.inmuebles else "")
+        self.lindero_sur.setText(self.inmuebles[texto]["lindero_sur"] if texto in self.inmuebles else "")
+        self.lindero_Oriental.setText(self.inmuebles[texto]["lindero_Oriental"] if texto in self.inmuebles else "")
+        self.lindero_Occidental.setText(self.inmuebles[texto]["lindero_Occidental"] if texto in self.inmuebles else "")
+        self.topografia.setCurrentText(self.inmuebles[texto]["topografia"] if texto in self.inmuebles else "")
         
         if self.matricula_actual in self.inmuebles:             
              
@@ -1270,7 +1355,16 @@ class PestanaDatosSolicitud(QWidget):
                 "avaluo_id": self.id_avaluo,
                 "doc_propiedad": self.doc_propiedad.toPlainText().strip(),
                 "propietario": self.propietario.text().strip(),
-                "id_propietario": self.id_propietario.text().strip()
+                "id_propietario": self.id_propietario.text().strip(),
+                "area_catastro": str(self.area_catastro.value()),
+                "area_documentos_juridicos": str(self.area_documentos_juridicos.value()),
+                "area_levantamiento_topografico": str(self.area_levantamiento_topografico.value()),
+                "lindero_norte": self.lindero_norte.toPlainText().strip(),
+                "lindero_sur": self.lindero_sur.toPlainText().strip(),
+                "lindero_Oriental": self.lindero_Oriental.toPlainText().strip(),
+                "lindero_Occidental": self.lindero_Occidental.toPlainText().strip(),
+                "topografia": self.topografia.currentText(),
+                "numpre": self.numpre.text().strip()
                 }   
         
         if not isinstance(inmueble_data, dict):
@@ -1320,9 +1414,9 @@ class PestanaDatosSolicitud(QWidget):
                     db = self.ventana_principal.obtener_conexion_db()
                     db.conectar()
                     
-                    query = """ UPDATE inmuebles SET tipo_inmueble=%s, direccion=%s, barrio=%s, municipio=%s, departamento=%s, cedula_catastral=%s, modo_adquicision=%s, limitaciones=%s, longitud=%s, latitud=%s, doc_propiedad=%s, propietario=%s, id_propietario=%s WHERE matricula_inmobiliaria=%s AND avaluo_id=%s """
+                    query = """ UPDATE inmuebles SET tipo_inmueble=%s, direccion=%s, barrio=%s, municipio=%s, departamento=%s, cedula_catastral=%s, modo_adquicision=%s, limitaciones=%s, longitud=%s, latitud=%s, doc_propiedad=%s, propietario=%s, id_propietario=%s, area_catastro=%s, area_documentos_juridicos=%s, area_levantamiento_topografico=%s, lindero_norte=%s, lindero_sur=%s, lindero_Oriental=%s, lindero_Occidental=%s, topografia=%s, numpre=%s WHERE matricula_inmobiliaria=%s AND avaluo_id=%s """
                     
-                    db.actualizar(query, (inmueble_data["tipo_inmueble"], inmueble_data["direccion"], inmueble_data["barrio"], inmueble_data["municipio"], inmueble_data["departamento"], inmueble_data["cedula_catastral"], inmueble_data["modo_adquisicion"], inmueble_data["limitaciones"], inmueble_data["longitud"], inmueble_data["latitud"], inmueble_data["doc_propiedad"], inmueble_data["propietario"], inmueble_data["id_propietario"], matricula, self.id_avaluo))
+                    db.actualizar(query, (inmueble_data["tipo_inmueble"], inmueble_data["direccion"], inmueble_data["barrio"], inmueble_data["municipio"], inmueble_data["departamento"], inmueble_data["cedula_catastral"], inmueble_data["modo_adquisicion"], inmueble_data["limitaciones"], inmueble_data["longitud"], inmueble_data["latitud"], inmueble_data["doc_propiedad"], inmueble_data["propietario"], inmueble_data["id_propietario"],inmueble_data["area_catastro"], inmueble_data["area_documentos_juridicos"], inmueble_data["area_levantamiento_topografico"], inmueble_data["lindero_norte"], inmueble_data["lindero_sur"], inmueble_data["lindero_Oriental"], inmueble_data["lindero_Occidental"], inmueble_data["topografia"], inmueble_data["numpre"], matricula, self.id_avaluo))
                     
                     db.cerrar_conexion()
                     QMessageBox.information(
@@ -1345,8 +1439,6 @@ class PestanaDatosSolicitud(QWidget):
         else:
             print(f"Agregando nuevo inmueble con matrícula: {matricula}")
             self.inmuebles[matricula] = inmueble_data
-    
-        
     
     def cargar_inmuebles(self):
         """
@@ -1387,9 +1479,17 @@ class PestanaDatosSolicitud(QWidget):
                     "avaluo_id": registro[12],
                     "doc_propiedad": registro[13],
                     "propietario": registro[14],
-                    "id_propietario": registro[15]
-                }
-                
+                    "id_propietario": registro[15],
+                    "area_catastro": registro[16],
+                    "area_documentos_juridicos": registro[17],
+                    "area_levantamiento_topografico": registro[18],
+                    "lindero_norte": registro[19],
+                    "lindero_sur": registro[20],
+                    "lindero_Oriental": registro[21],
+                    "lindero_Occidental": registro[22],
+                    "topografia": registro[23],
+                    "numpre": registro[24]
+                }              
                 
                 # Crear el campo de texto para la matrícula
                 campo = QPushButton()
@@ -1398,6 +1498,7 @@ class PestanaDatosSolicitud(QWidget):
                 
                 # Conectar las señales usando una función auxiliar para capturar el valor actual
                 campo.clicked.connect(self.crear_focus_evento(campo))
+                print(f"Texto del botón de matrícula: {campo.text()}")
                 self.actualizar_informacion_inmueble(campo)
                 # Crear el botón de eliminar
                 btn_eliminar = QPushButton("×")

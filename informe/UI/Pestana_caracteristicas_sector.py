@@ -563,6 +563,7 @@ class PestanaCaracteristicasSector(QWidget):
 
             # Cargar usos y tratamientos del sector
             if resultado:
+                print(f"Cargando usos y tratamientos para caracteristicas_sector_id: {datos[19]}")
                 self.cargar_usos_sector(datos[19])
                 self.cargar_tratamientos_sector(datos[19])
             else:
@@ -608,7 +609,7 @@ class PestanaCaracteristicasSector(QWidget):
             resultados = db.consultar(query, (caracteristicas_sector_id,))
             for uso, path_imagen, id_imagen in resultados:
                 print(f"Cargando uso: {uso}, imagen: {path_imagen}, id: {id_imagen}")
-                FuncionesImagenes.agregar_imagen(self, self.imagenes_usos_layout, path_imagen, uso, id_imagen, 'usos_sector', ventana_principal=self.ventana_principal)
+                FuncionesImagenes.agregar_imagen(self, self.imagenes_usos_layout, path_imagen, uso, id_imagen, 'usos_sector')
 
                 
         except Exception as e:

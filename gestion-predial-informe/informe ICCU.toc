@@ -1,9 +1,0 @@
-\babel@toc {spanish}{}\relax 
-\contentsline {section}{\numberline {1} INTRODUCCIÓN }{3}{}%
-\contentsline {subsection}{\numberline {1.1} Objetivo general }{3}{}%
-\contentsline {subsection}{\numberline {1.2} Objetivo específicos }{3}{}%
-\contentsline {section}{\numberline {2} Método y alcance }{4}{}%
-\contentsline {subsection}{\numberline {2.1} Afectación predial}{4}{}%
-\contentsline {subsection}{\numberline {2.2} Elaboración de planos y fichas prediales}{4}{}%
-\contentsline {section}{\numberline {3}Memoria técnica}{5}{}%
-\contentsline {section}{\numberline {4}Conclusiones}{8}{}%

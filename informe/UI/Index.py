@@ -1,4 +1,25 @@
 import sys, os
+
+# ============================================================================
+# CONFIGURACIÓN PARA EVITAR ERRORES DE VULKAN/COMPOSITOR EN QWEBENGINEVIEW
+# ============================================================================
+# Estas variables DEBEN configurarse ANTES de importar cualquier módulo de Qt
+# Soluciona: "Backend texture is not a Vulkan texture" / "Compositor returned null texture"
+
+# Deshabilitar aceleración GPU en Chromium (usado por QWebEngineView)
+os.environ['QTWEBENGINE_CHROMIUM_FLAGS'] = '--disable-gpu --disable-software-rasterizer --no-sandbox --disable-setuid-sandbox'
+
+# Deshabilitar sandbox de Chromium (necesario en algunos sistemas Linux)
+os.environ['QTWEBENGINE_DISABLE_SANDBOX'] = '1'
+
+# Forzar rendering sin aceleración OpenGL
+os.environ['QT_XCB_GL_INTEGRATION'] = 'none'
+
+# Usar software rendering en Mesa
+os.environ['LIBGL_ALWAYS_SOFTWARE'] = '1'
+
+# ============================================================================
+
 import subprocess
 import time
 from pathlib import Path
@@ -21,7 +42,11 @@ from DB import DB
 
 from Funciones import Funciones
 
+# Configurar atributos de Qt ANTES de crear QApplication
+# Compartir contextos OpenGL entre widgets
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
+# Usar OpenGL por software (evita problemas con drivers)
+QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseSoftwareOpenGL)
 
 usuario_global = ""
 password_global = ""
@@ -230,6 +255,9 @@ class ReportApp(QMainWindow):
 
         generar_action = self.file_proyecto.addAction("Generar Informe")
         generar_action.triggered.connect(self.iniciar_generacion)
+        
+        generar_ficha_action = self.file_proyecto.addAction("Generar Ficha Predial")
+        generar_ficha_action.triggered.connect(self.iniciar_generacion_ficha_predial)
 
         menu_bar.addMenu(self.file_proyecto)
         self.file_proyecto.menuAction().setVisible(False)  # Oculto por defecto
@@ -241,8 +269,6 @@ class ReportApp(QMainWindow):
 
         self.tab_panel.currentChanged.connect(lambda: self.on_tab_changed(self.tab_panel, self.tab_panel.currentIndex()))
         self.tab_panel.tabCloseRequested.connect(lambda: self.on_tab_changed(self.tab_panel, self.tab_panel.currentIndex()))
-        
-
 
         # Crear las pestañas
 
@@ -428,6 +454,15 @@ class ReportApp(QMainWindow):
         self.timer.timeout.connect(self.actualizar_progreso)
         self.timer.start(100)
     
+    def iniciar_generacion_ficha_predial(self):
+        """Inicia el proceso de generación de la ficha predial"""
+        self.progress_bar.show()
+        self.progress_bar.setValue(0)
+        
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.actualizar_progreso_ficha)
+        self.timer.start(100)
+    
     def actualizar_progreso(self):
         current = self.progress_bar.value()
         if current < 100:
@@ -435,6 +470,15 @@ class ReportApp(QMainWindow):
         else:
             self.timer.stop()
             self.procesar_informe()
+            self.progress_bar.hide()
+    
+    def actualizar_progreso_ficha(self):
+        current = self.progress_bar.value()
+        if current < 100:
+            self.progress_bar.setValue(current + 10)
+        else:
+            self.timer.stop()
+            self.procesar_ficha_predial()
             self.progress_bar.hide()
     
     def procesar_informe(self):
@@ -510,6 +554,109 @@ class ReportApp(QMainWindow):
             QMessageBox.information(self, "Éxito", f"Informe guardado en:\n{resultado}")
         else:
             QMessageBox.critical(self, "Error", f"Error al generar informe:\n{resultado}")
+
+    def procesar_ficha_predial(self):
+        """Procesa y genera la ficha predial del inmueble"""
+        print("El id avaluo actual es:", getattr(self, 'id_avaluo', None))
+        self.id_avaluo = getattr(self, 'id_avaluo', None)
+        
+        if not self.id_avaluo:
+            QMessageBox.warning(self, "Error", "No se ha seleccionado ningún avalúo.")
+            return
+        
+        # Conectar a la base de datos
+        db = DB(host=self.db_host, database=self.basededatos, user=usuario_global, password=password_global)
+        db.conectar()
+        
+        success, resultado = False, "No se ha iniciado la generación de la ficha predial."
+        
+        try:
+            print(f"Cargando datos para la ficha predial del avalúo ID: {self.id_avaluo}")
+            
+            # Consulta SQL para obtener los datos del inmueble y avalúo
+            consulta = """
+            SELECT 
+                a.nombre_cliente,
+                a.id_cliente,
+                a.destinatario,
+                a.fecha_visita,
+                a.fecha_avaluo,
+                a.tipo_avaluo,
+                i.matricula_inmobiliaria,
+                i.tipo_inmueble,
+                i.direccion,
+                i.barrio,
+                m.nombre as municipio,
+                d.nombre as departamento,
+                i.cedula_catastral,
+                i.modo_adquicision,
+                i.area_catastro,
+                i.area_documentos_juridicos,
+                i.area_levantamiento_topografico,
+                i.propietario,
+                i.id_propietario,
+                i.lindero_norte,
+                i.lindero_sur,
+                i.lindero_Oriental,
+                i.lindero_Occidental,
+                i.doc_propiedad,
+                a.zona,
+                CONCAT(p.nombre, ' ', p.apellido) as perito_nombre,
+                p.id_peritos,
+                i.longitud,
+                i.latitud,
+                i.numpre,
+                i.limitaciones,
+                i.topografia,
+                cs.descripcion_usos,
+                us.path_imagen,
+                a.path_trabajo
+            FROM "Avaluos" a
+            LEFT JOIN inmuebles i ON a."Avaluo_id" = i.avaluo_id
+            LEFT JOIN municipios m ON i.municipio = m.id
+            LEFT JOIN departamentos d ON i.departamento = d.id
+            LEFT JOIN peritos p ON a.id_peritos = p.id_peritos
+            left join caracteristicas_sector cs on a."Avaluo_id" = cs.id_avaluo
+            left join usos_sector us  on cs.id  = us.caracteristicas_sector_id 
+            WHERE a."Avaluo_id" = %s
+            """
+            
+            resultado_consulta = db.consultar(consulta, (self.id_avaluo,))
+            
+            if not resultado_consulta:
+                QMessageBox.warning(self, "Error", "No se encontraron datos para el avalúo seleccionado.")
+                db.cerrar_conexion()
+                return
+            
+            # Determinar la ruta de guardado
+            
+            
+            self.default_save_path = resultado_consulta[0][34] or self.default_save_path
+            print("Ruta de guardado obtenida de la base de datos:", self.default_save_path)
+            
+            # Generar nombre de archivo para la ficha predial
+            ficha_path = f"{self.default_save_path}/Ficha_Predial/ficha_predial_{self.id_avaluo}.tex"
+            print("Ruta de guardado para ficha predial:", ficha_path)
+            print("Guardando ficha predial en:", ficha_path)
+            
+            # Generar la ficha predial
+            success, resultado = self.generar_ficha_predial(
+                resultado_consulta[0], 
+                "./FICHA_PREDIAL_LATEX/FICHA_V3.tex",
+                ficha_path
+            )
+            
+        except Exception as e:
+            print(f"Error al procesar la ficha predial: {e}")
+            success = False
+            resultado = str(e)
+        
+        db.cerrar_conexion()
+        
+        if success:
+            QMessageBox.information(self, "Éxito", f"Ficha predial guardada en:\n{resultado}")
+        else:
+            QMessageBox.critical(self, "Error", f"Error al generar ficha predial:\n{resultado}")
 
     def generar_informe(self, texto, template_path="Base/Informe.tex", output_name="../Resultados/informe"):
         """
@@ -587,9 +734,182 @@ class ReportApp(QMainWindow):
                  
         except FileNotFoundError:
             print("\n¡Error! Necesitas LaTeX instalado (pdflatex)")
+    
+    def generar_ficha_predial(self, datos, template_path="FICHA_PREDIAL_LATEX/FICHA_V3.tex", output_name="ficha_predial"):
+        """
+        Genera una ficha predial LaTeX desde una plantilla con los datos del inmueble.
+        
+        Args:
+            datos (tuple): Tupla con los datos del inmueble y avalúo
+            template_path (str): Ruta de la plantilla .tex
+            output_name (str): Nombre base del archivo de salida
+            
+        Returns:
+            tuple: (success: bool, resultado: str con la ruta del PDF o mensaje de error)
+        """
+        
+        try:
+            # Leer plantilla
+            with open(template_path, "r", encoding="utf-8") as f:
+                plantilla = f.read()
+        except FileNotFoundError:
+            print(f"Error: No se encontró {template_path}")
+            return False, f"No se encontró la plantilla: {template_path}"
+        
+        try:
+            # Extraer datos de la tupla
+            cliente = datos[0] or ""
+            doc_identidad = str(datos[1]) if datos[1] else ""
+            destinatario = datos[2] or ""
+            fecha_visita = datos[3].strftime("%d/%m/%Y") if datos[3] else ""
+            fecha_informe = datos[4].strftime("%d/%m/%Y") if datos[4] else ""
+            tipo_avaluo = datos[5] or ""
+            matricula = datos[6] or ""
+            tipo_inmueble = datos[7] or ""
+            direccion = datos[8] or ""
+            barrio = datos[9] or ""
+            municipio = datos[10] or ""
+            departamento = datos[11] or ""
+            cedula_catastral = datos[12] or ""
+            modo_adquisicion = datos[13] or ""
+            area_catastro = str(datos[14]) if datos[14] else "0"
+            area_documentos = str(datos[15]) if datos[15] else "0"
+            area_levantamiento = str(datos[16]) if datos[16] else "0"
+            propietario = datos[17] or ""
+            id_propietario = str(datos[18]) if datos[18] else ""
+            lindero_norte = datos[19] or ""
+            lindero_sur = datos[20] or ""
+            lindero_oriental = datos[21] or ""
+            lindero_occidental = datos[22] or ""
+            doc_propiedad = datos[23] or ""
+            zona = datos[24] or ""
+            perito = datos[25] or ""
+            tarjeta_profesional = str(datos[26]) if datos[26] else ""
+            longitud = str(datos[27]) if datos[27] else ""
+            latitud = str(datos[28]) if datos[28] else ""
+            numpre = str(datos[29]) if datos[29] else ""
+            limitaciones = datos[30] or ""
+            topografia = datos[31] or ""
+            usos = datos[32] or ""
+            path_imagen_uso = datos[33] or ""
+            
+            # Función auxiliar para escapar caracteres especiales de LaTeX
+            def escapar_latex(texto):
+                if not texto:
+                    return ""
+                texto = str(texto)
+                # Reemplazos básicos para LaTeX
+                replacements = {
+                    '&': r'\&',
+                    '%': r'\%',
+                    '$': r'\$',
+                    '#': r'\#',
+                    '_': r'\_',
+                    '{': r'\{',
+                    '}': r'\}',
+                    '~': r'\textasciitilde{}',
+                    '^': r'\^{}',
+                    '\\': r'\textbackslash{}',
+                }
+                for old, new in replacements.items():
+                    texto = texto.replace(old, new)
+                return texto
+            
+            # Reemplazar marcadores en la plantilla
+            ficha_final = plantilla.replace("%CLIENTE%", escapar_latex(cliente))
+            ficha_final = ficha_final.replace("%DOCUMENTO_ID%", escapar_latex(doc_identidad))
+            ficha_final = ficha_final.replace("%DESTINATARIO%", escapar_latex(destinatario))
+            ficha_final = ficha_final.replace("%FECHA_VISITA%", escapar_latex(fecha_visita))
+            ficha_final = ficha_final.replace("%FECHA_INFORME%", escapar_latex(fecha_informe))
+            ficha_final = ficha_final.replace("%TIPO_AVALUO%", escapar_latex(tipo_avaluo))
+            ficha_final = ficha_final.replace("%MATRICULA%", escapar_latex(matricula))
+            ficha_final = ficha_final.replace("%TIPO_INMUEBLE%", escapar_latex(tipo_inmueble))
+            ficha_final = ficha_final.replace("%DIRECCION%", escapar_latex(direccion))
+            ficha_final = ficha_final.replace("%BARRIO%", escapar_latex(barrio))
+            ficha_final = ficha_final.replace("%MUNICIPIO%", escapar_latex(municipio))
+            ficha_final = ficha_final.replace("%DEPARTAMENTO%", escapar_latex(departamento))
+            ficha_final = ficha_final.replace("%CEDULA_CATASTRAL%", escapar_latex(cedula_catastral))
+            ficha_final = ficha_final.replace("%MODO_ADQUISICION%", escapar_latex(modo_adquisicion))
+            ficha_final = ficha_final.replace("%AREA_CATASTRO%", escapar_latex(area_catastro))
+            ficha_final = ficha_final.replace("%AREA_DOCUMENTOS%", escapar_latex(area_documentos))
+            ficha_final = ficha_final.replace("%AREA_LEVANTAMIENTO%", escapar_latex(area_levantamiento))
+            ficha_final = ficha_final.replace("%PROPIETARIO%", escapar_latex(propietario))
+            ficha_final = ficha_final.replace("%ID_PROPIETARIO%", escapar_latex(id_propietario))
+            ficha_final = ficha_final.replace("%LINDERO_NORTE%", escapar_latex(lindero_norte))
+            ficha_final = ficha_final.replace("%LINDERO_SUR%", escapar_latex(lindero_sur))
+            ficha_final = ficha_final.replace("%LINDERO_ORIENTAL%", escapar_latex(lindero_oriental))
+            ficha_final = ficha_final.replace("%LINDERO_OCCIDENTAL%", escapar_latex(lindero_occidental))
+            ficha_final = ficha_final.replace("%DOC_PROPIEDAD%", escapar_latex(doc_propiedad))
+            ficha_final = ficha_final.replace("%ZONA%", escapar_latex(zona))
+            ficha_final = ficha_final.replace("%PERITO%", escapar_latex(perito))
+            ficha_final = ficha_final.replace("%TARJETA_PROFESIONAL%", escapar_latex(tarjeta_profesional))
+            ficha_final = ficha_final.replace("%LONGITUD%", escapar_latex(longitud))
+            ficha_final = ficha_final.replace("%LATITUD%", escapar_latex(latitud))
+            ficha_final = ficha_final.replace("%NUMPRE%", escapar_latex(numpre))
+            ficha_final = ficha_final.replace("%LIMITACIONES%", escapar_latex(limitaciones))
+            ficha_final = ficha_final.replace("%TOPOGRAFIA%", escapar_latex(topografia))
+            ficha_final = ficha_final.replace("%USOS%", escapar_latex(usos))
+            ficha_final = ficha_final.replace("%PATH_IMAGEN_USO%", escapar_latex(path_imagen_uso))
+            
+            # Guardar archivo .tex
+            with open(output_name, "w", encoding="utf-8") as f:
+                f.write(ficha_final)
+            print(f"Archivo .tex guardado en {output_name}")
+            
+            # Compilar el archivo .tex a PDF
+            print(f"Compilando {output_name} a PDF...")
+            directorio_trabajo = os.path.dirname(os.path.abspath(output_name))
+            
+            # Ejecutar pdflatex dos veces para resolver referencias cruzadas
+            subprocess.run(
+                ["pdflatex", "-interaction=nonstopmode", os.path.basename(output_name)], 
+                check=True, 
+                cwd=directorio_trabajo,
+                capture_output=True
+            )
+            subprocess.run(
+                ["pdflatex", "-interaction=nonstopmode", os.path.basename(output_name)], 
+                check=True, 
+                cwd=directorio_trabajo,
+                capture_output=True
+            )
+            
+            pdf_path = output_name.replace('.tex', '.pdf')
+            print(f"PDF generado correctamente: {pdf_path}")
+            
+            # Limpiar archivos auxiliares
+            base_name = output_name.replace('.tex', '')
+            for ext in [".aux", ".log", ".out", ".toc"]:
+                archivo_aux = f"{base_name}{ext}"
+                if os.path.exists(archivo_aux):
+                    try:
+                        os.remove(archivo_aux)
+                    except:
+                        pass
+            
+            return True, pdf_path
+            
+        except subprocess.CalledProcessError as e:
+            print(f"Error al compilar el archivo .tex: {e}")
+            return False, "Error al compilar el documento con pdflatex"
+        except FileNotFoundError:
+            print("Error: El comando 'pdflatex' no se encontró.")
+            return False, "pdflatex no está instalado o no está en el PATH"
+        except Exception as e:
+            print(f"Error inesperado al generar ficha predial: {e}")
+            return False, str(e)
         
 if __name__ == "__main__":
+    # Crear aplicación Qt
     app = QApplication(sys.argv)
+    
+    # Configuración adicional para QWebEngineView
+    # Esto ayuda a prevenir errores de rendering
+    app.setApplicationName("Seshat - Sistema de Avalúos")
+    app.setOrganizationName("Interval")
+    
+    print("[INFO] Aplicación iniciada con configuración anti-Vulkan")
+    print(f"[INFO] Qt Version: {app.applicationVersion()}")
     
     # Mostrar diálogo de login
     login_dialog = LoginDialog()
