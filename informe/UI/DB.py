@@ -14,14 +14,15 @@ class DB:
 
     def conectar(self):
         """
-        Conecta a la base de datos PostgreSQL.
+        Conecta a la base de datos PostgreSQL con encoding UTF-8.
         """
         try:
             self.connection = psycopg2.connect(
                 host=self.host,
                 database=self.database,
                 user=self.user,
-                password=self.password
+                password=self.password,
+                client_encoding='UTF8'
             )
             print("Conexión exitosa a la base de datos.")
             return True
@@ -86,6 +87,7 @@ class DB:
                 cursor.execute(query, valores)
                 self.connection.commit()
                 print("Registro actualizado exitosamente.")
+                print(f"Consulta ejecutada: {query} {valores}")
         except psycopg2.Error as e:
             print(f"Error al actualizar el registro: {e}")
             self.connection.rollback()

@@ -385,6 +385,7 @@ class PestanaDatosSolicitud(QWidget):
                     "ruta": ruta_radicado
                 }
             
+            
             os.makedirs(ruta_radicado, exist_ok=True)
             os.makedirs(os.path.join(ruta_radicado, "Documentos"), exist_ok=True)
             os.makedirs(os.path.join(ruta_radicado, "Registro_Fotografico"), exist_ok=True)
@@ -441,6 +442,38 @@ class PestanaDatosSolicitud(QWidget):
             QMessageBox.warning(self, "Campos incompletos", "Por favor complete todos los campos requeridos.")
             return
 
+        # Guardar los cambios actuales de la matrícula en edición en el diccionario
+        if self.matricula_actual and self.matricula_actual in self.inmuebles:
+            inmueble_data_actual = {
+                "tipo_inmueble": self.tipo_inmueble.currentText(),
+                "direccion": self.direccion_inmueble.text().strip(),
+                "barrio": self.barrio_inmueble.text().strip(),
+                "municipio": self.municipio_inmueble.currentData(role=Qt.ItemDataRole.UserRole),
+                "departamento": self.departamento_inmueble.currentData(role=Qt.ItemDataRole.UserRole),
+                "cedula_catastral": self.cedula_catastral.text().strip(),
+                "modo_adquisicion": self.modo_adquisicion.currentText(),
+                "limitaciones": self.limitaciones.toPlainText().strip(),
+                "longitud": str(self.longitud.value()),
+                "latitud": str(self.latitud.value()),
+                "avaluo_id": self.id_avaluo,
+                "doc_propiedad": self.doc_propiedad.toPlainText().strip(),
+                "propietario": self.propietario.text().strip(),
+                "id_propietario": self.id_propietario.text().strip(),
+                "area_catastro": str(self.area_catastro.value()),
+                "area_documentos_juridicos": str(self.area_documentos_juridicos.value()),
+                "area_levantamiento_topografico": str(self.area_levantamiento_topografico.value()),
+                "lindero_norte": self.lindero_norte.toPlainText().strip(),
+                "lindero_sur": self.lindero_sur.toPlainText().strip(),
+                "lindero_Oriental": self.lindero_Oriental.toPlainText().strip(),
+                "lindero_Occidental": self.lindero_Occidental.toPlainText().strip(),
+                "topografia": self.topografia.currentText(),
+                "numpre": self.numpre.text().strip(),
+                "zona": self.zona.currentData(role=Qt.ItemDataRole.UserRole)
+            }
+            # Actualizar el diccionario con los datos actuales
+            self.inmuebles[self.matricula_actual].update(inmueble_data_actual)
+            print(f"Datos actualizados en diccionario para matrícula {self.matricula_actual}")
+
         # Usar credenciales del usuario autenticado
         db = None
         #if self.ventana_principal:
@@ -458,15 +491,20 @@ class PestanaDatosSolicitud(QWidget):
 
         # Actualizar inmuebles asociados
         for i in range(self.matricula_layout.count()):
-            widget = self.matricula_layout.itemAt(i).widget().findChild(QPushButton)
+            campo_container = self.matricula_layout.itemAt(i).widget()
+            widget = campo_container.findChild(QPushButton)
             if isinstance(widget, QPushButton):
                 texto_matricula = widget.text().strip()
-                id_matricula = widget.property("id_matricula")
+                id_matricula = campo_container.property("id_matricula")  # Recuperar del contenedor
                 if id_matricula:
+                    print(f"Actualizando inmueble con matrícula {texto_matricula} (ID: {id_matricula})")
                     db.actualizar(
                         """UPDATE inmuebles SET tipo_inmueble=%s, direccion=%s, barrio=%s, municipio=%s, departamento=%s, cedula_catastral=%s, modo_adquicision=%s, limitaciones=%s, longitud=%s, latitud=%s, doc_propiedad=%s, propietario=%s, id_propietario=%s, area_catastro=%s, area_documentos_juridicos=%s, area_levantamiento_topografico=%s, lindero_norte=%s, lindero_sur=%s, lindero_Oriental=%s, lindero_Occidental=%s, topografia=%s, numpre=%s WHERE id_inmueble=%s """,
                         (self.inmuebles[texto_matricula]["tipo_inmueble"], self.inmuebles[texto_matricula]["direccion"], self.inmuebles[texto_matricula]["barrio"], self.inmuebles[texto_matricula]["municipio"], self.inmuebles[texto_matricula]["departamento"], self.inmuebles[texto_matricula]["cedula_catastral"], self.inmuebles[texto_matricula]["modo_adquisicion"], self.inmuebles[texto_matricula]["limitaciones"], self.inmuebles[texto_matricula]["longitud"], self.inmuebles[texto_matricula]["latitud"], self.inmuebles[texto_matricula]["doc_propiedad"], self.inmuebles[texto_matricula]["propietario"], self.inmuebles[texto_matricula]["id_propietario"], self.inmuebles[texto_matricula]["area_catastro"], self.inmuebles[texto_matricula]["area_documentos_juridicos"], self.inmuebles[texto_matricula]["area_levantamiento_topografico"], self.inmuebles[texto_matricula]["lindero_norte"], self.inmuebles[texto_matricula]["lindero_sur"], self.inmuebles[texto_matricula]["lindero_Oriental"], self.inmuebles[texto_matricula]["lindero_Occidental"], self.inmuebles[texto_matricula]["topografia"], self.inmuebles[texto_matricula]["numpre"], id_matricula)
                     )
+                    print(f"✓ Inmueble {texto_matricula} actualizado correctamente")
+                else:
+                    print(f"⚠️ No se encontró id_matricula para {texto_matricula}, no se actualizará en BD")
 
         # Actualizar documentación aportada
         for i in range(self.documentacion_layout.count()):
@@ -481,6 +519,7 @@ class PestanaDatosSolicitud(QWidget):
 
         db.cerrar_conexion()
         print("Información de la solicitud actualizada correctamente.")
+
 
     def cargar_datos_solicitud(self, id_avaluo):
         """
@@ -1508,6 +1547,7 @@ class PestanaDatosSolicitud(QWidget):
                 
                 # Contenedor para el campo y el botón
                 campo_container = QWidget()
+                print(f"Cargando el ID del inmueble (matrícula {matricula}): {registro[0]}")  # Imprimir el ID del inmueble
                 campo_container.setProperty("id_matricula", registro[0])  # Almacenar el ID del inmueble en el contenedor
                 layout_container = QHBoxLayout(campo_container)
                 layout_container.addWidget(campo)

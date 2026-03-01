@@ -622,6 +622,7 @@ class ReportApp(QMainWindow):
             """
             
             resultado_consulta = db.consultar(consulta, (self.id_avaluo,))
+            print(f"Resultado de la consulta para ficha predial: {resultado_consulta}")
             
             if not resultado_consulta:
                 QMessageBox.warning(self, "Error", "No se encontraron datos para el avalúo seleccionado.")
@@ -641,7 +642,7 @@ class ReportApp(QMainWindow):
             
             # Generar la ficha predial
             success, resultado = self.generar_ficha_predial(
-                resultado_consulta[0], 
+                resultado_consulta, 
                 "./FICHA_PREDIAL_LATEX/FICHA_V3.tex",
                 ficha_path
             )
@@ -758,61 +759,75 @@ class ReportApp(QMainWindow):
         
         try:
             # Extraer datos de la tupla
-            cliente = datos[0] or ""
-            doc_identidad = str(datos[1]) if datos[1] else ""
-            destinatario = datos[2] or ""
-            fecha_visita = datos[3].strftime("%d/%m/%Y") if datos[3] else ""
-            fecha_informe = datos[4].strftime("%d/%m/%Y") if datos[4] else ""
-            tipo_avaluo = datos[5] or ""
-            matricula = datos[6] or ""
-            tipo_inmueble = datos[7] or ""
-            direccion = datos[8] or ""
-            barrio = datos[9] or ""
-            municipio = datos[10] or ""
-            departamento = datos[11] or ""
-            cedula_catastral = datos[12] or ""
-            modo_adquisicion = datos[13] or ""
-            area_catastro = str(datos[14]) if datos[14] else "0"
-            area_documentos = str(datos[15]) if datos[15] else "0"
-            area_levantamiento = str(datos[16]) if datos[16] else "0"
-            propietario = datos[17] or ""
-            id_propietario = str(datos[18]) if datos[18] else ""
-            lindero_norte = datos[19] or ""
-            lindero_sur = datos[20] or ""
-            lindero_oriental = datos[21] or ""
-            lindero_occidental = datos[22] or ""
-            doc_propiedad = datos[23] or ""
-            zona = datos[24] or ""
-            perito = datos[25] or ""
-            tarjeta_profesional = str(datos[26]) if datos[26] else ""
-            longitud = str(datos[27]) if datos[27] else ""
-            latitud = str(datos[28]) if datos[28] else ""
-            numpre = str(datos[29]) if datos[29] else ""
-            limitaciones = datos[30] or ""
-            topografia = datos[31] or ""
-            usos = datos[32] or ""
-            path_imagen_uso = datos[33] or ""
+            cliente = datos[0][0] or ""
+            doc_identidad = str(datos[0][1]) if datos[0][1] else ""
+            destinatario = datos[0][2] or ""
+            fecha_visita = datos[0][3].strftime("%d/%m/%Y") if datos[0][3] else ""
+            fecha_informe = datos[0][4].strftime("%d/%m/%Y") if datos[0][4] else ""
+            tipo_avaluo = datos[0][5] or ""
+            matricula = datos[0][6] or ""
+            tipo_inmueble = datos[0][7] or ""
+            direccion = datos[0][8] or ""
+            barrio = datos[0][9] or ""
+            municipio = datos[0][10] or ""
+            departamento = datos[0][11] or ""
+            cedula_catastral = datos[0][12] or ""
+            modo_adquisicion = datos[0][13] or ""
+            area_catastro = str(datos[0][14]) if datos[0][14] else "0"
+            area_documentos = str(datos[0][15]) if datos[0][15] else "0"
+            area_levantamiento = str(datos[0][16]) if datos[0][16] else "0"
+            propietario = datos[0][17] or ""
+            id_propietario = str(datos[0][18]) if datos[0][18] else ""
+            lindero_norte = datos[0][19] or ""
+            lindero_sur = datos[0][20] or ""
+            lindero_oriental = datos[0][21] or ""
+            lindero_occidental = datos[0][22] or ""
+            doc_propiedad = datos[0][23] or ""
+            zona = datos[0][24] or ""
+            perito = datos[0][25] or ""
+            tarjeta_profesional = str(datos[0][26]) if datos[0][26] else ""
+            longitud = str(datos[0][27]) if datos[0][27] else ""
+            latitud = str(datos[0][28]) if datos[0][28] else ""
+            numpre = str(datos[0][29]) if datos[0][29] else ""
+            limitaciones = datos[0][30] or ""
+            topografia = datos[0][31] or ""
+            usos = datos[0][32] or ""
+            path_imagen_afectado = datos[0][33] or ""
+            path_imagen_usos = datos[1][33] or ""
             
             # Función auxiliar para escapar caracteres especiales de LaTeX
             def escapar_latex(texto):
+                """
+                Escapa caracteres especiales de LaTeX preservando UTF-8.
+                No toca caracteres del español como Ñ, á, é, í, ó, ú.
+                """
                 if not texto:
                     return ""
-                texto = str(texto)
+                
+                # Asegurar que es string y preservar UTF-8
+                if isinstance(texto, bytes):
+                    texto = texto.decode('utf-8', errors='replace')
+                elif not isinstance(texto, str):
+                    texto = str(texto)
+                
                 # Reemplazos básicos para LaTeX
-                replacements = {
-                    '&': r'\&',
-                    '%': r'\%',
-                    '$': r'\$',
-                    '#': r'\#',
-                    '_': r'\_',
-                    '{': r'\{',
-                    '}': r'\}',
-                    '~': r'\textasciitilde{}',
-                    '^': r'\^{}',
-                    '\\': r'\textbackslash{}',
-                }
-                for old, new in replacements.items():
+                # IMPORTANTE: El orden importa - backslash primero
+                replacements = [
+                    ('\\', r'\textbackslash{}'),
+                    ('&', r'\&'),
+                    ('%', r'\%'),
+                    ('$', r'\$'),
+                    ('#', r'\#'),
+                    ('_', r'\_'),
+                    ('{', r'\{'),
+                    ('}', r'\}'),
+                    ('~', r'\textasciitilde{}'),
+                    ('^', r'\^{}'),
+                ]
+                
+                for old, new in replacements:
                     texto = texto.replace(old, new)
+                
                 return texto
             
             # Reemplazar marcadores en la plantilla
@@ -849,7 +864,8 @@ class ReportApp(QMainWindow):
             ficha_final = ficha_final.replace("%LIMITACIONES%", escapar_latex(limitaciones))
             ficha_final = ficha_final.replace("%TOPOGRAFIA%", escapar_latex(topografia))
             ficha_final = ficha_final.replace("%USOS%", escapar_latex(usos))
-            ficha_final = ficha_final.replace("%PATH_IMAGEN_USO%", escapar_latex(path_imagen_uso))
+            ficha_final = ficha_final.replace("%PATH_IMAGEN_AFECTADO%", path_imagen_afectado)
+            ficha_final = ficha_final.replace("%PATH_IMAGEN_USOS%", path_imagen_usos)
             
             # Guardar archivo .tex
             with open(output_name, "w", encoding="utf-8") as f:

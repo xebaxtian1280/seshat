@@ -57,9 +57,13 @@ class PestanaCaracteristicasSector(QWidget):
         form_delimitacion = QFormLayout(grupo_delimitacion)
         
         self.norte = QLineEdit()
+        self.norte.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.sur = QLineEdit()
+        self.sur.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.oriente = QLineEdit()
+        self.oriente.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.occidente = QLineEdit()
+        self.occidente.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         
         form_delimitacion.addRow("Norte:", self.norte)
         form_delimitacion.addRow("Sur:", self.sur)
@@ -81,6 +85,7 @@ class PestanaCaracteristicasSector(QWidget):
             "Las vı́as principal más importantes de la zona corresponden a la carrera 15 y calle 3. Se desplaza un alto flujo vehicular y se desarrolla la mayor actividad comercial de la zona, en general se encuentra en buen estado de conservación."
         )
         self.vias_principales_texto.setFixedHeight(altura_textos)
+        self.vias_principales_texto.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         form_vias.addRow("Principales", self.vias_principales_texto)
         
         self.vias_secundarias_texto = QTextEdit()
@@ -88,6 +93,7 @@ class PestanaCaracteristicasSector(QWidget):
             "Cuenta con vı́as para acceder al sector, como la Calle 9 y Carrera 19. Se encuentran en buen estado de conservación."
         )
         self.vias_secundarias_texto.setFixedHeight(altura_textos)
+        self.vias_secundarias_texto.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         form_vias.addRow("Secundarias", self.vias_secundarias_texto)
         
         self.transporte_texto = QTextEdit()
@@ -95,6 +101,7 @@ class PestanaCaracteristicasSector(QWidget):
             "El servicio de transporte público es suministrado principalmente por buses, busetas, colectivos y taxis, que comunican a los diferentes puntos del municipio."
         )
         self.transporte_texto.setFixedHeight(altura_textos)
+        self.transporte_texto.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         form_vias.addRow("Trasnporte", self.transporte_texto)
         
         left_column.addWidget(grupo_vias)
@@ -108,6 +115,7 @@ class PestanaCaracteristicasSector(QWidget):
            
         self.amoblamiento_texto = QTextEdit()
         self.amoblamiento_texto.setFixedHeight(altura_textos)
+        self.amoblamiento_texto.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         layout_amoblamiento.addWidget(self.amoblamiento_texto)
         
         # Nuevo Grupo: Servicios Públicos
@@ -162,6 +170,7 @@ class PestanaCaracteristicasSector(QWidget):
             "Por el cual se adopta el Plan de Ordenamiento Territorial de segunda generación del Municipio de XXXXX."
         )
         self.instrumentos_ot.setFixedHeight(100)
+        self.instrumentos_ot.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         
         # Subgrupo Usos
 
@@ -179,6 +188,7 @@ class PestanaCaracteristicasSector(QWidget):
         
         # Descripción
         self.descripcion_usos = QTextEdit()
+        self.descripcion_usos.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         form_usos.addRow("Descripción:", self.descripcion_usos)
         
         # Imágenes
@@ -217,7 +227,8 @@ class PestanaCaracteristicasSector(QWidget):
         # Descripción tratamientos
         self.descripcion_tratamientos = QTextEdit()
         self.descripcion_tratamientos.setPlainText("De acuerdo con la consulta del POT, el predio se encuentra ubicado en una zona de tratamiento de xxxxxxxxx.")
-        self.descripcion_tratamientos.setFixedHeight(100)        
+        self.descripcion_tratamientos.setFixedHeight(100)
+        self.descripcion_tratamientos.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)        
         form_tratamientos.addRow("Descripción:", self.descripcion_tratamientos)
         
         # Imágenes tratamientos
@@ -260,11 +271,18 @@ class PestanaCaracteristicasSector(QWidget):
         main_layout.addWidget(grupo_norma)
               
         
-        # Establecer política de tamaño para que se expanda verticalmente
+        # Establecer política de tamaño para que se ajuste al ancho del scroll area
         contenido.setSizePolicy(
-            QSizePolicy.Policy.Expanding, 
+            QSizePolicy.Policy.Preferred, 
             QSizePolicy.Policy.MinimumExpanding
         )
+        
+        # Establecer anchos máximos en los grupos para que se ajusten
+        grupo_delimitacion.setMaximumWidth(600)
+        grupo_vias.setMaximumWidth(600)
+        grupo_amoblamiento.setMaximumWidth(600)
+        grupo_servicios.setMaximumWidth(600)
+        grupo_norma.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         
         # Agregar el scroll area al layout de la pestaña
         pestana_layout = QVBoxLayout(pestana)
@@ -494,8 +512,8 @@ class PestanaCaracteristicasSector(QWidget):
             # Si la pestaña estuvo activa y se cambió a otra pestaña, guardar los datos
             
             try:
-                if self.amoblamiento_texto.toPlainText().strip() != "":                    
-                    self.guardar_datos()
+                                   
+                    self.guardar_datos()   
                     
             except Exception as e:
                 print(f"Error al guardar datos: {e}")
@@ -607,6 +625,7 @@ class PestanaCaracteristicasSector(QWidget):
             WHERE caracteristicas_sector_id = %s
             """
             resultados = db.consultar(query, (caracteristicas_sector_id,))
+            print(f"Resultados obtenidos para usos_sector: {resultados}")
             for uso, path_imagen, id_imagen in resultados:
                 print(f"Cargando uso: {uso}, imagen: {path_imagen}, id: {id_imagen}")
                 FuncionesImagenes.agregar_imagen(self, self.imagenes_usos_layout, path_imagen, uso, id_imagen, 'usos_sector')
